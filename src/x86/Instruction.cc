@@ -7,6 +7,7 @@ namespace bamf::x86 {
 
 void Instruction::dump() {
     std::stringstream ss;
+    ss << std::hex << m_offset << ": " << std::dec;
     switch (m_opcode) {
     case Opcode::MovRegImm:
         ss << "mov ";

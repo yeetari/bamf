@@ -21,6 +21,7 @@ private:
     Opcode m_opcode;
     Register m_reg;
     std::size_t m_imm;
+    std::uintptr_t m_offset;
 
     int m_bit_width{32};
 

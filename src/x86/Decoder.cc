@@ -24,12 +24,14 @@ Decoder::Decoder(InputStream *stream) : m_stream(stream) {
 
 Instruction Decoder::next_inst() {
     Instruction inst;
+    inst.m_offset = m_stream->bytes_read();
     assert(m_stream->has_more());
 
     auto byte = m_stream->read<std::uint8_t>();
     bool has_prefix = true;
     switch (byte) {
     case 0x66:
+        // Operand size override
         inst.m_bit_width = 16;
         break;
     default:
