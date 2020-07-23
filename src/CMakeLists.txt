@@ -1,4 +1,5 @@
 add_library(bamf
+    io/ElfLoader.cc
     io/InputFile.cc
     support/Stream.cc
     x86/Decoder.cc
