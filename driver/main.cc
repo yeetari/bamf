@@ -1,4 +1,5 @@
 #include <bamf/core/Executable.hh>
+#include <bamf/io/ElfLoader.hh>
 #include <bamf/io/InputFile.hh>
 #include <bamf/support/Stream.hh>
 #include <bamf/x86/Decoder.hh>
@@ -41,6 +42,8 @@ int main(int argc, char **argv) {
     if (file_type == "bin") {
         executable.code = file.get<char>(0);
         executable.code_size = file.size();
+    } else if (file_type == "elf") {
+        load_elf_exec(file, &executable);
     } else {
         throw std::runtime_error("Unknown file type " + file_type);
     }
