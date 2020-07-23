@@ -1,4 +1,6 @@
 #include <bamf/io/InputFile.hh>
+#include <bamf/io/InputStream.hh>
+#include <bamf/x86/Decoder.hh>
 
 #include <iostream>
 
@@ -18,10 +20,17 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    std::cerr << "Parsing: " << std::hex;
+    std::cerr << "Decoding: " << std::hex;
     InputFile input(argv[1]);
     for (char ch : input) {
         std::cerr << (static_cast<int>(ch) & 0xFF) << ' ';
     }
     std::cerr << '\n';
+
+    InputStream stream(input);
+    x86::Decoder decoder(&stream);
+    while (stream.has_more()) {
+        auto inst = decoder.next_inst();
+        inst.dump();
+    }
 }
