@@ -30,6 +30,7 @@ int main(int argc, char **argv) {
     InputStream stream(input);
     x86::Decoder decoder(&stream);
     while (stream.has_more()) {
+        std::cout << std::hex << stream.bytes_read() << ": " << std::dec;
         auto inst = decoder.next_inst();
         inst.dump();
     }
