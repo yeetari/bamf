@@ -6,7 +6,7 @@
 
 namespace bamf {
 
-class InputStream;
+class Stream;
 
 } // namespace bamf
 
@@ -18,14 +18,14 @@ struct InstructionInfo {
 };
 
 class Decoder {
-    InputStream *const m_stream;
+    Stream *const m_stream;
     InstructionInfo m_table[256]{};
 
 public:
     BAMF_MAKE_NON_COPYABLE(Decoder)
     BAMF_MAKE_NON_MOVABLE(Decoder)
 
-    Decoder(InputStream *stream);
+    Decoder(Stream *stream);
 
     Instruction next_inst();
 };

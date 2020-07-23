@@ -1,6 +1,6 @@
 #include <bamf/x86/Decoder.hh>
 
-#include <bamf/io/InputStream.hh>
+#include <bamf/support/Stream.hh>
 #include <bamf/x86/Register.hh>
 
 #include <cassert>
@@ -10,7 +10,7 @@
 
 namespace bamf::x86 {
 
-Decoder::Decoder(InputStream *stream) : m_stream(stream) {
+Decoder::Decoder(Stream *stream) : m_stream(stream) {
     // mov r16, imm16 (B8+ rw iw)
     // mov r32, imm32 (B8+ rd id)
     // mov r64, imm64 (REX.W + B8+ rd io)

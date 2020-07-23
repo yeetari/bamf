@@ -1,6 +1,6 @@
 #include <bamf/core/Executable.hh>
 #include <bamf/io/InputFile.hh>
-#include <bamf/io/InputStream.hh>
+#include <bamf/support/Stream.hh>
 #include <bamf/x86/Decoder.hh>
 
 #include <iostream>
@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
     }
     std::cerr << '\n' << std::dec;
 
-    InputStream stream(file);
+    Stream stream(executable.code, executable.code_size);
     x86::Decoder decoder(&stream);
     while (stream.has_more()) {
         auto inst = decoder.next_inst();
