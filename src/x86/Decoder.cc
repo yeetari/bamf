@@ -26,7 +26,18 @@ Instruction Decoder::next_inst() {
     Instruction inst;
     assert(m_stream->has_more());
 
-    auto opcode = m_stream->read<std::uint8_t>();
+    auto byte = m_stream->read<std::uint8_t>();
+    bool has_prefix = true;
+    switch (byte) {
+    case 0x66:
+        inst.m_bit_width = 16;
+        break;
+    default:
+        has_prefix = false;
+        break;
+    }
+
+    auto opcode = has_prefix ? m_stream->read<std::uint8_t>() : byte;
     auto &info = m_table[opcode];
     if (!info.present) {
         std::stringstream ss;
@@ -39,7 +50,7 @@ Instruction Decoder::next_inst() {
     case 0xB8:
         inst.m_opcode = Opcode::MovRegImm;
         inst.m_reg = static_cast<Register>(opcode - info.base_op);
-        inst.m_imm = m_stream->read<std::uint32_t>();
+        inst.m_imm = inst.m_bit_width == 16 ? m_stream->read<std::uint16_t>() : m_stream->read<std::uint32_t>();
         break;
     case 0xC3:
         inst.m_opcode = Opcode::Ret;
