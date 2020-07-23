@@ -11,10 +11,10 @@ InputFile::InputFile(const char *path) {
         throw std::runtime_error("Failed to open file " + std::string(path) + "!");
     }
 
-    const auto size = file.tellg();
-    m_data.resize(size);
+    m_size = file.tellg();
+    m_data.resize(m_size);
     file.seekg(0);
-    file.read(m_data.data(), size);
+    file.read(m_data.data(), m_size);
 }
 
 } // namespace bamf
