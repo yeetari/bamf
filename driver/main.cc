@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
     }
 
     std::string file_name;
-    std::string file_type("bin");
+    std::string file_type;
     for (int i = 1; i < argc; i++) {
         std::string arg(argv[i]);
         if (arg.starts_with("-f")) {
@@ -36,9 +36,15 @@ int main(int argc, char **argv) {
         }
     }
 
+    bool file_type_detected = false;
+    if (file_type.empty()) {
+        file_type = file_name.substr(file_name.find_last_of('.') + 1);
+        file_type_detected = true;
+    }
+
     Executable executable{};
     InputFile file(file_name.c_str());
-    std::cerr << "Decoding " << file_name << " as " << file_type << '\n';
+    std::cerr << "Decoding " << file_name << " as " << file_type << (file_type_detected ? " (detected)\n" : "\n");
     if (file_type == "bin") {
         executable.code = file.get<char>(0);
         executable.code_size = file.size();
