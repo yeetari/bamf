@@ -1,6 +1,5 @@
 add_library(bamf
     io/InputFile.cc
-    io/InputStream.cc
     support/Stream.cc
     x86/Decoder.cc
     x86/Instruction.cc
