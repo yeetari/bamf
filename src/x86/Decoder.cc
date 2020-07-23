@@ -20,6 +20,10 @@ Decoder::Decoder(InputStream *stream) : m_stream(stream) {
 
     // ret (C3)
     m_table[0xC3] = {true, 0xC3};
+
+    // call rel16 (E8 cw)
+    // call rel32 (E8 cd)
+    m_table[0xE8] = {true, 0xE8};
 }
 
 Instruction Decoder::next_inst() {
@@ -56,6 +60,10 @@ Instruction Decoder::next_inst() {
         break;
     case 0xC3:
         inst.m_opcode = Opcode::Ret;
+        break;
+    case 0xE8:
+        inst.m_opcode = Opcode::Call;
+        inst.m_imm = m_stream->read<std::uint32_t>();
         break;
     }
 
