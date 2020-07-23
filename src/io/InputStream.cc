@@ -10,6 +10,7 @@ InputStream::InputStream(const InputFile &file) : m_file(file), m_it(file.begin(
 
 template <>
 std::uint8_t InputStream::read() {
+    m_bytes_read++;
     return static_cast<std::uint8_t>(*m_it++);
 }
 

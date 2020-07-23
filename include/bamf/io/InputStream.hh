@@ -12,6 +12,7 @@ class InputFile;
 class InputStream {
     const InputFile &m_file;
     std::vector<char>::const_iterator m_it;
+    std::size_t m_bytes_read{0};
 
 public:
     BAMF_MAKE_NON_COPYABLE(InputStream)
@@ -23,6 +24,7 @@ public:
     T read();
 
     bool has_more() const;
+    std::size_t bytes_read() const { return m_bytes_read; }
 };
 
 } // namespace bamf
