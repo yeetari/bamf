@@ -1,3 +1,4 @@
+#include <bamf/core/Executable.hh>
 #include <bamf/io/InputFile.hh>
 #include <bamf/io/InputStream.hh>
 #include <bamf/x86/Decoder.hh>
@@ -34,23 +35,26 @@ int main(int argc, char **argv) {
         }
     }
 
-    std::cerr << "Decoding " << file_name << " as " << file_type << '\n';
-
+    Executable executable{};
     InputFile file(file_name.c_str());
+    std::cerr << "Decoding " << file_name << " as " << file_type << '\n';
     if (file_type == "bin") {
-        std::cerr << std::hex;
-        for (char ch : file) {
-            std::cerr << (static_cast<int>(ch) & 0xFF) << ' ';
-        }
-        std::cerr << '\n' << std::dec;
-
-        InputStream stream(file);
-        x86::Decoder decoder(&stream);
-        while (stream.has_more()) {
-            auto inst = decoder.next_inst();
-            inst.dump();
-        }
+        executable.code = file.get<char>(0);
+        executable.code_size = file.size();
     } else {
         throw std::runtime_error("Unknown file type " + file_type);
+    }
+
+    std::cerr << std::hex;
+    for (std::size_t i = 0; i < executable.code_size; i++) {
+        std::cerr << (static_cast<int>(executable.code[i]) & 0xFF) << ' ';
+    }
+    std::cerr << '\n' << std::dec;
+
+    InputStream stream(file);
+    x86::Decoder decoder(&stream);
+    while (stream.has_more()) {
+        auto inst = decoder.next_inst();
+        inst.dump();
     }
 }
