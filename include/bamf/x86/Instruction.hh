@@ -12,6 +12,7 @@ class Decoder;
 enum class Opcode {
     Call,
     MovRegImm,
+    MovRegReg,
     Ret,
     Xor,
 };
