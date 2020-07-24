@@ -16,7 +16,7 @@ void Instruction::dump() {
         break;
     case Opcode::MovRegImm:
         ss << "mov ";
-        ss << reg_to_str(m_reg, m_bit_width);
+        ss << reg_to_str(m_dst, m_bit_width);
         ss << ", ";
         ss << m_imm;
         break;

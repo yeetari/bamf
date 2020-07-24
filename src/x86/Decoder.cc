@@ -55,7 +55,7 @@ Instruction Decoder::next_inst() {
     switch (info.base_op) {
     case 0xB8:
         inst.m_opcode = Opcode::MovRegImm;
-        inst.m_reg = static_cast<Register>(opcode - info.base_op);
+        inst.m_dst = static_cast<Register>(opcode - info.base_op);
         inst.m_imm = inst.m_bit_width == 16 ? m_stream->read<std::uint16_t>() : m_stream->read<std::uint32_t>();
         break;
     case 0xC3:

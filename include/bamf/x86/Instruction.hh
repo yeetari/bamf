@@ -20,7 +20,7 @@ class Instruction {
 
 private:
     Opcode m_opcode;
-    Register m_reg;
+    Register m_dst;
     std::size_t m_imm;
     std::uintptr_t m_offset;
 
