@@ -79,6 +79,8 @@ Instruction Decoder::next_inst() {
     case DecodeMethod::OpImm:
         inst.m_imm = inst.m_bit_width == 16 ? m_stream->read<std::uint16_t>() : m_stream->read<std::uint32_t>();
         break;
+    case DecodeMethod::Op:
+        break;
     default:
         assert(info.mod_rm);
         auto mod_rm = m_stream->read<std::uint8_t>();
