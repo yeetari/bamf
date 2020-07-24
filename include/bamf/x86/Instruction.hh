@@ -28,7 +28,7 @@ private:
     Register m_dst;
     Register m_src;
     std::size_t m_imm;
-    int m_bit_width{32};
+    int m_bit_width;
 
 public:
     void dump();
