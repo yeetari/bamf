@@ -11,5 +11,8 @@ if(BAMF_BUILD_DRIVER)
 endif()
 
 if(BAMF_BUILD_TESTS)
+    find_package(GTest REQUIRED)
+    include(GoogleTest)
+    enable_testing()
     add_subdirectory(tests)
 endif()
