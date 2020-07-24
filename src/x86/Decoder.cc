@@ -61,19 +61,19 @@ Instruction Decoder::next_inst() {
         throw std::runtime_error(ss.str());
     }
 
+    inst.m_opcode = info.opcode;
     switch (info.method) {
+    case DecodeMethod::OpReg:
+        inst.m_src = static_cast<Register>(op - info.base_op);
+        break;
     case DecodeMethod::OpRegImm:
         inst.m_dst = static_cast<Register>(op - info.base_op);
         // fall-through
     case DecodeMethod::OpImm:
         inst.m_imm = inst.m_bit_width == 16 ? m_stream->read<std::uint16_t>() : m_stream->read<std::uint32_t>();
-        // fall-through
-    default:
-        inst.m_opcode = info.opcode;
         break;
-    }
-
-    if (info.mod_rm) {
+    default:
+        assert(info.mod_rm);
         auto mod_rm = m_stream->read<std::uint8_t>();
         auto reg = (mod_rm >> 3U) & 0b111U;
         auto rm = mod_rm & 0b111U;
@@ -84,6 +84,7 @@ Instruction Decoder::next_inst() {
             inst.m_src = static_cast<Register>(reg);
             break;
         }
+        break;
     }
 
     return inst;

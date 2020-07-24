@@ -17,6 +17,7 @@ namespace bamf::x86 {
 enum class DecodeMethod {
     Op,
     OpImm,
+    OpReg,
     OpRegImm,
 
     // ModRM
