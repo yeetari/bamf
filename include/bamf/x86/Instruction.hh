@@ -13,6 +13,7 @@ enum class Opcode {
     Call,
     MovRegImm,
     MovRegReg,
+    PushReg,
     Ret,
     Xor,
 };

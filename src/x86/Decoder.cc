@@ -16,13 +16,20 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
     // xor r64, r64 (REX.w + 31 /r)
     m_table[0x31] = {true, 0x31, Opcode::Xor, DecodeMethod::OpRegReg, true};
 
+    // push r16 (50+rw)
+    // push r32 (50+rd)
+    // push r64 (50+rd)
+    for (std::uint8_t i = 0x50; i < 0x5F; i++) {
+        m_table[i] = {true, 0x50, Opcode::PushReg, DecodeMethod::OpReg, false};
+    }
+
     // mov r16, r16 (89 /r)
     // mov r32, r32 (89 /r)
     m_table[0x89] = {true, 0x89, Opcode::MovRegReg, DecodeMethod::OpRegReg, true};
 
-    // mov r16, imm16 (B8+ rw iw)
-    // mov r32, imm32 (B8+ rd id)
-    // mov r64, imm64 (REX.W + B8+ rd io)
+    // mov r16, imm16 (B8+rw iw)
+    // mov r32, imm32 (B8+rd id)
+    // mov r64, imm64 (REX.W + B8+rd io)
     for (std::uint8_t i = 0xB8; i < 0xBF; i++) {
         m_table[i] = {true, 0xB8, Opcode::MovRegImm, DecodeMethod::OpRegImm, false};
     }
