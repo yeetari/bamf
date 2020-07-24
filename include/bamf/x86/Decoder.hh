@@ -4,6 +4,8 @@
 #include <bamf/core/NonMovable.hh>
 #include <bamf/x86/Instruction.hh>
 
+#include <array>
+
 namespace bamf {
 
 class Stream;
@@ -12,14 +14,22 @@ class Stream;
 
 namespace bamf::x86 {
 
+enum class DecodeMethod {
+    Op,
+    OpImm,
+    OpRegImm,
+};
+
 struct InstructionInfo {
     bool present;
     std::uint8_t base_op;
+    Opcode opcode;
+    DecodeMethod method;
 };
 
 class Decoder {
     Stream *const m_stream;
-    InstructionInfo m_table[256]{};
+    std::array<InstructionInfo, 256> m_table{};
 
 public:
     BAMF_MAKE_NON_COPYABLE(Decoder)

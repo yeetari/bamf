@@ -15,15 +15,15 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
     // mov r32, imm32 (B8+ rd id)
     // mov r64, imm64 (REX.W + B8+ rd io)
     for (std::uint8_t i = 0xB8; i < 0xBF; i++) {
-        m_table[i] = {true, 0xB8};
+        m_table[i] = {true, 0xB8, Opcode::MovRegImm, DecodeMethod::OpRegImm};
     }
 
     // ret (C3)
-    m_table[0xC3] = {true, 0xC3};
+    m_table[0xC3] = {true, 0xC3, Opcode::Ret, DecodeMethod::Op};
 
     // call rel16 (E8 cw)
     // call rel32 (E8 cd)
-    m_table[0xE8] = {true, 0xE8};
+    m_table[0xE8] = {true, 0xE8, Opcode::Call, DecodeMethod::OpImm};
 }
 
 Instruction Decoder::next_inst() {
@@ -43,27 +43,24 @@ Instruction Decoder::next_inst() {
         break;
     }
 
-    auto opcode = has_prefix ? m_stream->read<std::uint8_t>() : byte;
-    auto &info = m_table[opcode];
+    auto op = has_prefix ? m_stream->read<std::uint8_t>() : byte;
+    auto &info = m_table[op];
     if (!info.present) {
         std::stringstream ss;
         ss << "Unknown opcode: " << std::hex;
-        ss << (static_cast<int>(opcode) & 0xFF);
+        ss << (static_cast<unsigned int>(op) & 0xFFU);
         throw std::runtime_error(ss.str());
     }
 
-    switch (info.base_op) {
-    case 0xB8:
-        inst.m_opcode = Opcode::MovRegImm;
-        inst.m_dst = static_cast<Register>(opcode - info.base_op);
+    switch (info.method) {
+    case DecodeMethod::OpRegImm:
+        inst.m_dst = static_cast<Register>(op - info.base_op);
+        // fall-through
+    case DecodeMethod::OpImm:
         inst.m_imm = inst.m_bit_width == 16 ? m_stream->read<std::uint16_t>() : m_stream->read<std::uint32_t>();
-        break;
-    case 0xC3:
-        inst.m_opcode = Opcode::Ret;
-        break;
-    case 0xE8:
-        inst.m_opcode = Opcode::Call;
-        inst.m_imm = m_stream->read<std::uint32_t>();
+        // fall-through
+    default:
+        inst.m_opcode = info.opcode;
         break;
     }
 
