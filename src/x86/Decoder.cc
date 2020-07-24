@@ -30,7 +30,7 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
     // mov r16, imm16 (B8+rw iw)
     // mov r32, imm32 (B8+rd id)
     // mov r64, imm64 (REX.W + B8+rd io)
-    for (std::uint8_t i = 0xB8; i < 0xBF; i++) {
+    for (std::uint8_t i = 0xB8; i < 0xC7; i++) {
         m_table[i] = {true, 0xB8, Opcode::MovRegImm, DecodeMethod::OpRegImm, false};
     }
 
