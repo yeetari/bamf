@@ -75,6 +75,24 @@ TEST(x86DecoderTest, NearRet) {
     EXPECT_EQ(inst.opcode(), Opcode::Ret);
 }
 
+TEST(x86DecoderTest, PushReg16) {
+    // push ax
+    auto inst = decode_single_inst(0x66, 0x50);
+    EXPECT_EQ(inst.opcode(), Opcode::PushReg);
+    EXPECT_EQ(inst.src(), Register::Rax);
+    EXPECT_EQ(inst.bit_width(), 16);
+}
+
+// TODO: Add test for invalid PushReg32
+
+TEST(x86DecoderTest, PushReg64) {
+    // push rbp
+    auto inst = decode_single_inst(0x55);
+    EXPECT_EQ(inst.opcode(), Opcode::PushReg);
+    EXPECT_EQ(inst.src(), Register::Rbp);
+    EXPECT_EQ(inst.bit_width(), 64);
+}
+
 TEST(x86DecoderTest, XorRegReg16) {
     // xor ax, ax
     auto inst = decode_single_inst(0x66, 0x31, 0xC0);
