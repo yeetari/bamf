@@ -22,16 +22,22 @@ class Instruction {
     friend Decoder;
 
 private:
+    std::uintptr_t m_offset;
+
     Opcode m_opcode;
     Register m_dst;
     Register m_src;
     std::size_t m_imm;
-    std::uintptr_t m_offset;
-
     int m_bit_width{32};
 
 public:
     void dump();
+
+    Opcode opcode() const { return m_opcode; }
+    Register dst() const { return m_dst; }
+    Register src() const { return m_src; }
+    std::size_t imm() const { return m_imm; }
+    int bit_width() const { return m_bit_width; }
 };
 
 } // namespace bamf::x86
