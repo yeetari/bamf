@@ -13,6 +13,7 @@ enum class Opcode {
     Call,
     MovRegImm,
     Ret,
+    Xor,
 };
 
 class Instruction {

@@ -11,6 +11,11 @@
 namespace bamf::x86 {
 
 Decoder::Decoder(Stream *stream) : m_stream(stream) {
+    // xor r16, r16 (31 /r)
+    // xor r32, r32 (31 /r)
+    // xor r64, r64 (REX.w + 31 /r)
+    m_table[0x31] = {true, 0x31, Opcode::Xor, DecodeMethod::OpRegReg, true};
+
     // mov r16, imm16 (B8+ rw iw)
     // mov r32, imm32 (B8+ rd id)
     // mov r64, imm64 (REX.W + B8+ rd io)
