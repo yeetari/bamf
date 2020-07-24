@@ -21,6 +21,7 @@ class Instruction {
 private:
     Opcode m_opcode;
     Register m_dst;
+    Register m_src;
     std::size_t m_imm;
     std::uintptr_t m_offset;
 

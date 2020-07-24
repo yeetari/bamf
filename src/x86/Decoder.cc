@@ -15,15 +15,15 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
     // mov r32, imm32 (B8+ rd id)
     // mov r64, imm64 (REX.W + B8+ rd io)
     for (std::uint8_t i = 0xB8; i < 0xBF; i++) {
-        m_table[i] = {true, 0xB8, Opcode::MovRegImm, DecodeMethod::OpRegImm};
+        m_table[i] = {true, 0xB8, Opcode::MovRegImm, DecodeMethod::OpRegImm, false};
     }
 
     // ret (C3)
-    m_table[0xC3] = {true, 0xC3, Opcode::Ret, DecodeMethod::Op};
+    m_table[0xC3] = {true, 0xC3, Opcode::Ret, DecodeMethod::Op, false};
 
     // call rel16 (E8 cw)
     // call rel32 (E8 cd)
-    m_table[0xE8] = {true, 0xE8, Opcode::Call, DecodeMethod::OpImm};
+    m_table[0xE8] = {true, 0xE8, Opcode::Call, DecodeMethod::OpImm, false};
 }
 
 Instruction Decoder::next_inst() {
@@ -62,6 +62,19 @@ Instruction Decoder::next_inst() {
     default:
         inst.m_opcode = info.opcode;
         break;
+    }
+
+    if (info.mod_rm) {
+        auto mod_rm = m_stream->read<std::uint8_t>();
+        auto reg = (mod_rm >> 3U) & 0b111U;
+        auto rm = mod_rm & 0b111U;
+
+        switch (info.method) {
+        case DecodeMethod::OpRegReg:
+            inst.m_dst = static_cast<Register>(rm);
+            inst.m_src = static_cast<Register>(reg);
+            break;
+        }
     }
 
     return inst;

@@ -18,6 +18,9 @@ enum class DecodeMethod {
     Op,
     OpImm,
     OpRegImm,
+
+    // ModRM
+    OpRegReg,
 };
 
 struct InstructionInfo {
@@ -25,6 +28,7 @@ struct InstructionInfo {
     std::uint8_t base_op;
     Opcode opcode;
     DecodeMethod method;
+    bool mod_rm;
 };
 
 class Decoder {
