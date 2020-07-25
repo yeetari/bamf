@@ -21,6 +21,7 @@ enum class DecodeMethod {
     OpRegImm,
 
     // ModRM
+    OpRegMem,
     OpRegReg,
 };
 

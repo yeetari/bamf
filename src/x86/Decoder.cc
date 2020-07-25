@@ -27,6 +27,11 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
     // mov r32, r32 (89 /r)
     m_table[0x89] = {true, 0x89, Opcode::MovRegReg, DecodeMethod::OpRegReg, true, 0, 32};
 
+    // lea r16, m (8D /r)
+    // lea r32, m (8D /r)
+    // lea r64, m (REX.W + 8D /r)
+    m_table[0x8D] = {true, 0x8D, Opcode::Lea, DecodeMethod::OpRegMem, true, 64, 32};
+
     // mov r16, imm16 (B8+rw iw)
     // mov r32, imm32 (B8+rd id)
     // mov r64, imm64 (REX.W + B8+rd io)
@@ -144,9 +149,14 @@ Instruction Decoder::next_inst() {
         }
 
         switch (info.method) {
+        case DecodeMethod::OpRegMem:
+            inst.m_dst = static_cast<Register>(reg);
+            break;
         case DecodeMethod::OpRegReg:
             inst.m_dst = static_cast<Register>(rm);
             inst.m_src = static_cast<Register>(reg);
+            break;
+        default:
             break;
         }
         break;
