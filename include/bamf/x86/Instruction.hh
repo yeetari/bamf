@@ -32,6 +32,10 @@ private:
     int m_address_bit_width;
     int m_operand_bit_width;
 
+    std::uint8_t m_sib_scale;
+    Register m_sib_index;
+    Register m_sib_base;
+
 public:
     void dump();
 
@@ -42,6 +46,10 @@ public:
 
     int address_bit_width() const { return m_address_bit_width; }
     int operand_bit_width() const { return m_operand_bit_width; }
+
+    std::uint8_t sib_scale() const { return m_sib_scale; }
+    Register sib_index() const { return m_sib_index; }
+    Register sib_base() const { return m_sib_base; }
 };
 
 } // namespace bamf::x86

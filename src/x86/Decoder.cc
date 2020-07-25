@@ -98,8 +98,50 @@ Instruction Decoder::next_inst() {
     default:
         assert(info.mod_rm);
         auto mod_rm = m_stream->read<std::uint8_t>();
+        auto mod = (mod_rm >> 5U) & 0b11U;
         auto reg = (mod_rm >> 3U) & 0b111U;
         auto rm = mod_rm & 0b111U;
+
+        // Decode SIB
+        if (rm == 0b100) {
+            assert(mod != 0b11);
+            auto sib = m_stream->read<std::uint8_t>();
+            auto scale = (sib >> 5U) & 0b11U;
+            switch (scale) {
+            case 0b00:
+                inst.m_sib_scale = 1;
+                break;
+            case 0b01:
+                inst.m_sib_scale = 2;
+                break;
+            case 0b10:
+                inst.m_sib_scale = 4;
+                break;
+            case 0b11:
+                inst.m_sib_scale = 8;
+                break;
+            default:
+                assert(false);
+            }
+
+            inst.m_sib_index = static_cast<Register>((sib >> 3U) & 0b111U);
+            inst.m_sib_base = static_cast<Register>(sib & 0b111U);
+
+            if (static_cast<std::uint8_t>(inst.m_sib_base) == 0b101) {
+                // No base register encoded, special value indicating disp
+                switch (mod) {
+                case 0b00:
+                case 0b10:
+                    inst.m_imm = m_stream->read<std::uint32_t>();
+                    break;
+                case 0b01:
+                    inst.m_imm = m_stream->read<std::uint8_t>();
+                    break;
+                default:
+                    assert(false);
+                }
+            }
+        }
 
         switch (info.method) {
         case DecodeMethod::OpRegReg:
