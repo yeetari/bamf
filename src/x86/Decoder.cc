@@ -54,6 +54,10 @@ Instruction Decoder::next_inst() {
         // Operand size override
         inst.m_operand_bit_width = 16;
         break;
+    case 0x67:
+        // Address size override
+        inst.m_address_bit_width = 32;
+        break;
     default:
         has_prefix = false;
         break;
@@ -66,6 +70,11 @@ Instruction Decoder::next_inst() {
         ss << "Unknown opcode: " << std::hex;
         ss << (static_cast<unsigned int>(op) & 0xFFU);
         throw std::runtime_error(ss.str());
+    }
+
+    if (inst.m_address_bit_width == 0) {
+        // Address size override prefix not present
+        inst.m_address_bit_width = info.default_address_bit_width;
     }
 
     if (inst.m_operand_bit_width == 0) {
