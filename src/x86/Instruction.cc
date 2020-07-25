@@ -16,28 +16,28 @@ void Instruction::dump() {
         break;
     case Opcode::MovRegImm:
         ss << "mov ";
-        ss << reg_to_str(m_dst, m_bit_width);
+        ss << reg_to_str(m_dst, m_operand_bit_width);
         ss << ", ";
         ss << m_imm;
         break;
     case Opcode::MovRegReg:
         ss << "mov ";
-        ss << reg_to_str(m_dst, m_bit_width);
+        ss << reg_to_str(m_dst, m_operand_bit_width);
         ss << ", ";
-        ss << reg_to_str(m_src, m_bit_width);
+        ss << reg_to_str(m_src, m_operand_bit_width);
         break;
     case Opcode::PushReg:
         ss << "push ";
-        ss << reg_to_str(m_src, m_bit_width);
+        ss << reg_to_str(m_src, m_operand_bit_width);
         break;
     case Opcode::Ret:
         ss << "ret";
         break;
     case Opcode::Xor:
         ss << "xor ";
-        ss << reg_to_str(m_dst, m_bit_width);
+        ss << reg_to_str(m_dst, m_operand_bit_width);
         ss << ", ";
-        ss << reg_to_str(m_src, m_bit_width);
+        ss << reg_to_str(m_src, m_operand_bit_width);
         break;
     }
     std::cout << ss.str() << '\n';

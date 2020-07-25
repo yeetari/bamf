@@ -13,33 +13,33 @@ namespace bamf::x86 {
 Decoder::Decoder(Stream *stream) : m_stream(stream) {
     // xor r16, r16 (31 /r)
     // xor r32, r32 (31 /r)
-    // xor r64, r64 (REX.w + 31 /r)
-    m_table[0x31] = {true, 0x31, Opcode::Xor, DecodeMethod::OpRegReg, true, 32};
+    // xor r64, r64 (REX.W + 31 /r)
+    m_table[0x31] = {true, 0x31, Opcode::Xor, DecodeMethod::OpRegReg, true, 0, 32};
 
     // push r16 (50+rw)
     // push r32 (50+rd)
     // push r64 (50+rd)
     for (std::uint8_t i = 0x50; i < 0x5F; i++) {
-        m_table[i] = {true, 0x50, Opcode::PushReg, DecodeMethod::OpReg, false, 64};
+        m_table[i] = {true, 0x50, Opcode::PushReg, DecodeMethod::OpReg, false, 0, 64};
     }
 
     // mov r16, r16 (89 /r)
     // mov r32, r32 (89 /r)
-    m_table[0x89] = {true, 0x89, Opcode::MovRegReg, DecodeMethod::OpRegReg, true, 32};
+    m_table[0x89] = {true, 0x89, Opcode::MovRegReg, DecodeMethod::OpRegReg, true, 0, 32};
 
     // mov r16, imm16 (B8+rw iw)
     // mov r32, imm32 (B8+rd id)
     // mov r64, imm64 (REX.W + B8+rd io)
     for (std::uint8_t i = 0xB8; i < 0xC7; i++) {
-        m_table[i] = {true, 0xB8, Opcode::MovRegImm, DecodeMethod::OpRegImm, false, 32};
+        m_table[i] = {true, 0xB8, Opcode::MovRegImm, DecodeMethod::OpRegImm, false, 0, 32};
     }
 
     // ret (C3)
-    m_table[0xC3] = {true, 0xC3, Opcode::Ret, DecodeMethod::Op, false, 32};
+    m_table[0xC3] = {true, 0xC3, Opcode::Ret, DecodeMethod::Op, false, 0, 32};
 
     // call rel16 (E8 cw)
     // call rel32 (E8 cd)
-    m_table[0xE8] = {true, 0xE8, Opcode::Call, DecodeMethod::OpImm, false, 32};
+    m_table[0xE8] = {true, 0xE8, Opcode::Call, DecodeMethod::OpImm, false, 0, 32};
 }
 
 Instruction Decoder::next_inst() {
@@ -52,7 +52,7 @@ Instruction Decoder::next_inst() {
     switch (byte) {
     case 0x66:
         // Operand size override
-        inst.m_bit_width = 16;
+        inst.m_operand_bit_width = 16;
         break;
     default:
         has_prefix = false;
@@ -68,9 +68,9 @@ Instruction Decoder::next_inst() {
         throw std::runtime_error(ss.str());
     }
 
-    if (inst.m_bit_width == 0) {
+    if (inst.m_operand_bit_width == 0) {
         // Operand size override prefix not present
-        inst.m_bit_width = info.default_bit_width;
+        inst.m_operand_bit_width = info.default_operand_bit_width;
     }
 
     inst.m_opcode = info.opcode;
@@ -82,7 +82,7 @@ Instruction Decoder::next_inst() {
         inst.m_dst = static_cast<Register>(op - info.base_op);
         // fall-through
     case DecodeMethod::OpImm:
-        inst.m_imm = inst.m_bit_width == 16 ? m_stream->read<std::uint16_t>() : m_stream->read<std::uint32_t>();
+        inst.m_imm = inst.m_operand_bit_width == 16 ? m_stream->read<std::uint16_t>() : m_stream->read<std::uint32_t>();
         break;
     case DecodeMethod::Op:
         break;

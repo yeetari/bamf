@@ -30,7 +30,8 @@ struct InstructionInfo {
     Opcode opcode;
     DecodeMethod method;
     bool mod_rm;
-    int default_bit_width;
+    int default_address_bit_width;
+    int default_operand_bit_width;
 };
 
 class Decoder {

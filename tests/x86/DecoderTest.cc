@@ -25,7 +25,7 @@ TEST(x86DecoderTest, MovRegImm16) {
     EXPECT_EQ(inst.opcode(), Opcode::MovRegImm);
     EXPECT_EQ(inst.dst(), Register::Rsi);
     EXPECT_EQ(inst.imm(), 1);
-    EXPECT_EQ(inst.bit_width(), 16);
+    EXPECT_EQ(inst.operand_bit_width(), 16);
 }
 
 TEST(x86DecoderTest, MovRegImm32) {
@@ -34,7 +34,7 @@ TEST(x86DecoderTest, MovRegImm32) {
     EXPECT_EQ(inst.opcode(), Opcode::MovRegImm);
     EXPECT_EQ(inst.dst(), Register::Rdi);
     EXPECT_EQ(inst.imm(), 2);
-    EXPECT_EQ(inst.bit_width(), 32);
+    EXPECT_EQ(inst.operand_bit_width(), 32);
 }
 
 TEST(x86DecoderTest, MovRegReg16) {
@@ -43,7 +43,7 @@ TEST(x86DecoderTest, MovRegReg16) {
     EXPECT_EQ(inst.opcode(), Opcode::MovRegReg);
     EXPECT_EQ(inst.dst(), Register::Rax);
     EXPECT_EQ(inst.src(), Register::Rdx);
-    EXPECT_EQ(inst.bit_width(), 16);
+    EXPECT_EQ(inst.operand_bit_width(), 16);
 }
 
 TEST(x86DecoderTest, MovRegReg32) {
@@ -52,21 +52,21 @@ TEST(x86DecoderTest, MovRegReg32) {
     EXPECT_EQ(inst.opcode(), Opcode::MovRegReg);
     EXPECT_EQ(inst.dst(), Register::Rcx);
     EXPECT_EQ(inst.src(), Register::Rbx);
-    EXPECT_EQ(inst.bit_width(), 32);
+    EXPECT_EQ(inst.operand_bit_width(), 32);
 }
 
 TEST(x86DecoderTest, NearCall16) {
     auto inst = decode_single_inst(0x66, 0xE8, 0xFF, 0xFF);
     EXPECT_EQ(inst.opcode(), Opcode::Call);
     EXPECT_EQ(inst.imm(), 0xFFFF);
-    EXPECT_EQ(inst.bit_width(), 16);
+    EXPECT_EQ(inst.operand_bit_width(), 16);
 }
 
 TEST(x86DecoderTest, NearCall32) {
     auto inst = decode_single_inst(0xE8, 0xFF, 0xFF, 0xFF, 0xFF);
     EXPECT_EQ(inst.opcode(), Opcode::Call);
     EXPECT_EQ(inst.imm(), 0xFFFFFFFF);
-    EXPECT_EQ(inst.bit_width(), 32);
+    EXPECT_EQ(inst.operand_bit_width(), 32);
 }
 
 TEST(x86DecoderTest, NearRet) {
@@ -80,7 +80,7 @@ TEST(x86DecoderTest, PushReg16) {
     auto inst = decode_single_inst(0x66, 0x50);
     EXPECT_EQ(inst.opcode(), Opcode::PushReg);
     EXPECT_EQ(inst.src(), Register::Rax);
-    EXPECT_EQ(inst.bit_width(), 16);
+    EXPECT_EQ(inst.operand_bit_width(), 16);
 }
 
 // TODO: Add test for invalid PushReg32
@@ -90,7 +90,7 @@ TEST(x86DecoderTest, PushReg64) {
     auto inst = decode_single_inst(0x55);
     EXPECT_EQ(inst.opcode(), Opcode::PushReg);
     EXPECT_EQ(inst.src(), Register::Rbp);
-    EXPECT_EQ(inst.bit_width(), 64);
+    EXPECT_EQ(inst.operand_bit_width(), 64);
 }
 
 TEST(x86DecoderTest, XorRegReg16) {
@@ -99,7 +99,7 @@ TEST(x86DecoderTest, XorRegReg16) {
     EXPECT_EQ(inst.opcode(), Opcode::Xor);
     EXPECT_EQ(inst.dst(), Register::Rax);
     EXPECT_EQ(inst.src(), Register::Rax);
-    EXPECT_EQ(inst.bit_width(), 16);
+    EXPECT_EQ(inst.operand_bit_width(), 16);
 }
 
 TEST(x86DecoderTest, XorRegReg32) {
@@ -108,7 +108,7 @@ TEST(x86DecoderTest, XorRegReg32) {
     EXPECT_EQ(inst.opcode(), Opcode::Xor);
     EXPECT_EQ(inst.dst(), Register::Rax);
     EXPECT_EQ(inst.src(), Register::Rax);
-    EXPECT_EQ(inst.bit_width(), 32);
+    EXPECT_EQ(inst.operand_bit_width(), 32);
 }
 
 } // namespace

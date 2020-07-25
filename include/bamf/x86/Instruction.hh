@@ -28,7 +28,9 @@ private:
     Register m_dst;
     Register m_src;
     std::size_t m_imm;
-    int m_bit_width;
+
+    int m_address_bit_width;
+    int m_operand_bit_width;
 
 public:
     void dump();
@@ -37,7 +39,9 @@ public:
     Register dst() const { return m_dst; }
     Register src() const { return m_src; }
     std::size_t imm() const { return m_imm; }
-    int bit_width() const { return m_bit_width; }
+
+    int address_bit_width() const { return m_address_bit_width; }
+    int operand_bit_width() const { return m_operand_bit_width; }
 };
 
 } // namespace bamf::x86
