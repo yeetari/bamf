@@ -54,6 +54,7 @@ Instruction Decoder::next_inst() {
 
     auto byte = m_stream->read<std::uint8_t>();
     bool has_prefix = true;
+    bool has_rex = false;
     switch (byte) {
     case 0x66:
         // Operand size override
@@ -64,6 +65,15 @@ Instruction Decoder::next_inst() {
         inst.m_address_bit_width = 32;
         break;
     default:
+        if ((byte & 0xF0U) >> 4U == 0b100U) {
+            has_rex = true;
+            auto w = (byte >> 3U) & 0b1U;
+            if (w == 1) {
+                inst.m_operand_bit_width = 64;
+            }
+            break;
+        }
+
         has_prefix = false;
         break;
     }
@@ -104,7 +114,11 @@ Instruction Decoder::next_inst() {
         assert(info.mod_rm);
         auto mod_rm = m_stream->read<std::uint8_t>();
         auto mod = (mod_rm >> 5U) & 0b11U;
+
+        // TODO: Include REX.R here
         auto reg = (mod_rm >> 3U) & 0b111U;
+
+        // TODO: Include REX.B here
         auto rm = mod_rm & 0b111U;
 
         // Decode SIB
@@ -129,6 +143,7 @@ Instruction Decoder::next_inst() {
                 assert(false);
             }
 
+            // TODO: Include REX.X here
             inst.m_sib_index = static_cast<Register>((sib >> 3U) & 0b111U);
             inst.m_sib_base = static_cast<Register>(sib & 0b111U);
 
