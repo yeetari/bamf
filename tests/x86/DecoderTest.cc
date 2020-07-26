@@ -75,6 +75,24 @@ TEST(x86DecoderTest, NearRet) {
     EXPECT_EQ(inst.opcode(), Opcode::Ret);
 }
 
+TEST(x86DecoderTest, PopReg16) {
+    // pop bx
+    auto inst = decode_single_inst(0x66, 0x5B);
+    EXPECT_EQ(inst.opcode(), Opcode::PopReg);
+    EXPECT_EQ(inst.dst(), Register::Rbx);
+    EXPECT_EQ(inst.operand_bit_width(), 16);
+}
+
+// TODO: Add test for invalid PopReg32
+
+TEST(x86DecoderTest, PopReg64) {
+    // pop rcx
+    auto inst = decode_single_inst(0x59);
+    EXPECT_EQ(inst.opcode(), Opcode::PopReg);
+    EXPECT_EQ(inst.dst(), Register::Rcx);
+    EXPECT_EQ(inst.operand_bit_width(), 64);
+}
+
 TEST(x86DecoderTest, PushReg16) {
     // push ax
     auto inst = decode_single_inst(0x66, 0x50);

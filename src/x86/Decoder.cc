@@ -19,8 +19,15 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
     // push r16 (50+rw)
     // push r32 (50+rd)
     // push r64 (50+rd)
-    for (std::uint8_t i = 0x50; i < 0x5F; i++) {
+    for (std::uint8_t i = 0x50; i < 0x58; i++) {
         m_table[i] = {true, 0x50, Opcode::PushReg, DecodeMethod::OpReg, false, 0, 64};
+    }
+
+    // pop r16 (58+rw)
+    // pop r32 (58+rd)
+    // pop r64 (58+rd)
+    for (std::uint8_t i = 0x58; i < 0x60; i++) {
+        m_table[i] = {true, 0x58, Opcode::PopReg, DecodeMethod::OpReg, false, 0, 64};
     }
 
     // mov r16, r16 (89 /r)
@@ -100,7 +107,8 @@ MachineInst Decoder::next_inst() {
     inst.m_opcode = info.opcode;
     switch (info.method) {
     case DecodeMethod::OpReg:
-        inst.m_src = static_cast<Register>(op - info.base_op);
+        inst.m_dst = static_cast<Register>(op - info.base_op);
+        inst.m_src = inst.m_dst;
         break;
     case DecodeMethod::OpRegImm:
         inst.m_dst = static_cast<Register>(op - info.base_op);

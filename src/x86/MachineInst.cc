@@ -37,6 +37,10 @@ void MachineInst::dump() {
         ss << ", ";
         ss << reg_to_str(m_src, m_operand_bit_width);
         break;
+    case Opcode::PopReg:
+        ss << "pop ";
+        ss << reg_to_str(m_dst, m_operand_bit_width);
+        break;
     case Opcode::PushReg:
         ss << "push ";
         ss << reg_to_str(m_src, m_operand_bit_width);

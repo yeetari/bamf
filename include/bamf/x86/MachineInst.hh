@@ -14,6 +14,7 @@ enum class Opcode {
     Lea,
     MovRegImm,
     MovRegReg,
+    PopReg,
     PushReg,
     Ret,
     Xor,
