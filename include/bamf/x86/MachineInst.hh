@@ -19,7 +19,7 @@ enum class Opcode {
     Xor,
 };
 
-class Instruction {
+class MachineInst {
     friend Decoder;
 
 private:

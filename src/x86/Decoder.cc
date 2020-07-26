@@ -47,8 +47,8 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
     m_table[0xE8] = {true, 0xE8, Opcode::Call, DecodeMethod::OpImm, false, 0, 32};
 }
 
-Instruction Decoder::next_inst() {
-    Instruction inst{};
+MachineInst Decoder::next_inst() {
+    MachineInst inst{};
     inst.m_offset = m_stream->bytes_read();
     assert(m_stream->has_more());
 

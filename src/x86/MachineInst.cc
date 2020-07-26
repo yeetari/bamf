@@ -1,4 +1,4 @@
-#include <bamf/x86/Instruction.hh>
+#include <bamf/x86/MachineInst.hh>
 
 #include <cstdint>
 #include <iostream>
@@ -6,7 +6,7 @@
 
 namespace bamf::x86 {
 
-void Instruction::dump() {
+void MachineInst::dump() {
     std::stringstream ss;
     ss << std::hex << m_offset << ": " << std::dec;
     switch (m_opcode) {

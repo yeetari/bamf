@@ -2,7 +2,7 @@
 
 #include <bamf/core/NonCopyable.hh>
 #include <bamf/core/NonMovable.hh>
-#include <bamf/x86/Instruction.hh>
+#include <bamf/x86/MachineInst.hh>
 
 #include <array>
 
@@ -45,7 +45,7 @@ public:
 
     Decoder(Stream *stream);
 
-    Instruction next_inst();
+    MachineInst next_inst();
 };
 
 } // namespace bamf::x86

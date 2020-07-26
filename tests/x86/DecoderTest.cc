@@ -12,7 +12,7 @@ using namespace bamf::x86;
 namespace {
 
 template <typename... Args>
-Instruction decode_single_inst(Args &&... args) {
+MachineInst decode_single_inst(Args &&... args) {
     std::array<char, sizeof...(Args)> code = {static_cast<char>(args)...};
     Stream stream(code.data(), code.size());
     Decoder decoder(&stream);
