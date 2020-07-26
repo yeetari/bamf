@@ -180,4 +180,8 @@ MachineInst Decoder::next_inst() {
     return inst;
 }
 
+bool Decoder::has_next() const {
+    return m_stream->has_more();
+}
+
 } // namespace bamf::x86

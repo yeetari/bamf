@@ -46,6 +46,8 @@ public:
     Decoder(Stream *stream);
 
     MachineInst next_inst();
+
+    bool has_next() const;
 };
 
 } // namespace bamf::x86
