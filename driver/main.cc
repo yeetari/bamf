@@ -27,10 +27,13 @@ int main(int argc, char **argv) {
 
     std::string file_name;
     std::string file_type;
+    std::string mode("decomp");
     for (int i = 1; i < argc; i++) {
         std::string arg(argv[i]);
         if (arg.starts_with("-f")) {
             file_type = arg.substr(2);
+        } else if (arg.starts_with("-m")) {
+            mode = arg.substr(2);
         } else {
             file_name = arg;
             break;
@@ -63,7 +66,16 @@ int main(int argc, char **argv) {
 
     Stream stream(executable.code, executable.code_size);
     x86::Decoder decoder(&stream);
-    x86::Frontend frontend(&decoder);
-    auto block = frontend.run();
-    block->dump();
+    if (mode == "disasm") {
+        while (decoder.has_next()) {
+            auto inst = decoder.next_inst();
+            inst.dump();
+        }
+    } else if (mode == "decomp") {
+        x86::Frontend frontend(&decoder);
+        auto block = frontend.run();
+        block->dump();
+    } else {
+        throw std::runtime_error("Invalid mode " + mode + " (valid disasm/decomp)");
+    }
 }
