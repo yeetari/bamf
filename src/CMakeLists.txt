@@ -1,6 +1,10 @@
 add_library(bamf
     io/ElfLoader.cc
     io/InputFile.cc
+    ir/BasicBlock.cc
+    ir/Expressions.cc
+    ir/Local.cc
+    ir/Statements.cc
     support/Stream.cc
     x86/Decoder.cc
     x86/MachineInst.cc
