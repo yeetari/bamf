@@ -8,7 +8,7 @@
 namespace bamf::x86 {
 
 Local *Frontend::local(std::size_t local) {
-    return &m_locals.try_emplace(local, std::to_string(local)).first->second;
+    return &m_locals.try_emplace(local, std::to_string(local - 16)).first->second;
 }
 
 Local *Frontend::reg_local(Register reg) {
