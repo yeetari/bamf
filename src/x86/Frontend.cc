@@ -19,6 +19,10 @@ void Frontend::translate_mov_reg_imm(Register dst, std::size_t imm) {
     m_block->insert<AssignStmt>(reg_local(dst), new ConstExpr<std::size_t>(imm));
 }
 
+void Frontend::translate_mov_reg_reg(Register dst, Register src) {
+    m_block->insert<AssignStmt>(reg_local(dst), reg_local(src));
+}
+
 void Frontend::translate_push_reg(Register reg) {
     const auto *dst = local(m_stack.size() + 16);
     m_stack.push_back(dst);
@@ -48,6 +52,9 @@ std::unique_ptr<BasicBlock> Frontend::run() {
         switch (inst.opcode()) {
         case Opcode::MovRegImm:
             translate_mov_reg_imm(inst.dst(), inst.imm());
+            break;
+        case Opcode::MovRegReg:
+            translate_mov_reg_reg(inst.dst(), inst.src());
             break;
         case Opcode::PushReg:
             translate_push_reg(inst.src());
