@@ -1,8 +1,8 @@
 #pragma once
 
-#include <bamf/core/Iterator.hh>
-#include <bamf/core/NonCopyable.hh>
-#include <bamf/core/NonMovable.hh>
+#include <bamf/support/Iterator.hh>
+#include <bamf/support/NonCopyable.hh>
+#include <bamf/support/NonMovable.hh>
 
 #include <cstdint>
 #include <vector>

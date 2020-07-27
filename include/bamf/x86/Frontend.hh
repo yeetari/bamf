@@ -1,9 +1,9 @@
 #pragma once
 
-#include <bamf/core/NonCopyable.hh>
-#include <bamf/core/NonMovable.hh>
 #include <bamf/ir/BasicBlock.hh>
 #include <bamf/ir/Local.hh>
+#include <bamf/support/NonCopyable.hh>
+#include <bamf/support/NonMovable.hh>
 #include <bamf/x86/Decoder.hh>
 
 #include <cstdint>
