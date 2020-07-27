@@ -3,6 +3,7 @@
 #include <bamf/io/InputFile.hh>
 #include <bamf/support/Stream.hh>
 #include <bamf/x86/Decoder.hh>
+#include <bamf/x86/Frontend.hh>
 
 #include <iostream>
 #include <stdexcept>
@@ -62,8 +63,7 @@ int main(int argc, char **argv) {
 
     Stream stream(executable.code, executable.code_size);
     x86::Decoder decoder(&stream);
-    while (stream.has_more()) {
-        auto inst = decoder.next_inst();
-        inst.dump();
-    }
+    x86::Frontend frontend(&decoder);
+    auto block = frontend.run();
+    block->dump();
 }
