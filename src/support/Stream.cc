@@ -18,6 +18,10 @@ template <>
 std::uint32_t Stream::read() {
     return read<std::uint16_t>() | (static_cast<std::uint32_t>(read<std::uint16_t>()) << 16U);
 }
+
+template <>
+std::uint64_t Stream::read() {
+    return read<std::uint32_t>() | (static_cast<std::uint64_t>(read<std::uint32_t>()) << 32U);
 }
 
 } // namespace bamf
