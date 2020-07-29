@@ -13,7 +13,7 @@ namespace {
 
 template <typename... Args>
 MachineInst decode_single_inst(Args &&... args) {
-    std::array<char, sizeof...(Args)> code = {static_cast<char>(args)...};
+    std::array<std::uint8_t, sizeof...(Args)> code = {static_cast<std::uint8_t>(args)...};
     Stream stream(code.data(), code.size());
     Decoder decoder(&stream);
     return decoder.next_inst();

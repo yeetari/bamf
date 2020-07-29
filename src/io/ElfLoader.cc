@@ -109,7 +109,7 @@ void load_elf_exec(const InputFile &file, Executable *executable) {
             continue;
         }
 
-        executable->code = file.get<char>(sh->offset);
+        executable->code = file.get<std::uint8_t>(sh->offset);
         executable->code_size = sh->size;
     }
 }

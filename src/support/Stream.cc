@@ -6,7 +6,7 @@ namespace bamf {
 
 template <>
 std::uint8_t Stream::read() {
-    return static_cast<std::uint8_t>(m_data[m_bytes_read++]);
+    return m_data[m_bytes_read++];
 }
 
 template <>

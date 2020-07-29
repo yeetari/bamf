@@ -5,7 +5,7 @@
 namespace bamf {
 
 struct Executable {
-    const char *code;
+    const std::uint8_t *code;
     std::uint64_t code_size;
     std::uint64_t entry_point;
 };

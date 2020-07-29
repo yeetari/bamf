@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
     InputFile file(file_name.c_str());
     std::cerr << "Decoding " << file_name << " as " << file_type << (file_type_detected ? " (detected)\n" : "\n");
     if (file_type == "bin") {
-        executable.code = file.get<char>(0);
+        executable.code = file.get<std::uint8_t>(0);
         executable.code_size = file.size();
     } else if (file_type == "elf") {
         load_elf_exec(file, &executable);
@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
 
     std::cerr << std::hex;
     for (std::size_t i = 0; i < executable.code_size; i++) {
-        std::cerr << (static_cast<int>(executable.code[i]) & 0xFF) << ' ';
+        std::cerr << (static_cast<unsigned int>(executable.code[i]) & 0xFF) << ' ';
     }
     std::cerr << '\n' << std::dec;
 
