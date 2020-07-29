@@ -9,6 +9,7 @@ Checks: >
   -cppcoreguidelines-pro-bounds-constant-array-index,
   -cppcoreguidelines-pro-type-union-access,
   -cppcoreguidelines-macro-usage,
+  -google-readability-todo,
   -hicpp-no-array-decay,
   -llvm-header-guard,
   -modernize-use-nodiscard,
