@@ -14,25 +14,26 @@ class Stream;
 
 namespace bamf::x86 {
 
-enum class DecodeMethod {
-    Op,
-    OpImm,
-    OpReg,
-    OpRegImm,
+enum class OperandInfoType {
+    None = 0,
+    Imm,
+    ModRmGpr,
+    ModRmRm,
+    OpcodeGpr,
+};
 
-    // ModRM
-    OpRegMem,
-    OpRegReg,
+struct OperandInfo {
+    OperandInfoType type;
 };
 
 struct InstructionInfo {
     bool present;
     std::uint8_t base_op;
     Opcode opcode;
-    DecodeMethod method;
     bool mod_rm;
-    int default_address_bit_width;
-    int default_operand_bit_width;
+    int default_address_width;
+    int default_operand_width;
+    std::array<OperandInfo, 4> operands;
 };
 
 class Decoder {
@@ -43,10 +44,10 @@ public:
     BAMF_MAKE_NON_COPYABLE(Decoder)
     BAMF_MAKE_NON_MOVABLE(Decoder)
 
-    Decoder(Stream *stream);
+    explicit Decoder(Stream *stream);
+    ~Decoder() = default;
 
     MachineInst next_inst();
-
     bool has_next() const;
 };
 

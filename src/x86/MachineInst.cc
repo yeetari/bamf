@@ -1,59 +1,78 @@
 #include <bamf/x86/MachineInst.hh>
 
+#include <cassert>
 #include <cstdint>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 
 namespace bamf::x86 {
 
-void MachineInst::dump() {
-    std::stringstream ss;
-    ss << std::hex << m_offset << ": " << std::dec;
-    switch (m_opcode) {
+namespace {
+
+const char *mnemonic(Opcode opcode) {
+    switch (opcode) {
     case Opcode::Call:
-        ss << "call " << std::hex;
-        ss << "0x" << static_cast<std::uint32_t>(m_imm + m_offset + 5);
-        break;
+        return "call";
     case Opcode::Lea:
-        ss << "lea ";
-        ss << reg_to_str(m_dst, m_operand_bit_width);
-        ss << ", [";
-        ss << reg_to_str(m_sib_base, m_address_bit_width);
-        ss << " + ";
-        ss << reg_to_str(m_sib_index, m_address_bit_width);
-        ss << " * ";
-        ss << (static_cast<unsigned int>(m_sib_scale) & 0xFFU);
-        ss << "]";
-        break;
-    case Opcode::MovRegImm:
-        ss << "mov ";
-        ss << reg_to_str(m_dst, m_operand_bit_width);
-        ss << ", ";
-        ss << m_imm;
-        break;
-    case Opcode::MovRegReg:
-        ss << "mov ";
-        ss << reg_to_str(m_dst, m_operand_bit_width);
-        ss << ", ";
-        ss << reg_to_str(m_src, m_operand_bit_width);
-        break;
-    case Opcode::PopReg:
-        ss << "pop ";
-        ss << reg_to_str(m_dst, m_operand_bit_width);
-        break;
-    case Opcode::PushReg:
-        ss << "push ";
-        ss << reg_to_str(m_src, m_operand_bit_width);
-        break;
+        return "lea";
+    case Opcode::Mov:
+        return "mov";
+    case Opcode::Pop:
+        return "pop";
+    case Opcode::Push:
+        return "push";
     case Opcode::Ret:
-        ss << "ret";
-        break;
+        return "ret";
     case Opcode::Xor:
-        ss << "xor ";
-        ss << reg_to_str(m_dst, m_operand_bit_width);
-        ss << ", ";
-        ss << reg_to_str(m_src, m_operand_bit_width);
-        break;
+        return "xor";
+    }
+}
+
+} // namespace
+
+void dump_inst(const MachineInst &inst) {
+    std::stringstream ss;
+    ss << std::hex << inst.offset << ": ";
+    for (int i = 0; i < inst.length; i++) {
+        ss << std::setfill('0') << std::setw(2) << (static_cast<unsigned int>(inst.bytes[i]) & 0xFFU);
+        ss << ' ';
+    }
+
+    for (int i = 0; i < 8 - inst.length; i++) {
+        ss << "   ";
+    }
+
+    ss << mnemonic(inst.opcode) << ' ';
+    for (bool first = true; const auto &operand : inst.operands) {
+        if (operand.type == OperandType::None) {
+            continue;
+        }
+
+        if (!first) {
+            ss << ", ";
+        }
+        first = false;
+
+        switch (operand.type) {
+        case OperandType::Imm:
+            ss << std::hex << operand.imm << std::dec;
+            break;
+        case OperandType::Mem:
+            ss << "[";
+            ss << reg_to_str(operand.base, inst.address_width);
+            ss << " + ";
+            ss << reg_to_str(operand.index, inst.address_width);
+            ss << " * ";
+            ss << (static_cast<unsigned int>(operand.scale) & 0xFFU);
+            ss << "]";
+            break;
+        case OperandType::Reg:
+            ss << reg_to_str(operand.reg, inst.operand_width);
+            break;
+        default:
+            assert(false);
+        }
     }
     std::cout << ss.str() << '\n';
 }

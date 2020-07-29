@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
     if (mode == "disasm") {
         while (decoder.has_next()) {
             auto inst = decoder.next_inst();
-            inst.dump();
+            x86::dump_inst(inst);
         }
     } else if (mode == "decomp") {
         x86::Frontend frontend(&decoder);

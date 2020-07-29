@@ -23,10 +23,9 @@ class Frontend {
     Local *local(std::size_t);
     Local *reg_local(Register);
 
-    void translate_mov_reg_imm(Register, std::size_t);
-    void translate_mov_reg_reg(Register, Register);
-    void translate_push_reg(Register);
-    void translate_pop_reg(Register);
+    void translate_mov(const Operand &dst, const Operand &src);
+    void translate_pop(const Operand &dst);
+    void translate_push(const Operand &src);
     void translate_ret();
 
 public:
