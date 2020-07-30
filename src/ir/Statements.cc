@@ -5,7 +5,7 @@
 namespace bamf {
 
 void AssignStmt::dump() const {
-    m_dst->dump();
+    m_dst.dump();
     std::cout << " = ";
     m_expr->dump();
     std::cout << '\n';
@@ -13,7 +13,7 @@ void AssignStmt::dump() const {
 
 void RetStmt::dump() const {
     std::cout << "ret ";
-    m_local->dump();
+    m_local.dump();
     std::cout << '\n';
 }
 

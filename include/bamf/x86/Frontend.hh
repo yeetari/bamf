@@ -18,10 +18,10 @@ class Frontend {
 
     BasicBlock *m_block{nullptr};
     std::unordered_map<std::size_t, Local> m_locals;
-    std::vector<const Local *> m_stack;
+    std::vector<Local *> m_stack;
 
-    Local *local(std::size_t);
-    Local *reg_local(Register);
+    Local &local(std::size_t);
+    Local &reg_local(Register);
 
     void translate_mov(const Operand &dst, const Operand &src);
     void translate_pop(const Operand &dst);

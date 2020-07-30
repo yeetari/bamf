@@ -8,11 +8,11 @@
 
 namespace bamf::x86 {
 
-Local *Frontend::local(std::size_t local) {
-    return &m_locals.try_emplace(local, std::to_string(local - 16)).first->second;
+Local &Frontend::local(std::size_t local) {
+    return m_locals.try_emplace(local, std::to_string(local - 16)).first->second;
 }
 
-Local *Frontend::reg_local(Register reg) {
+Local &Frontend::reg_local(Register reg) {
     return local(static_cast<std::size_t>(reg));
 }
 
@@ -23,7 +23,7 @@ void Frontend::translate_mov(const Operand &dst, const Operand &src) {
         m_block->insert<AssignStmt>(reg_local(dst.reg), new ConstExpr(src.imm));
         break;
     case OperandType::Reg:
-        m_block->insert<AssignStmt>(reg_local(dst.reg), reg_local(src.reg));
+        m_block->insert<AssignStmt>(reg_local(dst.reg), &reg_local(src.reg));
         break;
     default:
         throw std::runtime_error("Unsupported mov src type");
@@ -32,20 +32,20 @@ void Frontend::translate_mov(const Operand &dst, const Operand &src) {
 
 void Frontend::translate_pop(const Operand &dst) {
     assert(dst.type == OperandType::Reg);
-    const auto *src = m_stack.back();
+    auto *src = m_stack.back();
     m_stack.pop_back();
     m_block->insert<AssignStmt>(reg_local(dst.reg), src);
 }
 
 void Frontend::translate_push(const Operand &src) {
-    const auto *dst = local(m_stack.size() + 16);
-    m_stack.push_back(dst);
+    auto &dst = local(m_stack.size() + 16);
+    m_stack.push_back(&dst);
     switch (src.type) {
     case OperandType::Imm:
         m_block->insert<AssignStmt>(dst, new ConstExpr(src.imm));
         break;
     case OperandType::Reg:
-        m_block->insert<AssignStmt>(dst, reg_local(src.reg));
+        m_block->insert<AssignStmt>(dst, &reg_local(src.reg));
         break;
     default:
         throw std::runtime_error("Unsupported push src type");
