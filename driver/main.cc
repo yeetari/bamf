@@ -1,6 +1,6 @@
+#include <bamf/core/ElfLoader.hh>
 #include <bamf/core/Executable.hh>
-#include <bamf/io/ElfLoader.hh>
-#include <bamf/io/InputFile.hh>
+#include <bamf/core/InputFile.hh>
 #include <bamf/support/Stream.hh>
 #include <bamf/x86/Decoder.hh>
 #include <bamf/x86/Frontend.hh>

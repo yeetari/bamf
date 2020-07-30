@@ -1,4 +1,4 @@
-#include <bamf/io/InputFile.hh>
+#include <bamf/core/InputFile.hh>
 
 #include <fstream>
 #include <stdexcept>

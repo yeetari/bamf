@@ -1,7 +1,7 @@
-#include <bamf/io/ElfLoader.hh>
+#include <bamf/core/ElfLoader.hh>
 
 #include <bamf/core/Executable.hh>
-#include <bamf/io/InputFile.hh>
+#include <bamf/core/InputFile.hh>
 
 #include <array>
 #include <cstdint>
