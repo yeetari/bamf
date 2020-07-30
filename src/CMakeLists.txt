@@ -8,6 +8,7 @@ add_library(bamf
     ir/Statements.cc
     pass/PassManager.cc
     support/Stream.cc
+    transforms/SsaTranslator.cc
     x86/Decoder.cc
     x86/Frontend.cc
     x86/MachineInst.cc
