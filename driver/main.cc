@@ -73,8 +73,8 @@ int main(int argc, char **argv) {
         }
     } else if (mode == "decomp") {
         x86::Frontend frontend(&decoder);
-        auto block = frontend.run();
-        block->dump();
+        auto function = frontend.run();
+        function->dump();
     } else {
         throw std::runtime_error("Invalid mode " + mode + " (valid disasm/decomp)");
     }

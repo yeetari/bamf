@@ -56,9 +56,10 @@ void Frontend::translate_ret() {
     m_block->insert<RetStmt>(reg_local(Register::Rax));
 }
 
-std::unique_ptr<BasicBlock> Frontend::run() {
-    auto block = std::make_unique<BasicBlock>();
-    m_block = block.get();
+std::unique_ptr<Function> Frontend::run() {
+    auto function = std::make_unique<Function>("main");
+    m_block = function->insert_block();
+    function->set_entry(m_block);
     for (int i = 0; i < 15; i++) {
         m_locals.emplace(i, reg_to_str(static_cast<Register>(i), 64));
     }
@@ -84,7 +85,7 @@ std::unique_ptr<BasicBlock> Frontend::run() {
         }
     }
 
-    return block;
+    return function;
 }
 
 } // namespace bamf::x86

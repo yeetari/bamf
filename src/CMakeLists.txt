@@ -3,6 +3,7 @@ add_library(bamf
     core/InputFile.cc
     ir/BasicBlock.cc
     ir/Expressions.cc
+    ir/Function.cc
     ir/Local.cc
     ir/Statements.cc
     support/Stream.cc

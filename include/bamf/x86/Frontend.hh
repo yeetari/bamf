@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bamf/ir/BasicBlock.hh>
+#include <bamf/ir/Function.hh>
 #include <bamf/ir/Local.hh>
 #include <bamf/support/NonCopyable.hh>
 #include <bamf/support/NonMovable.hh>
@@ -31,7 +31,7 @@ class Frontend {
 public:
     explicit Frontend(Decoder *decoder) : m_decoder(decoder) {}
 
-    std::unique_ptr<BasicBlock> run();
+    std::unique_ptr<Function> run();
 };
 
 } // namespace bamf::x86
