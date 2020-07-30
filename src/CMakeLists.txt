@@ -6,6 +6,7 @@ add_library(bamf
     ir/Function.cc
     ir/Local.cc
     ir/Statements.cc
+    pass/PassManager.cc
     support/Stream.cc
     x86/Decoder.cc
     x86/Frontend.cc
