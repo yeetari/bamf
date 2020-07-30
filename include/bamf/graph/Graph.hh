@@ -18,7 +18,7 @@ class Graph {
     std::unordered_map<const V *, std::vector<std::unique_ptr<Edge<V>>>> m_preds;
     std::unordered_map<const V *, std::vector<std::unique_ptr<Edge<V>>>> m_succs;
     std::vector<std::unique_ptr<V>> m_vertices;
-    const V *m_entry{nullptr};
+    V *m_entry{nullptr};
 
 public:
     BAMF_MAKE_ITERABLE(m_vertices)
@@ -35,10 +35,13 @@ public:
     V *emplace(Args &&... args);
     void remove(const V *vertex);
 
+    void set_entry(V *entry) { m_entry = entry; }
+
     std::vector<V *> preds_of(const V *vertex);
     std::vector<V *> succs_of(const V *vertex);
 
     std::size_t size() const;
+    V *entry() { return m_entry; }
 };
 
 template <typename V>
