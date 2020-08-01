@@ -24,7 +24,6 @@ public:
     explicit Function(std::string name) : m_name(std::move(name)) {}
     ~Function() = default;
 
-    void dump() const;
     void set_entry(BasicBlock *block) { m_cfg.set_entry(block); }
 
     BasicBlock *insert_block() { return m_cfg.emplace(); }

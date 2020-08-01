@@ -3,7 +3,7 @@
 #include <bamf/core/InputFile.hh>
 #include <bamf/pass/PassManager.hh>
 #include <bamf/support/Stream.hh>
-#include <bamf/transforms/SsaTranslator.hh>
+#include <bamf/transforms/Dumper.hh>
 #include <bamf/x86/Decoder.hh>
 #include <bamf/x86/Frontend.hh>
 
@@ -76,12 +76,9 @@ int main(int argc, char **argv) {
     } else if (mode == "decomp") {
         x86::Frontend frontend(&decoder);
         auto function = frontend.run();
-        function->dump();
-
         PassManager pass_manager;
-        pass_manager.add<SsaTranslator>();
+        pass_manager.add<Dumper>();
         pass_manager.run(function.get());
-        function->dump();
     } else {
         throw std::runtime_error("Invalid mode " + mode + " (valid disasm/decomp)");
     }
