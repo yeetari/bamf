@@ -5,6 +5,7 @@
 #include <bamf/support/NonCopyable.hh>
 #include <bamf/support/NonMovable.hh>
 
+#include <algorithm>
 #include <concepts>
 #include <memory>
 #include <utility>
@@ -26,6 +27,16 @@ public:
     template <typename Inst, typename... Args>
     Inst *insert(Args &&... args) requires std::derived_from<Inst, Instruction> {
         return static_cast<Inst *>(m_instructions.emplace_back(new Inst(std::forward<Args>(args)...)).get());
+    }
+
+    void remove(Instruction *inst) {
+        auto it = std::find_if(m_instructions.begin(), m_instructions.end(), [inst](auto &ptr) {
+            return ptr.get() == inst;
+        });
+
+        if (it != m_instructions.end()) {
+            m_instructions.erase(it);
+        }
     }
 };
 
