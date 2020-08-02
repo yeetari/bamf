@@ -1,6 +1,7 @@
 add_library(bamf
     core/ElfLoader.cc
     core/InputFile.cc
+    ir/Value.cc
     pass/PassManager.cc
     support/Stream.cc
     transforms/Dumper.cc
