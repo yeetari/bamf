@@ -4,6 +4,7 @@
 #include <bamf/pass/PassManager.hh>
 #include <bamf/support/Stream.hh>
 #include <bamf/transforms/ConstantPropagator.hh>
+#include <bamf/transforms/DeadInstructionPruner.hh>
 #include <bamf/transforms/Dumper.hh>
 #include <bamf/x86/Decoder.hh>
 #include <bamf/x86/Frontend.hh>
@@ -79,6 +80,7 @@ int main(int argc, char **argv) {
         auto function = frontend.run();
         PassManager pass_manager;
         pass_manager.add<ConstantPropagator>();
+        pass_manager.add<DeadInstructionPruner>();
         pass_manager.add<Dumper>();
         pass_manager.run(function.get());
     } else {

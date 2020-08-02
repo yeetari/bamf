@@ -5,6 +5,7 @@ add_library(bamf
     pass/PassManager.cc
     support/Stream.cc
     transforms/ConstantPropagator.cc
+    transforms/DeadInstructionPruner.cc
     transforms/Dumper.cc
     x86/Decoder.cc
     x86/Frontend.cc
