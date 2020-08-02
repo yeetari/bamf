@@ -4,6 +4,7 @@ add_library(bamf
     ir/Value.cc
     pass/PassManager.cc
     support/Stream.cc
+    transforms/ConstantPropagator.cc
     transforms/Dumper.cc
     x86/Decoder.cc
     x86/Frontend.cc
