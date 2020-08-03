@@ -33,7 +33,7 @@ const char *mnemonic(Opcode opcode) {
 
 void dump_inst(const MachineInst &inst) {
     std::stringstream ss;
-    ss << std::hex << inst.offset << ": ";
+    ss << std::hex << std::setfill(' ') << std::setw(4) << inst.offset << ": ";
     for (int i = 0; i < inst.length; i++) {
         ss << std::setfill('0') << std::setw(2) << (static_cast<unsigned int>(inst.bytes[i]) & 0xFFU);
         ss << ' ';
