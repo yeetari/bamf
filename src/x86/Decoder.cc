@@ -44,6 +44,7 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
     BUILD(0x89, 1, {
         inst.opcode = Opcode::Mov;
         inst.mod_rm = true;
+        inst.default_address_width = 64;
         inst.default_operand_width = 32;
         inst.operands[0] = {OperandInfoType::ModRmRm};
         inst.operands[1] = {OperandInfoType::ModRmGpr};
@@ -174,7 +175,8 @@ MachineInst Decoder::next_inst() {
                 std::uint8_t index;
                 std::uint8_t base;
             } sib{};
-            if (mod_rm.rm == 0b100) {
+            bool has_sib = mod_rm.rm == 0b100;
+            if (has_sib) {
                 auto sib_byte = m_stream->read<std::uint8_t>();
                 inst.bytes[inst.length++] = sib_byte;
                 sib.scale = (sib_byte >> 6U) & 0b11U;
@@ -184,8 +186,30 @@ MachineInst Decoder::next_inst() {
 
             auto reg = static_cast<Register>(mod_rm.rm);
             if (mod_rm.mod == 0b11) {
+                // reg
                 operand.type = OperandType::Reg;
                 operand.reg = reg;
+                break;
+            }
+
+            // [reg]
+            operand.type = OperandType::Mem;
+            operand.base = reg;
+            operand.has_disp = false;
+            operand.has_index = true;
+            if (has_sib) {
+                operand.base = static_cast<Register>(sib.base);
+                operand.index = static_cast<Register>(sib.index);
+                operand.scale = 1U << sib.scale;
+            }
+
+            if (mod_rm.mod == 0b01) {
+                // [reg] + disp8
+                auto disp_byte = m_stream->read<std::uint8_t>();
+                inst.bytes[inst.length++] = disp_byte;
+                operand.disp = disp_byte;
+                operand.has_disp = true;
+                operand.has_index = false;
                 break;
             }
             throw std::runtime_error("Unsupported ModRM addressing mode");

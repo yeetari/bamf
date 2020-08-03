@@ -20,9 +20,12 @@ struct Operand {
         std::size_t imm;
         std::array<std::uint8_t, sizeof(std::size_t)> imm_bytes;
         struct {
+            bool has_disp;
+            bool has_index;
             Register base;
             Register index;
             std::uint8_t scale;
+            std::uint32_t disp;
         };
         Register reg;
     };

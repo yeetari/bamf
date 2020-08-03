@@ -61,10 +61,18 @@ void dump_inst(const MachineInst &inst) {
         case OperandType::Mem:
             ss << "[";
             ss << reg_to_str(operand.base, inst.address_width);
-            ss << " + ";
-            ss << reg_to_str(operand.index, inst.address_width);
-            ss << " * ";
-            ss << (static_cast<unsigned int>(operand.scale) & 0xFFU);
+            if (operand.has_index) {
+                ss << " + ";
+                ss << reg_to_str(operand.index, inst.address_width);
+            }
+            if (operand.scale != 1) {
+                ss << " * ";
+                ss << (static_cast<unsigned int>(operand.scale) & 0xFFU);
+            }
+            if (operand.has_disp) {
+                ss << " + ";
+                ss << operand.disp;
+            }
             ss << "]";
             break;
         case OperandType::Reg:

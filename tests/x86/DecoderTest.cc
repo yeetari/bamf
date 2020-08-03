@@ -19,6 +19,8 @@ MachineInst decode_single_inst(Args &&... args) {
     return decoder.next_inst();
 }
 
+// TODO: Test all possible registers for each test
+
 TEST(x86DecoderTest, MovRegImm16) {
     // mov si, 1
     auto inst = decode_single_inst(0x66, 0xBE, 0x01, 0x00);
