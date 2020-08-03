@@ -169,6 +169,19 @@ MachineInst Decoder::next_inst() {
             operand.reg = static_cast<Register>(mod_rm.reg);
             break;
         case OperandInfoType::ModRmRm: {
+            struct {
+                std::uint8_t scale;
+                std::uint8_t index;
+                std::uint8_t base;
+            } sib{};
+            if (mod_rm.rm == 0b100) {
+                auto sib_byte = m_stream->read<std::uint8_t>();
+                inst.bytes[inst.length++] = sib_byte;
+                sib.scale = (sib_byte >> 6U) & 0b11U;
+                sib.index = (sib_byte >> 3U) & 0b111U;
+                sib.base = sib_byte & 0b111U;
+            }
+
             auto reg = static_cast<Register>(mod_rm.rm);
             if (mod_rm.mod == 0b11) {
                 operand.type = OperandType::Reg;
