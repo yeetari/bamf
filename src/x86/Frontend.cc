@@ -13,6 +13,10 @@ Value *Frontend::phys_dst(Register reg) {
 }
 
 Value *Frontend::phys_src(Register reg) {
+    if (m_phys_regs[reg] == nullptr) {
+        m_phys_regs[reg] = m_block->insert<AllocInst>();
+        m_block->insert<StoreInst>(m_phys_regs[reg], new Constant<std::size_t>(0));
+    }
     return m_block->insert<LoadInst>(m_phys_regs[reg]);
 }
 
@@ -62,12 +66,6 @@ std::unique_ptr<Function> Frontend::run() {
     auto function = std::make_unique<Function>("main");
     m_block = function->insert_block();
     function->set_entry(m_block);
-
-//    for (int reg = 0; reg < 16; reg++) {
-//        auto *alloc = m_block->insert<AllocInst>();
-//        alloc->set_name(reg_to_str(static_cast<Register>(reg), 64));
-//        m_phys_regs.emplace(static_cast<Register>(reg), alloc);
-//    }
 
     while (m_decoder->has_next()) {
         auto inst = m_decoder->next_inst();
