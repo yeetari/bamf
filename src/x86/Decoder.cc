@@ -193,10 +193,8 @@ MachineInst Decoder::next_inst() {
             }
 
             // [reg]
-            operand.type = OperandType::Mem;
+            operand.type = OperandType::MemBaseIndexScale;
             operand.base = reg;
-            operand.has_disp = false;
-            operand.has_index = true;
             if (has_sib) {
                 operand.base = static_cast<Register>(sib.base);
                 operand.index = static_cast<Register>(sib.index);
@@ -207,9 +205,8 @@ MachineInst Decoder::next_inst() {
                 // [reg] + disp8
                 auto disp_byte = m_stream->read<std::uint8_t>();
                 inst.bytes[inst.length++] = disp_byte;
+                operand.type = OperandType::MemBaseDisp;
                 operand.disp = disp_byte;
-                operand.has_disp = true;
-                operand.has_index = false;
                 break;
             }
             throw std::runtime_error("Unsupported ModRM addressing mode");
