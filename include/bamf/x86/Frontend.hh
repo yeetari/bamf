@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bamf/ir/Function.hh>
+#include <bamf/ir/Program.hh>
 #include <bamf/ir/Value.hh>
 #include <bamf/support/NonCopyable.hh>
 #include <bamf/support/NonMovable.hh>
@@ -15,8 +15,10 @@ namespace bamf::x86 {
 
 class Frontend {
     Decoder *const m_decoder;
-
+    Program *m_program{nullptr};
+    Function *m_function{nullptr};
     BasicBlock *m_block{nullptr};
+
     std::unordered_map<Register, Value *> m_phys_regs;
     std::vector<Value *> m_stack;
 
@@ -31,7 +33,7 @@ class Frontend {
 public:
     explicit Frontend(Decoder *decoder) : m_decoder(decoder) {}
 
-    std::unique_ptr<Function> run();
+    std::unique_ptr<Program> run();
 };
 
 } // namespace bamf::x86

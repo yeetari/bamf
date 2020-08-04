@@ -77,12 +77,12 @@ int main(int argc, char **argv) {
         }
     } else if (mode == "decomp") {
         x86::Frontend frontend(&decoder);
-        auto function = frontend.run();
+        auto program = frontend.run();
         PassManager pass_manager;
         pass_manager.add<ConstantPropagator>();
         pass_manager.add<DeadInstructionPruner>();
         pass_manager.add<Dumper>();
-        pass_manager.run(function.get());
+        pass_manager.run(program->main());
     } else {
         throw std::runtime_error("Invalid mode " + mode + " (valid disasm/decomp)");
     }

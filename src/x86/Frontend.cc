@@ -62,10 +62,13 @@ void Frontend::translate_ret() {
     m_block->insert<RetInst>(phys_src(Register::Rax));
 }
 
-std::unique_ptr<Function> Frontend::run() {
-    auto function = std::make_unique<Function>("main");
-    m_block = function->insert_block();
-    function->set_entry(m_block);
+std::unique_ptr<Program> Frontend::run() {
+    auto program = std::make_unique<Program>();
+    m_program = program.get();
+    m_function = program->create_function("main");
+    m_block = m_function->insert_block();
+    m_program->set_main(m_function);
+    m_function->set_entry(m_block);
 
     while (m_decoder->has_next()) {
         auto inst = m_decoder->next_inst();
@@ -88,7 +91,7 @@ std::unique_ptr<Function> Frontend::run() {
         }
     }
 
-    return function;
+    return program;
 }
 
 } // namespace bamf::x86
