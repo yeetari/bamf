@@ -42,6 +42,7 @@ public:
 
     std::size_t size() const;
     V *entry() { return m_entry; }
+    const V *entry() const { return m_entry; }
 };
 
 template <typename V>
