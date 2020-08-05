@@ -17,10 +17,21 @@ void run(BasicBlock *block) {
     do {
         changed = false;
         for (auto &inst : *block) {
-            if (inst->uses().empty() && !inst->is<RetInst>()) {
-                changed = true;
-                to_remove.insert(inst.get());
+            // If an instruction has uses, it isn't dead
+            if (!inst->uses().empty()) {
+                continue;
             }
+
+            if (inst->is<StoreInst>()) {
+                continue;
+            }
+
+            if (inst->is<RetInst>()) {
+                continue;
+            }
+
+            changed = true;
+            to_remove.insert(inst.get());
         }
 
         for (auto *inst : to_remove) {
