@@ -1,14 +1,14 @@
 #pragma once
 
-#include <list>
 #include <string>
 #include <utility>
+#include <vector>
 
 namespace bamf {
 
 class Value {
     std::string m_name;
-    std::list<Value **> m_uses;
+    std::vector<Value **> m_uses;
 
 public:
     virtual ~Value() = default;
@@ -27,7 +27,7 @@ public:
     bool has_name() const { return !m_name.empty(); }
 
     const std::string &name() const { return m_name; }
-    const std::list<Value **> &uses() const { return m_uses; }
+    const std::vector<Value **> &uses() const { return m_uses; }
 };
 
 template <typename T>

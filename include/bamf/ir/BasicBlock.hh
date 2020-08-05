@@ -22,7 +22,11 @@ public:
     BAMF_MAKE_NON_MOVABLE(BasicBlock)
 
     BasicBlock() = default;
-    ~BasicBlock() = default;
+    ~BasicBlock() {
+        for (auto &inst : m_instructions) {
+            inst->replace_all_uses_with(nullptr);
+        }
+    }
 
     template <typename Inst, typename... Args>
     Inst *insert(Args &&... args) requires std::derived_from<Inst, Instruction> {
@@ -35,6 +39,7 @@ public:
         });
 
         if (it != m_instructions.end()) {
+            inst->replace_all_uses_with(nullptr);
             m_instructions.erase(it);
         }
     }
