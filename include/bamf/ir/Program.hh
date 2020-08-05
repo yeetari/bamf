@@ -2,6 +2,7 @@
 
 #include <bamf/graph/Graph.hh>
 #include <bamf/ir/Function.hh>
+#include <bamf/ir/GlobalVariable.hh>
 #include <bamf/ir/Value.hh>
 #include <bamf/support/Iterator.hh>
 #include <bamf/support/NonCopyable.hh>
@@ -14,7 +15,7 @@ namespace bamf {
 
 class Program {
     Graph<Function> m_call_graph;
-    std::vector<std::unique_ptr<Value>> m_globals;
+    std::vector<std::unique_ptr<GlobalVariable>> m_globals;
 
 public:
     BAMF_MAKE_ITERABLE(m_call_graph)
@@ -24,9 +25,7 @@ public:
     Program() = default;
     ~Program() = default;
 
-    Value *add_global() {
-        return m_globals.emplace_back(new Value).get();
-    }
+    GlobalVariable *add_global() { return m_globals.emplace_back(new GlobalVariable).get(); }
 
     template <typename... Args>
     Function *create_function(Args &&... args) {
