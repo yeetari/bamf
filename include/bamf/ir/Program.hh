@@ -25,7 +25,7 @@ public:
     ~Program() = default;
 
     Value *add_global() {
-        return m_globals.emplace_back().get();
+        return m_globals.emplace_back(new Value).get();
     }
 
     template <typename... Args>
