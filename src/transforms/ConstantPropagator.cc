@@ -12,23 +12,23 @@ namespace bamf {
 
 namespace {
 
-struct AllocInfo {
+struct VarInfo {
     std::vector<LoadInst *> loads;
     std::vector<StoreInst *> stores;
 };
 
-void run(BasicBlock *block, std::unordered_map<AllocInst *, AllocInfo> *map) {
+void run(BasicBlock *block, std::unordered_map<Value *, VarInfo> *map) {
     // Build def-use info
     auto &info_map = *map;
     for (auto &inst : *block) {
         if (auto *load = inst->as<LoadInst>()) {
-            info_map[load->ptr()->as<AllocInst>()].loads.push_back(load);
+            info_map[load->ptr()].loads.push_back(load);
         } else if (auto *store = inst->as<StoreInst>()) {
-            info_map[store->dst()->as<AllocInst>()].stores.push_back(store);
+            info_map[store->dst()].stores.push_back(store);
         }
     }
 
-    for (auto &[alloc, info] : info_map) {
+    for (auto &[var, info] : info_map) {
         // If a var only has one store (def), we can propagate the load values with the store value
         // NOTE: The dead instructions will stay after this pass, you must run the DeadInstructionPruner pass
         if (info.stores.size() == 1) {
@@ -43,7 +43,7 @@ void run(BasicBlock *block, std::unordered_map<AllocInst *, AllocInfo> *map) {
 } // namespace
 
 void ConstantPropagator::run_on(Function *function) {
-    std::unordered_map<AllocInst *, AllocInfo> info_map;
+    std::unordered_map<Value *, VarInfo> info_map;
     for (auto &block : *function) {
         run(block.get(), &info_map);
     }
