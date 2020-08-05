@@ -9,14 +9,10 @@
 namespace bamf::x86 {
 
 Value *Frontend::phys_dst(Register reg) {
-    return m_phys_regs[reg] = m_block->insert<AllocInst>();
+    return m_phys_regs[reg];
 }
 
 Value *Frontend::phys_src(Register reg) {
-    if (m_phys_regs[reg] == nullptr) {
-        m_phys_regs[reg] = m_block->insert<AllocInst>();
-        m_block->insert<StoreInst>(m_phys_regs[reg], new Constant<std::size_t>(0));
-    }
     return m_block->insert<LoadInst>(m_phys_regs[reg]);
 }
 
@@ -69,6 +65,13 @@ std::unique_ptr<Program> Frontend::run() {
     m_block = m_function->insert_block();
     m_program->set_main(m_function);
     m_function->set_entry(m_block);
+
+    for (int i = 0; i < 16; i++) {
+        auto reg = static_cast<Register>(i);
+        auto *global = m_program->add_global();
+        global->set_name(reg_to_str(reg, 64));
+        m_phys_regs[reg] = global;
+    }
 
     while (m_decoder->has_next()) {
         auto inst = m_decoder->next_inst();

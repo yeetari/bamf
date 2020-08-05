@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bamf/ir/GlobalVariable.hh>
 #include <bamf/ir/Program.hh>
 #include <bamf/ir/Value.hh>
 #include <bamf/support/NonCopyable.hh>
@@ -19,7 +20,7 @@ class Frontend {
     Function *m_function{nullptr};
     BasicBlock *m_block{nullptr};
 
-    std::unordered_map<Register, Value *> m_phys_regs;
+    std::unordered_map<Register, GlobalVariable *> m_phys_regs;
     std::vector<Value *> m_stack;
 
     Value *phys_dst(Register);
