@@ -21,9 +21,9 @@ enum class LogLevel {
 constexpr fmt::color log_level_to_colour(LogLevel level) {
     switch (level) {
     case LogLevel::Trace:
-        return fmt::color::light_blue;
+        return fmt::color::steel_blue;
     case LogLevel::Debug:
-        return fmt::color::light_coral;
+        return fmt::color::cornflower_blue;
     case LogLevel::Info:
         return fmt::color::white;
     case LogLevel::Warn:
