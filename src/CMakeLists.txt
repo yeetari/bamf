@@ -4,9 +4,9 @@ add_library(bamf
     ir/Value.cc
     pass/PassManager.cc
     support/Stream.cc
-    transforms/DeadInstructionPruner.cc
     transforms/DeadStorePruner.cc
     transforms/Dumper.cc
+    transforms/TriviallyDeadInstructionPruner.cc
     x86/Decoder.cc
     x86/Frontend.cc
     x86/MachineInst.cc

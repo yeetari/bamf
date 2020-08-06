@@ -1,4 +1,4 @@
-#include <bamf/transforms/DeadInstructionPruner.hh>
+#include <bamf/transforms/TriviallyDeadInstructionPruner.hh>
 
 #include <bamf/ir/BasicBlock.hh>
 #include <bamf/ir/Function.hh>
@@ -7,7 +7,7 @@
 
 namespace bamf {
 
-void DeadInstructionPruner::run_on(Function *function) {
+void TriviallyDeadInstructionPruner::run_on(Function *function) {
     std::vector<Instruction *> work_queue;
     for (auto &block : *function) {
         for (auto &inst : *block) {
