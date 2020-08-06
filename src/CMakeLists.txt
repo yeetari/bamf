@@ -14,3 +14,4 @@ add_library(bamf
     x86/Register.cc)
 target_compile_features(bamf PUBLIC cxx_std_20)
 target_include_directories(bamf PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(bamf PRIVATE fmt::fmt)

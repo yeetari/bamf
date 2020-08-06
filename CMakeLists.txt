@@ -4,6 +4,7 @@ project(bamf)
 option(BAMF_BUILD_DRIVER "Build example" OFF)
 option(BAMF_BUILD_TESTS "Build tests" OFF)
 
+find_package(fmt REQUIRED)
 add_subdirectory(src)
 
 if(BAMF_BUILD_DRIVER)
