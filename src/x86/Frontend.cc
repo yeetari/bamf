@@ -32,15 +32,14 @@ void Frontend::translate_mov(const Operand &dst, const Operand &src) {
 
 void Frontend::translate_pop(const Operand &dst) {
     assert(dst.type == OperandType::Reg);
-    auto *src = m_block->insert<LoadInst>(m_stack.back());
-    m_stack.pop_back();
+    auto *src = m_block->insert<LoadInst>(m_stack.pop());
     m_block->insert<StoreInst>(phys_dst(dst.reg), src);
 }
 
 void Frontend::translate_push(const Operand &src) {
     auto *stack_var = m_block->insert<AllocInst>();
     stack_var->set_name("svar" + std::to_string(m_stack.size()));
-    m_stack.push_back(stack_var);
+    m_stack.push(stack_var);
 
     switch (src.type) {
     case OperandType::Imm:
