@@ -5,47 +5,35 @@
 #include <bamf/ir/Instruction.hh>
 #include <bamf/ir/Instructions.hh>
 
-#include <unordered_set>
-
 namespace bamf {
 
-namespace {
-
-void run(BasicBlock *block) {
-    std::unordered_set<Instruction *> to_remove;
-    bool changed = false;
-    do {
-        changed = false;
-        for (auto &inst : *block) {
-            // If an instruction has uses, it isn't dead
-            if (!inst->uses().empty()) {
-                continue;
-            }
-
-            // Dead stores are handled by DeadStorePruner
-            if (inst->is<StoreInst>()) {
-                continue;
-            }
-
-            if (inst->is<RetInst>()) {
-                continue;
-            }
-
-            changed = true;
-            to_remove.insert(inst.get());
-        }
-
-        for (auto *inst : to_remove) {
-            block->remove(inst);
-        }
-    } while (changed);
-}
-
-} // namespace
-
 void DeadInstructionPruner::run_on(Function *function) {
+    std::vector<Instruction *> work_queue;
     for (auto &block : *function) {
-        run(block.get());
+        for (auto &inst : *block) {
+            work_queue.push_back(inst.get());
+        }
+    }
+
+    while (!work_queue.empty()) {
+        auto *inst = work_queue.back();
+        work_queue.pop_back();
+
+        // If an instruction has uses, it isn't dead
+        if (!inst->uses().empty()) {
+            continue;
+        }
+
+        // Dead stores are handled by DeadStorePruner
+        if (inst->is<StoreInst>()) {
+            continue;
+        }
+
+        if (inst->is<RetInst>()) {
+            continue;
+        }
+
+        inst->parent()->remove(inst);
     }
 }
 
