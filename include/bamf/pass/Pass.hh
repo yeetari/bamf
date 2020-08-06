@@ -1,5 +1,7 @@
 #pragma once
 
+#include <bamf/support/Logger.hh>
+
 #include <string>
 #include <utility>
 
@@ -11,7 +13,8 @@ class Pass {
     const std::string m_name;
 
 protected:
-    explicit Pass(std::string name) : m_name(std::move(name)) {}
+    Logger m_logger;
+    explicit Pass(std::string name) : m_name(std::move(name)), m_logger(m_name) {}
 
 public:
     virtual ~Pass() = default;

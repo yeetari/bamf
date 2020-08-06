@@ -5,7 +5,7 @@
 namespace bamf {
 
 struct DeadStorePruner : public Pass {
-    DeadStorePruner() : Pass("Dead Store Pruner") {}
+    DeadStorePruner() : Pass("dead-store-pruner") {}
 
     void run_on(Function *function) override;
 };

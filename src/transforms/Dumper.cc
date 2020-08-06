@@ -11,6 +11,7 @@
 namespace bamf {
 
 void Dumper::run_on(Function *function) {
+    m_logger.info("Dumping function {}", function->name());
     std::unordered_map<const Value *, std::size_t> value_map;
     auto versioned_value = [&](const Value *value) {
         if (!value_map.contains(value)) {

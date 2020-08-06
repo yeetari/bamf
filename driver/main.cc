@@ -2,6 +2,7 @@
 #include <bamf/core/Executable.hh>
 #include <bamf/core/InputFile.hh>
 #include <bamf/pass/PassManager.hh>
+#include <bamf/support/Logger.hh>
 #include <bamf/support/Stream.hh>
 #include <bamf/transforms/DeadStorePruner.hh>
 #include <bamf/transforms/Dumper.hh>
@@ -9,7 +10,6 @@
 #include <bamf/x86/Decoder.hh>
 #include <bamf/x86/Frontend.hh>
 
-#include <iostream>
 #include <stdexcept>
 #include <string>
 
@@ -17,8 +17,10 @@ using namespace bamf;
 
 namespace {
 
+Logger s_logger("driver");
+
 void print_usage(const char *prog_name) {
-    std::cerr << "Usage: " << prog_name << " [options] <file>\n";
+    s_logger.info("Usage: {} [options] <file>\n", prog_name);
 }
 
 } // namespace
@@ -52,7 +54,8 @@ int main(int argc, char **argv) {
 
     Executable executable{};
     InputFile file(file_name.c_str());
-    std::cerr << "Decoding " << file_name << " as " << file_type << (file_type_detected ? " (detected)\n" : "\n");
+    s_logger.info("{} {} as {} {}", mode == "disasm" ? "Disassembling" : "Decompiling", file_name, file_type,
+               file_type_detected ? "(detected)" : "");
     if (file_type == "bin") {
         executable.code = file.get<std::uint8_t>(0);
         executable.code_size = file.size();
@@ -61,12 +64,6 @@ int main(int argc, char **argv) {
     } else {
         throw std::runtime_error("Unknown file type " + file_type);
     }
-
-    std::cerr << std::hex;
-    for (std::size_t i = 0; i < executable.code_size; i++) {
-        std::cerr << (static_cast<unsigned int>(executable.code[i]) & 0xFF) << ' ';
-    }
-    std::cerr << '\n' << std::dec;
 
     Stream stream(executable.code, executable.code_size);
     x86::Decoder decoder(&stream);

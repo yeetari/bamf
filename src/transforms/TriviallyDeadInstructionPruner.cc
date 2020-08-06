@@ -15,6 +15,7 @@ void TriviallyDeadInstructionPruner::run_on(Function *function) {
         }
     }
 
+    int pruned_count = 0;
     while (!work_queue.empty()) {
         auto *inst = work_queue.back();
         work_queue.pop_back();
@@ -35,7 +36,9 @@ void TriviallyDeadInstructionPruner::run_on(Function *function) {
         }
 
         inst->remove_from_parent();
+        pruned_count++;
     }
+    m_logger.trace("Pruned {} trivially dead instructions", pruned_count);
 }
 
 } // namespace bamf
