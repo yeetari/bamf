@@ -30,7 +30,10 @@ public:
 
     template <typename Inst, typename... Args>
     Inst *insert(Args &&... args) requires std::derived_from<Inst, Instruction> {
-        return static_cast<Inst *>(m_instructions.emplace_back(new Inst(std::forward<Args>(args)...)).get());
+        auto *inst = new Inst(std::forward<Args>(args)...);
+        inst->set_parent(this);
+        m_instructions.emplace_back(inst);
+        return inst;
     }
 
     void remove(Instruction *inst) {
