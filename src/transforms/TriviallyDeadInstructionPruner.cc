@@ -29,11 +29,12 @@ void TriviallyDeadInstructionPruner::run_on(Function *function) {
             continue;
         }
 
+        // Returns are never explictly used, and therefore can never be trivially dead
         if (inst->is<RetInst>()) {
             continue;
         }
 
-        inst->parent()->remove(inst);
+        inst->remove_from_parent();
     }
 }
 
