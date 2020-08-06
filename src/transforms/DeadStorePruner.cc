@@ -1,10 +1,11 @@
-#include <bamf/transforms/ConstantPropagator.hh>
+#include <bamf/transforms/DeadStorePruner.hh>
 
 #include <bamf/ir/BasicBlock.hh>
 #include <bamf/ir/Function.hh>
 #include <bamf/ir/Instruction.hh>
 #include <bamf/ir/Instructions.hh>
 
+#include <cassert>
 #include <unordered_map>
 #include <vector>
 
@@ -30,11 +31,16 @@ void run(BasicBlock *block, std::unordered_map<Value *, VarInfo> *map) {
 
     for (auto &[var, info] : info_map) {
         // If a var only has one store (def), we can propagate the load values with the store value
-        // NOTE: The dead instructions will stay after this pass, you must run the DeadInstructionPruner pass
+        // NOTE: The dead loads will stay after this pass, you must run the DeadInstructionPruner pass
         if (info.stores.size() == 1) {
             auto *store = info.stores[0];
             for (auto *load : info.loads) {
+                // Propagate all uses of the load with the RHS of the store
                 load->replace_all_uses_with(store->src());
+
+                // Remove dead store
+                assert(store->uses().empty());
+                block->remove(store);
             }
         }
     }
@@ -42,7 +48,7 @@ void run(BasicBlock *block, std::unordered_map<Value *, VarInfo> *map) {
 
 } // namespace
 
-void ConstantPropagator::run_on(Function *function) {
+void DeadStorePruner::run_on(Function *function) {
     std::unordered_map<Value *, VarInfo> info_map;
     for (auto &block : *function) {
         run(block.get(), &info_map);

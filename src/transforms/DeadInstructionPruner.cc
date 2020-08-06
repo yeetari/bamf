@@ -22,6 +22,7 @@ void run(BasicBlock *block) {
                 continue;
             }
 
+            // Dead stores are handled by DeadStorePruner
             if (inst->is<StoreInst>()) {
                 continue;
             }

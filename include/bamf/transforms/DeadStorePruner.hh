@@ -4,8 +4,8 @@
 
 namespace bamf {
 
-struct ConstantPropagator : public Pass {
-    ConstantPropagator() : Pass("Constant Propagator") {}
+struct DeadStorePruner : public Pass {
+    DeadStorePruner() : Pass("Dead Store Pruner") {}
 
     void run_on(Function *function) override;
 };
