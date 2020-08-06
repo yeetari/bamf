@@ -28,6 +28,8 @@ public:
 
     BasicBlock *insert_block() { return m_cfg.emplace(); }
     BasicBlock *entry() { return m_cfg.entry(); }
+
+    const std::string &name() const { return m_name; }
 };
 
 } // namespace bamf
