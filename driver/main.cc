@@ -6,7 +6,7 @@
 #include <bamf/support/Stream.hh>
 #include <bamf/transforms/DeadStorePruner.hh>
 #include <bamf/transforms/Dumper.hh>
-#include <bamf/transforms/TriviallyDeadInstructionPruner.hh>
+#include <bamf/transforms/TriviallyDeadInstPruner.hh>
 #include <bamf/x86/Decoder.hh>
 #include <bamf/x86/Frontend.hh>
 
@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
         auto program = frontend.run();
         PassManager pass_manager;
         pass_manager.add<DeadStorePruner>();
-        pass_manager.add<TriviallyDeadInstructionPruner>();
+        pass_manager.add<TriviallyDeadInstPruner>();
         pass_manager.add<Dumper>();
         pass_manager.run(program->main());
     } else {

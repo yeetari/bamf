@@ -31,7 +31,7 @@ void run(BasicBlock *block, std::unordered_map<Value *, VarInfo> *map, int *prun
 
     for (auto &[var, info] : info_map) {
         // If a var only has one store (def), we can propagate the load values with the store value
-        // NOTE: The dead loads will stay after this pass, you must run the TriviallyDeadInstructionPruner pass
+        // NOTE: The dead loads will stay after this pass, you must run the TriviallyDeadInstPruner pass
         if (info.stores.size() == 1) {
             auto *store = info.stores[0];
             for (auto *load : info.loads) {

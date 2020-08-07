@@ -4,8 +4,8 @@
 
 namespace bamf {
 
-struct TriviallyDeadInstructionPruner : public Pass {
-    TriviallyDeadInstructionPruner() : Pass("tdip") {}
+struct TriviallyDeadInstPruner : public Pass {
+    TriviallyDeadInstPruner() : Pass("trivially-dead-inst-pruner") {}
 
     void run_on(Function *function) override;
 };
