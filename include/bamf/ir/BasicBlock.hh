@@ -46,7 +46,7 @@ public:
         return insert<Inst>(m_instructions.end(), std::forward<Args>(args)...);
     }
 
-    void remove(Instruction *inst) {
+    const_iterator remove(Instruction *inst) {
         auto it = std::find_if(m_instructions.begin(), m_instructions.end(), [inst](auto &ptr) {
             return ptr.get() == inst;
         });
@@ -55,6 +55,7 @@ public:
             inst->replace_all_uses_with(nullptr);
             m_instructions.erase(it);
         }
+        return it;
     }
 };
 
