@@ -74,15 +74,19 @@ void StackSimulator::run_on(Function *function) {
             auto *root = find_root_value(inst.get());
             assert(root != nullptr);
 
-            // TODO: Hacky, this should work for any GPR
-            if (!root->is<GlobalVariable>() || root->name() != "rbp") {
+            // TODO: Hacky, this should work for any GPR, decompiler information (such as which values correspond to
+            // TODO: physical registers) should be available in some analysis info.
+            if (!root->is<GlobalVariable>() || (root->name() != "rbp" && root->name() != "rsp")) {
                 continue;
             }
 
             auto *load = inst->as<LoadInst>();
-            auto *store = inst->as<StoreInst>();
-
             if (load != nullptr && !load->ptr()->is<BinaryInst>()) {
+                continue;
+            }
+
+            auto *store = inst->as<StoreInst>();
+            if (store != nullptr && !store->dst()->is<BinaryInst>()) {
                 continue;
             }
 
