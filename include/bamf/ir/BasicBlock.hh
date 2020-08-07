@@ -5,7 +5,6 @@
 #include <bamf/support/NonCopyable.hh>
 #include <bamf/support/NonMovable.hh>
 
-#include <algorithm>
 #include <concepts>
 #include <memory>
 #include <utility>
@@ -17,16 +16,13 @@ class BasicBlock {
     std::vector<std::unique_ptr<Instruction>> m_instructions;
 
 public:
+    // TODO: Make custom iterator to iterate through `Instruction *` (rather than `std::unique_ptr<Instruction>`)
     BAMF_MAKE_ITERABLE(m_instructions)
     BAMF_MAKE_NON_COPYABLE(BasicBlock)
     BAMF_MAKE_NON_MOVABLE(BasicBlock)
 
     BasicBlock() = default;
-    ~BasicBlock() {
-        for (auto &inst : m_instructions) {
-            inst->replace_all_uses_with(nullptr);
-        }
-    }
+    ~BasicBlock();
 
     template <typename Inst, typename... Args>
     Inst *insert(const_iterator position, Args &&... args) requires std::derived_from<Inst, Instruction> {
@@ -46,17 +42,7 @@ public:
         return insert<Inst>(m_instructions.end(), std::forward<Args>(args)...);
     }
 
-    const_iterator remove(Instruction *inst) {
-        auto it = std::find_if(m_instructions.begin(), m_instructions.end(), [inst](auto &ptr) {
-            return ptr.get() == inst;
-        });
-
-        if (it != m_instructions.end()) {
-            inst->replace_all_uses_with(nullptr);
-            m_instructions.erase(it);
-        }
-        return it;
-    }
+    const_iterator remove(Instruction *inst);
 };
 
 } // namespace bamf
