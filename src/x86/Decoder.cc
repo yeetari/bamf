@@ -56,6 +56,14 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
         inst.operands[1] = {OperandInfoType::Imm};
     });
     BUILD(0xC3, 1, { inst.opcode = Opcode::Ret; });
+    BUILD(0xC7, 1, {
+        inst.opcode = Opcode::Mov;
+        inst.mod_rm = true;
+        inst.default_address_width = 64;
+        inst.default_operand_width = 32;
+        inst.operands[0] = {OperandInfoType::ModRmRm};
+        inst.operands[1] = {OperandInfoType::Imm};
+    });
     BUILD(0xE8, 1, {
         inst.opcode = Opcode::Call;
         inst.default_operand_width = 32;
