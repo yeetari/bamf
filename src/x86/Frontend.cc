@@ -17,13 +17,26 @@ Value *Frontend::phys_src(Register reg) {
 }
 
 void Frontend::translate_mov(const Operand &dst, const Operand &src) {
-    assert(dst.type == OperandType::Reg);
+    Value *store_dst = nullptr;
+    switch (dst.type) {
+    case OperandType::MemBaseDisp: {
+        auto *base = phys_src(dst.base);
+        store_dst = m_block->insert<BinaryInst>(BinaryOp::Add, base, new Constant<std::size_t>(dst.disp));
+        break;
+    }
+    case OperandType::Reg:
+        store_dst = phys_dst(dst.reg);
+        break;
+    default:
+        throw std::runtime_error("Unsupported mov dst type");
+    }
+
     switch (src.type) {
     case OperandType::Imm:
-        m_block->insert<StoreInst>(phys_dst(dst.reg), new Constant(src.imm));
+        m_block->insert<StoreInst>(store_dst, new Constant(src.imm));
         break;
     case OperandType::Reg:
-        m_block->insert<StoreInst>(phys_dst(dst.reg), phys_src(src.reg));
+        m_block->insert<StoreInst>(store_dst, phys_src(src.reg));
         break;
     default:
         throw std::runtime_error("Unsupported mov src type");
