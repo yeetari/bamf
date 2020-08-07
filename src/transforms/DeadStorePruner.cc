@@ -18,7 +18,7 @@ struct VarInfo {
     std::vector<StoreInst *> stores;
 };
 
-void run(BasicBlock *block, std::unordered_map<Value *, VarInfo> *map, int &pruned_count) {
+void run(BasicBlock *block, std::unordered_map<Value *, VarInfo> *map, int *pruned_count) {
     // Build def-use info
     auto &info_map = *map;
     for (auto &inst : *block) {
@@ -41,7 +41,7 @@ void run(BasicBlock *block, std::unordered_map<Value *, VarInfo> *map, int &prun
                 // Remove dead store
                 assert(store->uses().empty());
                 block->remove(store);
-                pruned_count++;
+                (*pruned_count)++;
             }
         }
     }
@@ -53,7 +53,7 @@ void DeadStorePruner::run_on(Function *function) {
     std::unordered_map<Value *, VarInfo> info_map;
     int pruned_count = 0;
     for (auto &block : *function) {
-        run(block.get(), &info_map, pruned_count);
+        run(block.get(), &info_map, &pruned_count);
     }
     m_logger.trace("Pruned {} dead stores", pruned_count);
 }
