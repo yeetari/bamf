@@ -7,6 +7,7 @@ add_library(bamf
     support/Stream.cc
     transforms/DeadStorePruner.cc
     transforms/Dumper.cc
+    transforms/StackSimulator.cc
     transforms/TriviallyDeadInstPruner.cc
     x86/Decoder.cc
     x86/Frontend.cc
