@@ -15,6 +15,31 @@ namespace bamf {
 
 namespace {
 
+struct StackOffset {
+    struct Hasher {
+        std::size_t operator()(const StackOffset &offset) const noexcept {
+            auto h1 = std::hash<std::size_t>{}(offset.offset);
+            auto h2 = std::hash<bool>{}(offset.negative);
+            return h1 ^ h2;
+        }
+    };
+
+    struct EqualFn {
+        bool operator()(const StackOffset &lhs, const StackOffset &rhs) const noexcept {
+            if (lhs.offset != rhs.offset) {
+                return false;
+            }
+            return lhs.negative == rhs.negative;
+        }
+    };
+
+    std::size_t offset{0};
+    bool negative{false};
+
+    StackOffset() = default;
+    StackOffset(std::size_t offset, bool negative) : offset(offset), negative(negative) {}
+};
+
 // TODO: Build a proper tree (Graph<Value *>) of this
 Value *find_root_value(Value *start) {
     if (auto *binary = start->as<BinaryInst>()) {
@@ -38,8 +63,8 @@ Value *find_root_value(Value *start) {
 } // namespace
 
 void StackSimulator::run_on(Function *function) {
-    std::unordered_map<LoadInst *, std::size_t> load_map;
-    std::unordered_map<StoreInst *, std::size_t> store_map;
+    std::unordered_map<LoadInst *, StackOffset> load_map;
+    std::unordered_map<StoreInst *, StackOffset> store_map;
     for (auto &block : *function) {
         for (auto &inst : *block) {
             if (!inst->is<LoadInst>() && !inst->is<StoreInst>()) {
@@ -62,25 +87,25 @@ void StackSimulator::run_on(Function *function) {
             }
 
             auto *offset_inst = (load != nullptr ? load->ptr() : store->dst())->as<BinaryInst>();
-            assert(offset_inst != nullptr && offset_inst->op() == BinaryOp::Add);
+            assert(offset_inst != nullptr);
 
-            auto *offset = offset_inst->rhs()->as<Constant<std::size_t>>();
-            assert(offset != nullptr);
+            auto *offset_const = offset_inst->rhs()->as<Constant<std::size_t>>();
+            assert(offset_const != nullptr);
 
+            StackOffset offset = {offset_const->value(), offset_inst->op() == BinaryOp::Sub};
             if (load != nullptr) {
-                load_map[load] = offset->value();
+                load_map[load] = offset;
             }
-
             if (store != nullptr) {
-                store_map[store] = offset->value();
+                store_map[store] = offset;
             }
         }
     }
 
-    std::unordered_map<std::size_t, AllocInst *> alloc_map;
+    std::unordered_map<StackOffset, AllocInst *, StackOffset::Hasher, StackOffset::EqualFn> alloc_map;
     for (auto [store, offset] : store_map) {
         auto *alloc = function->entry()->prepend<AllocInst>();
-        alloc->set_name("svar" + std::to_string(offset));
+        alloc->set_name("svar" + std::to_string(offset.offset));
         alloc_map[offset] = alloc;
 
         // TODO: Replace this with a Instruction::remove_from_parent()
