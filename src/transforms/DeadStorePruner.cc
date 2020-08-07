@@ -37,12 +37,11 @@ void run(BasicBlock *block, std::unordered_map<Value *, VarInfo> *map, int *prun
             for (auto *load : info.loads) {
                 // Propagate all uses of the load with the RHS of the store
                 load->replace_all_uses_with(store->src());
-
-                // Remove dead store
-                assert(store->uses().empty());
-                block->remove(store);
-                (*pruned_count)++;
             }
+            // Remove dead store
+            assert(store->uses().empty());
+            block->remove(store);
+            (*pruned_count)++;
         }
     }
 }
