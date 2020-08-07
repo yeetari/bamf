@@ -6,6 +6,36 @@ namespace bamf {
 
 struct AllocInst : public Instruction {};
 
+enum class BinaryOp {
+    Add,
+    Sub,
+};
+
+class BinaryInst : public Instruction {
+    BinaryOp m_op;
+    Value *m_lhs;
+    Value *m_rhs;
+
+public:
+    BinaryInst(BinaryOp op, Value *lhs, Value *rhs) : m_op(op), m_lhs(lhs), m_rhs(rhs) {
+        m_lhs->add_use(&m_lhs);
+        m_rhs->add_use(&m_rhs);
+    }
+
+    ~BinaryInst() override {
+        if (m_lhs != nullptr) {
+            m_lhs->remove_use(&m_lhs);
+        }
+        if (m_rhs != nullptr) {
+            m_rhs->remove_use(&m_rhs);
+        }
+    }
+
+    BinaryOp op() const { return m_op; }
+    Value *lhs() const { return m_lhs; }
+    Value *rhs() const { return m_rhs; }
+};
+
 class LoadInst : public Instruction {
     Value *m_ptr;
 

@@ -38,6 +38,17 @@ void Dumper::run_on(Function *function) {
 
             if (auto *alloc = inst->as<AllocInst>()) {
                 std::cout << "alloc";
+            } else if (auto *binary = inst->as<BinaryInst>()) {
+                switch (binary->op()) {
+                case BinaryOp::Add:
+                    std::cout << "add ";
+                    break;
+                case BinaryOp::Sub:
+                    std::cout << "sub ";
+                    break;
+                }
+                std::cout << printable_value(binary->lhs());
+                std::cout << ", " << printable_value(binary->rhs());
             } else if (auto *load = inst->as<LoadInst>()) {
                 std::cout << "load " << printable_value(load->ptr());
             } else if (auto *store = inst->as<StoreInst>()) {
