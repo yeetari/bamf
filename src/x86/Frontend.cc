@@ -35,6 +35,12 @@ void Frontend::translate_mov(const Operand &dst, const Operand &src) {
     case OperandType::Imm:
         m_block->insert<StoreInst>(store_dst, new Constant(src.imm));
         break;
+    case OperandType::MemBaseDisp: {
+        auto *base = phys_src(src.base);
+        auto *displaced = m_block->insert<BinaryInst>(BinaryOp::Add, base, new Constant<std::size_t>(src.disp));
+        m_block->insert<StoreInst>(store_dst, m_block->insert<LoadInst>(displaced));
+        break;
+    }
     case OperandType::Reg:
         m_block->insert<StoreInst>(store_dst, phys_src(src.reg));
         break;
