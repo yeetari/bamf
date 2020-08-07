@@ -21,7 +21,7 @@ namespace {
 Logger s_logger("driver");
 
 void print_usage(const char *prog_name) {
-    s_logger.info("Usage: {} [options] <file>\n", prog_name);
+    s_logger.info("Usage: {} [options] <file>", prog_name);
 }
 
 } // namespace
