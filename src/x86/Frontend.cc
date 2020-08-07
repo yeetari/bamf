@@ -13,7 +13,7 @@ Value *Frontend::phys_dst(Register reg) {
 }
 
 Value *Frontend::phys_src(Register reg) {
-    return m_block->insert<LoadInst>(m_phys_regs[reg]);
+    return m_block->append<LoadInst>(m_phys_regs[reg]);
 }
 
 void Frontend::translate_mov(const Operand &dst, const Operand &src) {
@@ -21,7 +21,7 @@ void Frontend::translate_mov(const Operand &dst, const Operand &src) {
     switch (dst.type) {
     case OperandType::MemBaseDisp: {
         auto *base = phys_src(dst.base);
-        store_dst = m_block->insert<BinaryInst>(BinaryOp::Add, base, new Constant<std::size_t>(dst.disp));
+        store_dst = m_block->append<BinaryInst>(BinaryOp::Add, base, new Constant<std::size_t>(dst.disp));
         break;
     }
     case OperandType::Reg:
@@ -33,16 +33,16 @@ void Frontend::translate_mov(const Operand &dst, const Operand &src) {
 
     switch (src.type) {
     case OperandType::Imm:
-        m_block->insert<StoreInst>(store_dst, new Constant(src.imm));
+        m_block->append<StoreInst>(store_dst, new Constant(src.imm));
         break;
     case OperandType::MemBaseDisp: {
         auto *base = phys_src(src.base);
-        auto *displaced = m_block->insert<BinaryInst>(BinaryOp::Add, base, new Constant<std::size_t>(src.disp));
-        m_block->insert<StoreInst>(store_dst, m_block->insert<LoadInst>(displaced));
+        auto *displaced = m_block->append<BinaryInst>(BinaryOp::Add, base, new Constant<std::size_t>(src.disp));
+        m_block->append<StoreInst>(store_dst, m_block->append<LoadInst>(displaced));
         break;
     }
     case OperandType::Reg:
-        m_block->insert<StoreInst>(store_dst, phys_src(src.reg));
+        m_block->append<StoreInst>(store_dst, phys_src(src.reg));
         break;
     default:
         throw std::runtime_error("Unsupported mov src type");
@@ -52,11 +52,11 @@ void Frontend::translate_mov(const Operand &dst, const Operand &src) {
 void Frontend::translate_pop(const Operand &dst) {
     assert(dst.type == OperandType::Reg);
     auto *sp = phys_src(Register::Rsp);
-    auto *stack_top = m_block->insert<LoadInst>(sp);
-    m_block->insert<StoreInst>(phys_dst(dst.reg), stack_top);
+    auto *stack_top = m_block->append<LoadInst>(sp);
+    m_block->append<StoreInst>(phys_dst(dst.reg), stack_top);
 
-    auto *new_sp = m_block->insert<BinaryInst>(BinaryOp::Add, sp, new Constant<std::size_t>(8));
-    m_block->insert<StoreInst>(phys_dst(Register::Rsp), new_sp);
+    auto *new_sp = m_block->append<BinaryInst>(BinaryOp::Add, sp, new Constant<std::size_t>(8));
+    m_block->append<StoreInst>(phys_dst(Register::Rsp), new_sp);
 }
 
 void Frontend::translate_push(const Operand &src) {
@@ -73,13 +73,13 @@ void Frontend::translate_push(const Operand &src) {
     }
 
     auto *sp = phys_src(Register::Rsp);
-    auto *new_sp = m_block->insert<BinaryInst>(BinaryOp::Sub, sp, new Constant<std::size_t>(8));
-    m_block->insert<StoreInst>(new_sp, val);
-    m_block->insert<StoreInst>(phys_dst(Register::Rsp), new_sp);
+    auto *new_sp = m_block->append<BinaryInst>(BinaryOp::Sub, sp, new Constant<std::size_t>(8));
+    m_block->append<StoreInst>(new_sp, val);
+    m_block->append<StoreInst>(phys_dst(Register::Rsp), new_sp);
 }
 
 void Frontend::translate_ret() {
-    m_block->insert<RetInst>(phys_src(Register::Rax));
+    m_block->append<RetInst>(phys_src(Register::Rax));
 }
 
 std::unique_ptr<Program> Frontend::run() {

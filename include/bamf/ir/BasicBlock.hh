@@ -29,11 +29,21 @@ public:
     }
 
     template <typename Inst, typename... Args>
-    Inst *insert(Args &&... args) requires std::derived_from<Inst, Instruction> {
+    Inst *insert(const_iterator position, Args &&... args) requires std::derived_from<Inst, Instruction> {
         auto *inst = new Inst(std::forward<Args>(args)...);
         inst->set_parent(this);
-        m_instructions.emplace_back(inst);
+        m_instructions.emplace(position, inst);
         return inst;
+    }
+
+    template <typename Inst, typename... Args>
+    Inst *prepend(Args &&... args) requires std::derived_from<Inst, Instruction> {
+        return insert<Inst>(m_instructions.begin(), std::forward<Args>(args)...);
+    }
+
+    template <typename Inst, typename... Args>
+    Inst *append(Args &&... args) requires std::derived_from<Inst, Instruction> {
+        return insert<Inst>(m_instructions.end(), std::forward<Args>(args)...);
     }
 
     void remove(Instruction *inst) {
