@@ -32,25 +32,31 @@ void Frontend::translate_mov(const Operand &dst, const Operand &src) {
 
 void Frontend::translate_pop(const Operand &dst) {
     assert(dst.type == OperandType::Reg);
-    auto *src = m_block->insert<LoadInst>(m_stack.pop());
-    m_block->insert<StoreInst>(phys_dst(dst.reg), src);
+    auto *sp = phys_src(Register::Rsp);
+    auto *stack_top = m_block->insert<LoadInst>(sp);
+    m_block->insert<StoreInst>(phys_dst(dst.reg), stack_top);
+
+    auto *new_sp = m_block->insert<BinaryInst>(BinaryOp::Add, sp, new Constant<std::size_t>(8));
+    m_block->insert<StoreInst>(phys_dst(Register::Rsp), new_sp);
 }
 
 void Frontend::translate_push(const Operand &src) {
-    auto *stack_var = m_block->insert<AllocInst>();
-    stack_var->set_name("svar" + std::to_string(m_stack.size()));
-    m_stack.push(stack_var);
-
+    Value *val = nullptr;
     switch (src.type) {
     case OperandType::Imm:
-        m_block->insert<StoreInst>(stack_var, new Constant(src.imm));
+        val = new Constant(src.imm);
         break;
     case OperandType::Reg:
-        m_block->insert<StoreInst>(stack_var, phys_src(src.reg));
+        val = phys_src(src.reg);
         break;
     default:
         throw std::runtime_error("Unsupported push src type");
     }
+
+    auto *sp = phys_src(Register::Rsp);
+    auto *new_sp = m_block->insert<BinaryInst>(BinaryOp::Sub, sp, new Constant<std::size_t>(8));
+    m_block->insert<StoreInst>(new_sp, val);
+    m_block->insert<StoreInst>(phys_dst(Register::Rsp), new_sp);
 }
 
 void Frontend::translate_ret() {

@@ -5,7 +5,6 @@
 #include <bamf/ir/Value.hh>
 #include <bamf/support/NonCopyable.hh>
 #include <bamf/support/NonMovable.hh>
-#include <bamf/support/Stack.hh>
 #include <bamf/x86/Decoder.hh>
 
 #include <cstdint>
@@ -21,7 +20,6 @@ class Frontend {
     BasicBlock *m_block{nullptr};
 
     std::unordered_map<Register, GlobalVariable *> m_phys_regs;
-    Stack<Value> m_stack;
 
     Value *phys_dst(Register);
     Value *phys_src(Register);
