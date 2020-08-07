@@ -25,11 +25,11 @@ constexpr fmt::color log_level_to_colour(LogLevel level) {
     case LogLevel::Debug:
         return fmt::color::cornflower_blue;
     case LogLevel::Info:
-        return fmt::color::white;
+        return fmt::color::light_cyan;
     case LogLevel::Warn:
         return fmt::color::yellow;
     case LogLevel::Error:
-        return fmt::color::red;
+        return fmt::color::orange_red;
     }
 }
 
