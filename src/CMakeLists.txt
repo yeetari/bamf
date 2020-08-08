@@ -1,4 +1,5 @@
 add_library(bamf
+    core/DecompilationContext.cc
     core/ElfLoader.cc
     core/InputFile.cc
     ir/BasicBlock.cc
