@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
         x86::Frontend frontend(&decoder, &decomp_ctx);
         auto program = frontend.run();
         PassManager pass_manager;
-        pass_manager.add<StackSimulator>();
+        pass_manager.add<StackSimulator>(decomp_ctx);
         pass_manager.add<DeadStorePruner>();
         pass_manager.add<TriviallyDeadInstPruner>();
         pass_manager.add<Dumper>();

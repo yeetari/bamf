@@ -1,5 +1,6 @@
 #include <bamf/transforms/StackSimulator.hh>
 
+#include <bamf/core/DecompilationContext.hh>
 #include <bamf/ir/BasicBlock.hh>
 #include <bamf/ir/Constant.hh>
 #include <bamf/ir/Function.hh>
@@ -75,9 +76,7 @@ void StackSimulator::run_on(Function *function) {
             auto *root = find_root_value(inst.get());
             assert(root != nullptr);
 
-            // TODO: Hacky, this should work for any GPR, decompiler information (such as which values correspond to
-            // TODO: physical registers) should be available in some analysis info.
-            if (!root->is<GlobalVariable>() || (root->name() != "rbp" && root->name() != "rsp")) {
+            if (!m_decomp_ctx.is_phys_reg(root)) {
                 continue;
             }
 
