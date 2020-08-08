@@ -1,3 +1,4 @@
+#include <bamf/core/DecompilationContext.hh>
 #include <bamf/core/ElfLoader.hh>
 #include <bamf/core/Executable.hh>
 #include <bamf/core/InputFile.hh>
@@ -56,7 +57,7 @@ int main(int argc, char **argv) {
     Executable executable{};
     InputFile file(file_name.c_str());
     s_logger.info("{} {} as {} {}", mode == "disasm" ? "Disassembling" : "Decompiling", file_name, file_type,
-               file_type_detected ? "(detected)" : "");
+                  file_type_detected ? "(detected)" : "");
     if (file_type == "bin") {
         executable.code = file.get<std::uint8_t>(0);
         executable.code_size = file.size();
@@ -74,7 +75,8 @@ int main(int argc, char **argv) {
             x86::dump_inst(inst);
         }
     } else if (mode == "decomp") {
-        x86::Frontend frontend(&decoder);
+        DecompilationContext decomp_ctx;
+        x86::Frontend frontend(&decoder, &decomp_ctx);
         auto program = frontend.run();
         PassManager pass_manager;
         pass_manager.add<StackSimulator>();

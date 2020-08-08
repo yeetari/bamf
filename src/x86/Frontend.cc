@@ -94,6 +94,7 @@ std::unique_ptr<Program> Frontend::run() {
         auto reg = static_cast<Register>(i);
         auto *global = m_program->add_global();
         global->set_name(reg_to_str(reg, 64));
+        m_decomp_ctx->add_phys_reg(global);
         m_phys_regs[reg] = global;
     }
 

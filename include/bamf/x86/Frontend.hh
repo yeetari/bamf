@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bamf/core/DecompilationContext.hh>
 #include <bamf/ir/GlobalVariable.hh>
 #include <bamf/ir/Program.hh>
 #include <bamf/ir/Value.hh>
@@ -15,6 +16,7 @@ namespace bamf::x86 {
 
 class Frontend {
     Decoder *const m_decoder;
+    DecompilationContext *const m_decomp_ctx;
     Program *m_program{nullptr};
     Function *m_function{nullptr};
     BasicBlock *m_block{nullptr};
@@ -30,7 +32,7 @@ class Frontend {
     void translate_ret();
 
 public:
-    explicit Frontend(Decoder *decoder) : m_decoder(decoder) {}
+    Frontend(Decoder *decoder, DecompilationContext *decomp_ctx) : m_decoder(decoder), m_decomp_ctx(decomp_ctx) {}
 
     std::unique_ptr<Program> run();
 };
