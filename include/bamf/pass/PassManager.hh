@@ -10,7 +10,7 @@
 
 namespace bamf {
 
-class Function;
+class Program;
 
 class PassManager {
     Logger m_logger;
@@ -24,7 +24,7 @@ public:
         m_passes.emplace_back(new T(std::forward<Args>(args)...));
     }
 
-    void run(Function *function) const;
+    void run(Program *program) const;
 };
 
 } // namespace bamf

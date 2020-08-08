@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
         pass_manager.add<DeadStorePruner>();
         pass_manager.add<TriviallyDeadInstPruner>();
         pass_manager.add<Dumper>();
-        pass_manager.run(program->main());
+        pass_manager.run(program.get());
     } else {
         throw std::runtime_error("Invalid mode " + mode + " (valid disasm/decomp)");
     }

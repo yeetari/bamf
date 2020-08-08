@@ -8,6 +8,7 @@
 namespace bamf {
 
 class Function;
+class Program;
 
 class Pass {
     const std::string m_name;
@@ -18,7 +19,8 @@ protected:
 
 public:
     virtual ~Pass() = default;
-    virtual void run_on(Function *function) = 0;
+    virtual void run_on(Program *program) {}
+    virtual void run_on(Function *function) {}
 
     const std::string &name() const { return m_name; }
 };
