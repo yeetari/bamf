@@ -34,6 +34,9 @@ public:
 
     void set_main(Function *function) { m_call_graph.set_entry(function); }
     Function *main() { return m_call_graph.entry(); }
+
+    const Graph<Function> &call_graph() const { return m_call_graph; }
+    const std::vector<std::unique_ptr<GlobalVariable>> &globals() const { return m_globals; }
 };
 
 } // namespace bamf
