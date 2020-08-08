@@ -65,6 +65,7 @@ Value *find_root_value(Value *start) {
 void StackSimulator::run_on(Function *function) {
     std::unordered_map<LoadInst *, StackOffset> load_map;
     std::unordered_map<StoreInst *, StackOffset> store_map;
+    std::unordered_map<StoreInst *, Value *> replace_map;
     for (auto &block : *function) {
         for (auto &inst : *block) {
             if (!inst->is<LoadInst>() && !inst->is<StoreInst>()) {
@@ -102,6 +103,7 @@ void StackSimulator::run_on(Function *function) {
             }
             if (store != nullptr) {
                 store_map[store] = offset;
+                replace_map[store] = offset_inst;
             }
         }
     }
@@ -111,6 +113,7 @@ void StackSimulator::run_on(Function *function) {
         auto *alloc = function->entry()->prepend<AllocInst>();
         alloc->set_name("svar" + std::to_string(offset.offset));
         alloc_map[offset] = alloc;
+        replace_map[store]->replace_all_uses_with(alloc);
 
         // TODO: Replace this with a Instruction::remove_from_parent()
         auto *src = store->src();
