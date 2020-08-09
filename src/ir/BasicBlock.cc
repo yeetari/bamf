@@ -10,11 +10,14 @@ BasicBlock::~BasicBlock() {
     }
 }
 
-BasicBlock::const_iterator BasicBlock::remove(Instruction *inst) {
-    auto it = std::find_if(m_instructions.begin(), m_instructions.end(), [inst](auto &ptr) {
+BasicBlock::const_iterator BasicBlock::position_of(Instruction *inst) const {
+    return std::find_if(m_instructions.begin(), m_instructions.end(), [inst](auto &ptr) {
         return ptr.get() == inst;
     });
+}
 
+BasicBlock::const_iterator BasicBlock::remove(Instruction *inst) {
+    auto it = position_of(inst);
     if (it != m_instructions.end()) {
         inst->replace_all_uses_with(nullptr);
         m_instructions.erase(it);

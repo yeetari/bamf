@@ -45,6 +45,7 @@ public:
         return insert<Inst>(m_instructions.end(), std::forward<Args>(args)...);
     }
 
+    const_iterator position_of(Instruction *inst) const;
     const_iterator remove(Instruction *inst);
 
     void set_parent(Function *parent) { m_parent = parent; }
