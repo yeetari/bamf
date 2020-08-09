@@ -10,6 +10,7 @@ add_library(bamf
     transforms/DeadStorePruner.cc
     transforms/Dumper.cc
     transforms/RegisterLocaliser.cc
+    transforms/SsaTranslator.cc
     transforms/StackSimulator.cc
     transforms/TriviallyDeadInstPruner.cc
     x86/Decoder.cc
