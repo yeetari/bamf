@@ -24,9 +24,13 @@ public:
     explicit Function(std::string name) : m_name(std::move(name)) {}
     ~Function() = default;
 
-    void set_entry(BasicBlock *block) { m_cfg.set_entry(block); }
+    BasicBlock *insert_block() {
+        auto *block = m_cfg.emplace();
+        block->set_parent(this);
+        return block;
+    }
 
-    BasicBlock *insert_block() { return m_cfg.emplace(); }
+    void set_entry(BasicBlock *block) { m_cfg.set_entry(block); }
     BasicBlock *entry() { return m_cfg.entry(); }
 
     const std::string &name() const { return m_name; }

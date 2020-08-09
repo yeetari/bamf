@@ -12,7 +12,10 @@
 
 namespace bamf {
 
+class Function;
+
 class BasicBlock {
+    Function *m_parent{nullptr};
     std::vector<std::unique_ptr<Instruction>> m_instructions;
 
 public:
@@ -43,6 +46,10 @@ public:
     }
 
     const_iterator remove(Instruction *inst);
+
+    void set_parent(Function *parent) { m_parent = parent; }
+    bool has_parent() const { return m_parent != nullptr; }
+    Function *parent() const { return m_parent; }
 };
 
 } // namespace bamf
