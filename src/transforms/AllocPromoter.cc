@@ -17,6 +17,7 @@ namespace {
 struct VarInfo {
     std::vector<StoreInst *> defs;
     std::vector<LoadInst *> uses;
+    std::vector<Instruction *> instructions;
 };
 
 void promote_single_store(const VarInfo &info, int *propagated_load_count) {
@@ -52,10 +53,12 @@ void AllocPromoter::run_on(Function *function) {
             if (auto *load = inst->as<LoadInst>()) {
                 if (auto *alloc = load->ptr()->as<AllocInst>()) {
                     vars[alloc].uses.push_back(load);
+                    vars[alloc].instructions.push_back(load);
                 }
             } else if (auto *store = inst->as<StoreInst>()) {
                 if (auto *alloc = store->dst()->as<AllocInst>()) {
                     vars[alloc].defs.push_back(store);
+                    vars[alloc].instructions.push_back(store);
                 }
             }
         }
@@ -83,7 +86,7 @@ void AllocPromoter::run_on(Function *function) {
         // accesses explicitly, it simply promotes trivially propagatable allocs. Bamf IR is similar to LLVM in that SSA
         // form is only used for scalar registers (and not memory).
         Stack<Value> def_stack;
-        for (auto &inst : *var->parent()) {
+        for (auto *inst : info.instructions) {
             if (auto *load = inst->as<LoadInst>()) {
                 if (!def_stack.empty()) {
                     // Load will become trivially dead.
