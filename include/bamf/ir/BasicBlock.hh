@@ -49,7 +49,6 @@ public:
     const_iterator remove(Instruction *inst);
 
     void set_parent(Function *parent) { m_parent = parent; }
-    bool has_parent() const { return m_parent != nullptr; }
     Function *parent() const { return m_parent; }
 };
 
