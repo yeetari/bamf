@@ -4,8 +4,8 @@
 
 namespace bamf {
 
-struct SsaTranslator : public Pass {
-    SsaTranslator() : Pass("ssa-translator") {}
+struct AllocPromoter : public Pass {
+    AllocPromoter() : Pass("alloc-promoter") {}
 
     void run_on(Function *function) override;
 };

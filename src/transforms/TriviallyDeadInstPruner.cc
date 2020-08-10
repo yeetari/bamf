@@ -25,7 +25,7 @@ void TriviallyDeadInstPruner::run_on(Function *function) {
             continue;
         }
 
-        // Dead stores are handled by DeadStorePruner
+        // Dead stores are promoted by AllocPromoter
         if (inst->is<StoreInst>()) {
             continue;
         }

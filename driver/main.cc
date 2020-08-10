@@ -5,10 +5,9 @@
 #include <bamf/pass/PassManager.hh>
 #include <bamf/support/Logger.hh>
 #include <bamf/support/Stream.hh>
-#include <bamf/transforms/DeadStorePruner.hh>
+#include <bamf/transforms/AllocPromoter.hh>
 #include <bamf/transforms/Dumper.hh>
 #include <bamf/transforms/RegisterLocaliser.hh>
-#include <bamf/transforms/SsaTranslator.hh>
 #include <bamf/transforms/StackSimulator.hh>
 #include <bamf/transforms/TriviallyDeadInstPruner.hh>
 #include <bamf/x86/Decoder.hh>
@@ -83,8 +82,7 @@ int main(int argc, char **argv) {
         PassManager pass_manager;
         pass_manager.add<StackSimulator>(decomp_ctx);
         pass_manager.add<RegisterLocaliser>(decomp_ctx);
-        pass_manager.add<SsaTranslator>();
-        pass_manager.add<DeadStorePruner>();
+        pass_manager.add<AllocPromoter>();
         pass_manager.add<TriviallyDeadInstPruner>();
         pass_manager.add<Dumper>();
         pass_manager.run(program.get());

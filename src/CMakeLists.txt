@@ -7,10 +7,9 @@ add_library(bamf
     ir/Value.cc
     pass/PassManager.cc
     support/Stream.cc
-    transforms/DeadStorePruner.cc
+    transforms/AllocPromoter.cc
     transforms/Dumper.cc
     transforms/RegisterLocaliser.cc
-    transforms/SsaTranslator.cc
     transforms/StackSimulator.cc
     transforms/TriviallyDeadInstPruner.cc
     x86/Decoder.cc
