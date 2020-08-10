@@ -19,7 +19,7 @@ struct VarInfo {
     std::vector<LoadInst *> uses;
 };
 
-void promote_single_store(const VarInfo &info) {
+void promote_single_store(const VarInfo &info, int *propagated_load_count) {
     auto *store = info.defs[0];
     for (auto *load : info.uses) {
         auto *block = load->parent();
@@ -34,6 +34,7 @@ void promote_single_store(const VarInfo &info) {
 
         assert(store->src() != load);
         load->replace_all_uses_with(store->src());
+        (*propagated_load_count)++;
     }
 
     assert(store->users().empty());
@@ -60,7 +61,8 @@ void AllocPromoter::run_on(Function *function) {
         }
     }
 
-    int single_store_count = 0;
+    int propagated_load_count = 0;
+    int pruned_store_count = 0;
     for (auto &[var, info] : vars) {
         // Ignore dead variable. If it trivially dead (i.e. no uses at all), it will be removed by the
         // TriviallyDeadInstPruner pass.
@@ -72,8 +74,8 @@ void AllocPromoter::run_on(Function *function) {
         // Dead allocs or loads are not pruned by this pass. Normally you would want a dead instruction pruner pass to
         // run sometime after this.
         if (info.defs.size() == 1) {
-            promote_single_store(info);
-            single_store_count++;
+            promote_single_store(info, &propagated_load_count);
+            pruned_store_count++;
             continue;
         }
 
@@ -86,6 +88,7 @@ void AllocPromoter::run_on(Function *function) {
                 if (!def_stack.empty()) {
                     // Load will become trivially dead.
                     load->replace_all_uses_with(def_stack.peek());
+                    propagated_load_count++;
                 }
             } else if (auto *store = inst->as<StoreInst>()) {
                 def_stack.push(store->src());
@@ -97,10 +100,12 @@ void AllocPromoter::run_on(Function *function) {
         for (auto *store : info.defs) {
             assert(store->users().empty());
             store->remove_from_parent();
+            pruned_store_count++;
         }
     }
 
-    m_logger.trace("Promoted {} single stores", single_store_count);
+    m_logger.trace("Propagated {} loads", propagated_load_count);
+    m_logger.trace("Pruned {} stores", pruned_store_count);
 }
 
 } // namespace bamf
