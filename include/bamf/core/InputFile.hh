@@ -18,7 +18,8 @@ public:
     BAMF_MAKE_NON_COPYABLE(InputFile)
     BAMF_MAKE_NON_MOVABLE(InputFile)
 
-    InputFile(const char *path);
+    explicit InputFile(const char *path);
+    ~InputFile() = default;
 
     template <typename T>
     const T *get(std::ptrdiff_t offset) const {
