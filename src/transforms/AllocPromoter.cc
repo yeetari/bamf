@@ -95,6 +95,7 @@ void AllocPromoter::run_on(Function *function) {
         // Remove (now dead) stores. We have to do this here, since the dead instruction pruner pass won't be able to
         // tell that this store is dead (since it technically still has uses).
         for (auto *store : info.defs) {
+            assert(store->users().empty());
             store->remove_from_parent();
         }
     }
