@@ -1,5 +1,8 @@
 #pragma once
 
+#include <bamf/support/NonCopyable.hh>
+#include <bamf/support/NonMovable.hh>
+
 #include <string>
 #include <utility>
 #include <vector>
@@ -13,7 +16,13 @@ class Value {
     std::vector<Value **> m_uses;
     std::vector<Value *> m_users;
 
+protected:
+    Value() = default;
+
 public:
+    BAMF_MAKE_NON_COPYABLE(Value)
+    BAMF_MAKE_NON_MOVABLE(Value)
+
     virtual ~Value() = default;
 
     template <typename T>
