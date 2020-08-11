@@ -39,9 +39,7 @@ bool is_promotable(AllocInst *alloc) {
     return true;
 }
 
-} // namespace
-
-void AllocPromoter::run_on(Function *function) {
+bool run(Function *function, int *propagated_load_count, int *pruned_store_count) {
     // Build store-load (def-use) info
     std::unordered_map<AllocInst *, VarInfo> vars;
     std::unordered_map<Value *, AllocInst *> reverse_map;
@@ -73,7 +71,7 @@ void AllocPromoter::run_on(Function *function) {
         }
     }
 
-    int propagated_load_count = 0;
+    bool changed = false;
     for (auto &block : *function) {
         for (auto &inst : *block) {
             if (!reverse_map.contains(inst.get())) {
@@ -87,7 +85,9 @@ void AllocPromoter::run_on(Function *function) {
                 if (!def_stack.empty()) {
                     // Load will become trivially dead
                     load->replace_all_uses_with(def_stack.peek());
-                    propagated_load_count++;
+
+                    changed = true;
+                    (*propagated_load_count)++;
                 }
             } else if (auto *store = inst->as<StoreInst>()) {
                 def_stack.push(store->src());
@@ -95,16 +95,31 @@ void AllocPromoter::run_on(Function *function) {
         }
     }
 
-    int pruned_store_count = 0;
     for (auto &[var, info] : vars) {
         // Remove (now dead) stores. We have to do this here, since the dead instruction pruner pass won't be able to
         // tell that this store is dead (since it technically still has uses).
         for (auto *store : info.stores) {
             assert(store->users().empty());
             store->remove_from_parent();
-            pruned_store_count++;
+
+            changed = true;
+            (*pruned_store_count)++;
         }
     }
+
+    return changed;
+}
+
+} // namespace
+
+void AllocPromoter::run_on(Function *function) {
+    int propagated_load_count = 0;
+    int pruned_store_count = 0;
+
+    bool changed = false;
+    do {
+        changed = run(function, &propagated_load_count, &pruned_store_count);
+    } while (changed);
 
     m_logger.trace("Propagated {} loads", propagated_load_count);
     m_logger.trace("Pruned {} stores", pruned_store_count);
