@@ -108,9 +108,9 @@ void StackSimulator::run_on(Function *function) {
     }
 
     std::unordered_map<StackOffset, AllocInst *, StackOffset::Hasher, StackOffset::EqualFn> alloc_map;
-    for (auto [store, offset] : store_map) {
+    for (int i = 0; auto [store, offset] : store_map) {
         auto *alloc = function->entry()->prepend<AllocInst>();
-        alloc->set_name("svar" + std::to_string(offset.offset));
+        alloc->set_name("svar" + std::to_string(i++));
         alloc_map[offset] = alloc;
         replace_map[store]->replace_all_uses_with(alloc);
 
