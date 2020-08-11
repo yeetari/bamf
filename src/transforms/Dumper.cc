@@ -21,7 +21,7 @@ void Dumper::run_on(Function *function) {
     };
 
     auto printable_value = [&](Value *value) {
-        if (auto *constant = value->as<Constant<std::size_t>>()) {
+        if (auto *constant = value->as<Constant>()) {
             return std::to_string(constant->value());
         }
         if (value->has_name()) {

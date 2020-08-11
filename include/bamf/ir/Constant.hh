@@ -2,16 +2,17 @@
 
 #include <bamf/ir/Value.hh>
 
+#include <cstdint>
+
 namespace bamf {
 
-template <typename T>
 class Constant : public Value {
-    const T m_value;
+    const std::size_t m_value;
 
 public:
-    constexpr explicit Constant(T value) : m_value(value) {}
+    explicit Constant(std::size_t value) : m_value(value) {}
 
-    T value() const { return m_value; }
+    std::size_t value() const { return m_value; }
 };
 
 } // namespace bamf

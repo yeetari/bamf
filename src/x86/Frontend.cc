@@ -21,7 +21,7 @@ void Frontend::translate_mov(const Operand &dst, const Operand &src) {
     switch (dst.type) {
     case OperandType::MemBaseDisp: {
         auto *base = phys_src(dst.base);
-        store_dst = m_block->append<BinaryInst>(BinaryOp::Add, base, new Constant<std::size_t>(dst.disp));
+        store_dst = m_block->append<BinaryInst>(BinaryOp::Add, base, new Constant(dst.disp));
         break;
     }
     case OperandType::Reg:
@@ -37,7 +37,7 @@ void Frontend::translate_mov(const Operand &dst, const Operand &src) {
         break;
     case OperandType::MemBaseDisp: {
         auto *base = phys_src(src.base);
-        auto *displaced = m_block->append<BinaryInst>(BinaryOp::Add, base, new Constant<std::size_t>(src.disp));
+        auto *displaced = m_block->append<BinaryInst>(BinaryOp::Add, base, new Constant(src.disp));
         m_block->append<StoreInst>(store_dst, m_block->append<LoadInst>(displaced));
         break;
     }
@@ -55,7 +55,7 @@ void Frontend::translate_pop(const Operand &dst) {
     auto *stack_top = m_block->append<LoadInst>(sp);
     m_block->append<StoreInst>(phys_dst(dst.reg), stack_top);
 
-    auto *new_sp = m_block->append<BinaryInst>(BinaryOp::Add, sp, new Constant<std::size_t>(8));
+    auto *new_sp = m_block->append<BinaryInst>(BinaryOp::Add, sp, new Constant(8));
     m_block->append<StoreInst>(phys_dst(Register::Rsp), new_sp);
 }
 
@@ -73,7 +73,7 @@ void Frontend::translate_push(const Operand &src) {
     }
 
     auto *sp = phys_src(Register::Rsp);
-    auto *new_sp = m_block->append<BinaryInst>(BinaryOp::Sub, sp, new Constant<std::size_t>(8));
+    auto *new_sp = m_block->append<BinaryInst>(BinaryOp::Sub, sp, new Constant(8));
     m_block->append<StoreInst>(new_sp, val);
     m_block->append<StoreInst>(phys_dst(Register::Rsp), new_sp);
 }

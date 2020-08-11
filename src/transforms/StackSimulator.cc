@@ -46,7 +46,7 @@ Value *find_root_value(Value *start) {
     if (auto *binary = start->as<BinaryInst>()) {
         return find_root_value(binary->lhs());
     }
-    if (auto *constant = start->as<Constant<std::size_t>>()) {
+    if (auto *constant = start->as<Constant>()) {
         return constant;
     }
     if (auto *global = start->as<GlobalVariable>()) {
@@ -93,7 +93,7 @@ void StackSimulator::run_on(Function *function) {
             auto *offset_inst = (load != nullptr ? load->ptr() : store->ptr())->as<BinaryInst>();
             assert(offset_inst != nullptr);
 
-            auto *offset_const = offset_inst->rhs()->as<Constant<std::size_t>>();
+            auto *offset_const = offset_inst->rhs()->as<Constant>();
             assert(offset_const != nullptr);
 
             StackOffset offset = {offset_const->value(), offset_inst->op() == BinaryOp::Sub};
