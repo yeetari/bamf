@@ -19,6 +19,15 @@ struct VarInfo {
     std::vector<StoreInst *> stores;
 };
 
+bool is_dead(AllocInst *alloc) {
+    for (auto *user : alloc->users()) {
+        if (user->is<StoreInst>()) {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool is_promotable(AllocInst *alloc) {
     for (auto *user : alloc->users()) {
         if (auto *store = user->as<StoreInst>()) {
@@ -45,7 +54,7 @@ void AllocPromoter::run_on(Function *function) {
 
             // Ignore dead variable. If it trivially dead (i.e. no uses at all), it will be removed by the
             // TriviallyDeadInstPruner pass.
-            if (alloc->users().empty()) {
+            if (is_dead(alloc)) {
                 continue;
             }
 
