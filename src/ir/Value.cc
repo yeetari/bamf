@@ -33,6 +33,11 @@ void Value::replace_all_uses_with(Value *value) {
             value->add_use(use);
         }
     }
+    for (auto *user : m_users) {
+        if (value != nullptr) {
+            value->add_user(user);
+        }
+    }
     m_uses.clear();
     m_users.clear();
 }
