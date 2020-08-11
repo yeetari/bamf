@@ -56,7 +56,7 @@ Value *find_root_value(Value *start) {
         return find_root_value(load->ptr());
     }
     if (auto *store = start->as<StoreInst>()) {
-        return find_root_value(store->dst());
+        return find_root_value(store->ptr());
     }
     return nullptr;
 }
@@ -86,11 +86,11 @@ void StackSimulator::run_on(Function *function) {
             }
 
             auto *store = inst->as<StoreInst>();
-            if (store != nullptr && !store->dst()->is<BinaryInst>()) {
+            if (store != nullptr && !store->ptr()->is<BinaryInst>()) {
                 continue;
             }
 
-            auto *offset_inst = (load != nullptr ? load->ptr() : store->dst())->as<BinaryInst>();
+            auto *offset_inst = (load != nullptr ? load->ptr() : store->ptr())->as<BinaryInst>();
             assert(offset_inst != nullptr);
 
             auto *offset_const = offset_inst->rhs()->as<Constant<std::size_t>>();
@@ -115,9 +115,9 @@ void StackSimulator::run_on(Function *function) {
         replace_map[store]->replace_all_uses_with(alloc);
 
         // TODO: Replace this with a Instruction::remove_from_parent()
-        auto *src = store->src();
+        auto *val = store->val();
         auto position = store->parent()->remove(store);
-        store->parent()->insert<StoreInst>(position, alloc, src);
+        store->parent()->insert<StoreInst>(position, alloc, val);
     }
 
     for (auto [load, offset] : load_map) {

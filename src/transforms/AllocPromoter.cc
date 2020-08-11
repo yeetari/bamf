@@ -31,7 +31,7 @@ bool is_dead(AllocInst *alloc) {
 bool is_promotable(AllocInst *alloc) {
     for (auto *user : alloc->users()) {
         if (auto *store = user->as<StoreInst>()) {
-            if (store->dst() != alloc) {
+            if (store->ptr() != alloc) {
                 return false;
             }
         }
@@ -90,7 +90,7 @@ bool run(Function *function, int *propagated_load_count, int *pruned_store_count
                     (*propagated_load_count)++;
                 }
             } else if (auto *store = inst->as<StoreInst>()) {
-                def_stack.push(store->src());
+                def_stack.push(store->val());
             }
         }
     }

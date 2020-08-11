@@ -52,8 +52,8 @@ void Dumper::run_on(Function *function) {
             } else if (auto *load = inst->as<LoadInst>()) {
                 std::cout << "load " << printable_value(load->ptr());
             } else if (auto *store = inst->as<StoreInst>()) {
-                std::cout << "store " << printable_value(store->dst());
-                std::cout << ", " << printable_value(store->src());
+                std::cout << "store " << printable_value(store->ptr());
+                std::cout << ", " << printable_value(store->val());
             } else if (auto *ret = inst->as<RetInst>()) {
                 std::cout << "ret " << printable_value(ret->ret_val());
             }

@@ -60,30 +60,30 @@ public:
 };
 
 class StoreInst : public Instruction {
-    Value *m_dst;
-    Value *m_src;
+    Value *m_ptr;
+    Value *m_val;
 
 public:
-    StoreInst(Value *dst, Value *src) : m_dst(dst), m_src(src) {
-        m_dst->add_use(&m_dst);
-        m_src->add_use(&m_src);
-        m_dst->add_user(this);
-        m_src->add_user(this);
+    StoreInst(Value *ptr, Value *val) : m_ptr(ptr), m_val(val) {
+        m_ptr->add_use(&m_ptr);
+        m_val->add_use(&m_val);
+        m_ptr->add_user(this);
+        m_val->add_user(this);
     }
 
     ~StoreInst() override {
-        if (m_dst != nullptr) {
-            m_dst->remove_use(&m_dst);
-            m_dst->remove_user(this);
+        if (m_ptr != nullptr) {
+            m_ptr->remove_use(&m_ptr);
+            m_ptr->remove_user(this);
         }
-        if (m_src != nullptr) {
-            m_src->remove_use(&m_src);
-            m_src->remove_user(this);
+        if (m_val != nullptr) {
+            m_val->remove_use(&m_val);
+            m_val->remove_user(this);
         }
     }
 
-    Value *dst() const { return m_dst; }
-    Value *src() const { return m_src; }
+    Value *ptr() const { return m_ptr; }
+    Value *val() const { return m_val; }
 };
 
 class RetInst : public Instruction {
