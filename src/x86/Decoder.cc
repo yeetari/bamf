@@ -77,6 +77,11 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
         inst.default_operand_width = 32;
         inst.operands[0] = {OperandInfoType::Imm};
     });
+    BUILD(0xEB, 1, {
+        inst.opcode = Opcode::Jmp;
+        inst.default_address_width = 8;
+        inst.operands[0] = {OperandInfoType::Rel};
+    });
 }
 
 MachineInst Decoder::next_inst() {
@@ -161,8 +166,10 @@ MachineInst Decoder::next_inst() {
 
         switch (operand_info.type) {
         case OperandInfoType::Imm:
+        case OperandInfoType::Rel: {
+            std::uint8_t width = operand_info.type == OperandInfoType::Imm ? inst.operand_width : inst.address_width;
             operand.type = OperandType::Imm;
-            switch (inst.operand_width) {
+            switch (width) {
             case 8:
                 operand.imm = m_stream->read<std::uint8_t>();
                 break;
@@ -177,10 +184,15 @@ MachineInst Decoder::next_inst() {
                 break;
             }
 
-            for (int i = 0; i < inst.operand_width / 8; i++) {
+            for (int i = 0; i < width / 8; i++) {
                 inst.bytes[inst.length++] = operand.imm_bytes[i];
             }
+
+            if (operand_info.type == OperandInfoType::Rel) {
+                operand.imm += inst.length + inst.offset;
+            }
             break;
+        }
         case OperandInfoType::ModRmGpr:
             operand.type = OperandType::Reg;
             operand.reg = static_cast<Register>(mod_rm.reg);

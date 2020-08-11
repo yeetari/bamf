@@ -20,6 +20,7 @@ enum class OperandInfoType {
     ModRmGpr,
     ModRmRm,
     OpcodeGpr,
+    Rel,
 };
 
 struct OperandInfo {
