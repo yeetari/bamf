@@ -30,6 +30,7 @@ class Frontend {
     void translate_pop(const Operand &dst);
     void translate_push(const Operand &src);
     void translate_ret();
+    void translate_shl(const Operand &dst, const Operand &src);
 
 public:
     Frontend(Decoder *decoder, DecompilationContext *decomp_ctx) : m_decoder(decoder), m_decomp_ctx(decomp_ctx) {}

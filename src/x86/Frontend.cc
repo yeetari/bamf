@@ -78,6 +78,13 @@ void Frontend::translate_push(const Operand &src) {
     m_block->append<StoreInst>(phys_dst(Register::Rsp), new_sp);
 }
 
+void Frontend::translate_shl(const Operand &dst, const Operand &src) {
+    assert(dst.type == OperandType::Reg);
+    assert(src.type == OperandType::Imm);
+    auto *shl = m_block->append<BinaryInst>(BinaryOp::Shl, phys_src(dst.reg), new Constant(src.imm));
+    m_block->append<StoreInst>(phys_dst(dst.reg), shl);
+}
+
 void Frontend::translate_ret() {
     m_block->append<RetInst>(phys_src(Register::Rax));
 }
@@ -113,6 +120,9 @@ std::unique_ptr<Program> Frontend::run() {
             break;
         case Opcode::Ret:
             translate_ret();
+            break;
+        case Opcode::Shl:
+            translate_shl(inst.operands[0], inst.operands[1]);
             break;
         default:
             throw std::runtime_error("Unsupported machine instruction");
