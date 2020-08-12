@@ -12,7 +12,14 @@ namespace bamf {
 
 void Dumper::run_on(Function *function) {
     m_logger.info("Dumping function {}", function->name());
+    std::unordered_map<const BasicBlock *, std::size_t> block_map;
     std::unordered_map<const Value *, std::size_t> value_map;
+    auto versioned_block = [&](const BasicBlock *block) {
+        if (!block_map.contains(block)) {
+            block_map.emplace(block, block_map.size());
+        }
+        return block_map[block];
+    };
     auto versioned_value = [&](const Value *value) {
         if (!value_map.contains(value)) {
             value_map.emplace(value, value_map.size());
@@ -31,7 +38,9 @@ void Dumper::run_on(Function *function) {
     };
 
     for (auto &block : *function) {
+        std::cout << 'L' << versioned_block(block.get()) << ":\n";
         for (auto &inst : *block) {
+            std::cout << "  ";
             if (inst->has_name() || (!inst->is<StoreInst>() && !inst->is<RetInst>())) {
                 std::cout << printable_value(inst.get()) << " = ";
             }
