@@ -8,6 +8,7 @@ struct AllocInst : public Instruction {};
 
 enum class BinaryOp {
     Add,
+    Shl,
     Sub,
 };
 

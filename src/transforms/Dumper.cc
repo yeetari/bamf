@@ -63,6 +63,9 @@ void Dumper::run_on(Function *function) {
                 case BinaryOp::Add:
                     std::cout << "add ";
                     break;
+                case BinaryOp::Shl:
+                    std::cout << "shl ";
+                    break;
                 case BinaryOp::Sub:
                     std::cout << "sub ";
                     break;
