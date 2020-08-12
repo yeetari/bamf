@@ -40,6 +40,15 @@ public:
     Value *rhs() const { return m_rhs; }
 };
 
+class BranchInst : public Instruction {
+    BasicBlock *m_dst;
+
+public:
+    explicit BranchInst(BasicBlock *dst) : m_dst(dst) {}
+
+    BasicBlock *dst() const { return m_dst; }
+};
+
 class LoadInst : public Instruction {
     Value *m_ptr;
 

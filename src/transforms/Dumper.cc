@@ -27,6 +27,9 @@ void Dumper::run_on(Function *function) {
         return value_map[value];
     };
 
+    auto printable_block = [&](BasicBlock *block) {
+        return 'L' + std::to_string(versioned_block(block));
+    };
     auto printable_value = [&](Value *value) {
         if (auto *constant = value->as<Constant>()) {
             return std::to_string(constant->value());
@@ -38,10 +41,18 @@ void Dumper::run_on(Function *function) {
     };
 
     for (auto &block : *function) {
-        std::cout << 'L' << versioned_block(block.get()) << ":\n";
+        std::cout << printable_block(block.get()) << ":\n";
         for (auto &inst : *block) {
             std::cout << "  ";
-            if (inst->has_name() || (!inst->is<StoreInst>() && !inst->is<RetInst>())) {
+
+            if (auto *branch = inst->as<BranchInst>()) {
+                std::cout << "br " << printable_block(branch->dst());
+            } else if (auto *store = inst->as<StoreInst>()) {
+                std::cout << "store " << printable_value(store->ptr());
+                std::cout << ", " << printable_value(store->val());
+            } else if (auto *ret = inst->as<RetInst>()) {
+                std::cout << "ret " << printable_value(ret->ret_val());
+            } else {
                 std::cout << printable_value(inst.get()) << " = ";
             }
 
@@ -60,11 +71,6 @@ void Dumper::run_on(Function *function) {
                 std::cout << ", " << printable_value(binary->rhs());
             } else if (auto *load = inst->as<LoadInst>()) {
                 std::cout << "load " << printable_value(load->ptr());
-            } else if (auto *store = inst->as<StoreInst>()) {
-                std::cout << "store " << printable_value(store->ptr());
-                std::cout << ", " << printable_value(store->val());
-            } else if (auto *ret = inst->as<RetInst>()) {
-                std::cout << "ret " << printable_value(ret->ret_val());
             }
             std::cout << '\n';
         }
