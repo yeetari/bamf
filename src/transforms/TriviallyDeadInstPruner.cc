@@ -20,18 +20,18 @@ void TriviallyDeadInstPruner::run_on(Function *function) {
         auto *inst = work_queue.back();
         work_queue.pop_back();
 
-        // If an instruction has uses, it isn't dead
+        // If an instruction has uses, it isn't dead.
         if (!inst->uses().empty()) {
             continue;
         }
 
-        // Dead stores are promoted by AllocPromoter
+        // Dead stores are promoted by AllocPromoter.
         if (inst->is<StoreInst>()) {
             continue;
         }
 
-        // Returns are never explictly used, and therefore can never be trivially dead
-        if (inst->is<RetInst>()) {
+        // Terminators are never explictly used, and therefore can never be trivially dead.
+        if (inst->is<BranchInst>() || inst->is<RetInst>()) {
             continue;
         }
 
