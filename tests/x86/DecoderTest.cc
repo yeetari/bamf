@@ -135,6 +135,39 @@ TEST(x86DecoderTest, PushReg64) {
     EXPECT_EQ(inst.operand_width, 64);
 }
 
+TEST(x86DecoderTest, ShlRegOne16) {
+    // shl ax, 1
+    auto inst = decode_single_inst(0x66, 0xD1, 0xE0);
+    EXPECT_EQ(inst.opcode, Opcode::Shl);
+    EXPECT_EQ(inst.operands[0].type, OperandType::Reg);
+    EXPECT_EQ(inst.operands[0].reg, Register::Rax);
+    EXPECT_EQ(inst.operands[1].type, OperandType::Imm);
+    EXPECT_EQ(inst.operands[1].imm, 1);
+    EXPECT_EQ(inst.operand_width, 16);
+}
+
+TEST(x86DecoderTest, ShlRegOne32) {
+    // shl eax, 1
+    auto inst = decode_single_inst(0xD1, 0xE0);
+    EXPECT_EQ(inst.opcode, Opcode::Shl);
+    EXPECT_EQ(inst.operands[0].type, OperandType::Reg);
+    EXPECT_EQ(inst.operands[0].reg, Register::Rax);
+    EXPECT_EQ(inst.operands[1].type, OperandType::Imm);
+    EXPECT_EQ(inst.operands[1].imm, 1);
+    EXPECT_EQ(inst.operand_width, 32);
+}
+
+TEST(x86DecoderTest, ShlRegOne64) {
+    // shl rax, 1
+    auto inst = decode_single_inst(0x48, 0xD1, 0xE0);
+    EXPECT_EQ(inst.opcode, Opcode::Shl);
+    EXPECT_EQ(inst.operands[0].type, OperandType::Reg);
+    EXPECT_EQ(inst.operands[0].reg, Register::Rax);
+    EXPECT_EQ(inst.operands[1].type, OperandType::Imm);
+    EXPECT_EQ(inst.operands[1].imm, 1);
+    EXPECT_EQ(inst.operand_width, 64);
+}
+
 TEST(x86DecoderTest, XorRegReg16) {
     // xor ax, ax
     auto inst = decode_single_inst(0x66, 0x31, 0xC0);

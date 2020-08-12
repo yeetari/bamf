@@ -72,6 +72,15 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
         inst.operands[0] = {OperandInfoType::ModRmRm};
         inst.operands[1] = {OperandInfoType::Imm};
     });
+    BUILD(0xD1, 1, {
+        inst.opcode = Opcode::Shl;
+        inst.mod_rm = true;
+        inst.default_address_width = 32;
+        inst.default_operand_width = 32;
+        inst.operands[0] = {OperandInfoType::ModRmRm};
+        inst.operands[1] = {OperandInfoType::Constant};
+        inst.operands[1].constant = 1;
+    });
     BUILD(0xE8, 1, {
         inst.opcode = Opcode::Call;
         inst.default_operand_width = 32;
@@ -165,9 +174,14 @@ MachineInst Decoder::next_inst() {
         }
 
         switch (operand_info.type) {
+        case OperandInfoType::Constant:
         case OperandInfoType::Imm:
         case OperandInfoType::Rel: {
             std::uint8_t width = operand_info.type == OperandInfoType::Imm ? inst.operand_width : inst.address_width;
+            if (operand_info.type == OperandInfoType::Constant) {
+                width = 0;
+            }
+
             operand.type = OperandType::Imm;
             switch (width) {
             case 8:
@@ -181,6 +195,9 @@ MachineInst Decoder::next_inst() {
                 break;
             case 64:
                 operand.imm = m_stream->read<std::uint64_t>();
+                break;
+            default:
+                operand.imm = operand_info.constant;
                 break;
             }
 

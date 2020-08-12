@@ -42,6 +42,7 @@ enum class Opcode {
     Pop,
     Push,
     Ret,
+    Shl,
     Xor,
 };
 

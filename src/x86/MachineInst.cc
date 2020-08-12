@@ -26,6 +26,8 @@ const char *mnemonic(Opcode opcode) {
         return "push";
     case Opcode::Ret:
         return "ret";
+    case Opcode::Shl:
+        return "shl";
     case Opcode::Xor:
         return "xor";
     }

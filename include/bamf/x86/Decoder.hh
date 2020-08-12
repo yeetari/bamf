@@ -16,6 +16,7 @@ namespace bamf::x86 {
 
 enum class OperandInfoType {
     None = 0,
+    Constant,
     Imm,
     ModRmGpr,
     ModRmRm,
@@ -25,6 +26,7 @@ enum class OperandInfoType {
 
 struct OperandInfo {
     OperandInfoType type;
+    std::uint8_t constant{0};
 };
 
 struct InstructionInfo {
