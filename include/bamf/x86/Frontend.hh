@@ -21,11 +21,13 @@ class Frontend {
     Function *m_function{nullptr};
     BasicBlock *m_block{nullptr};
 
+    std::unordered_map<std::uintptr_t, BasicBlock *> m_blocks;
     std::unordered_map<Register, GlobalVariable *> m_phys_regs;
 
     Value *phys_dst(Register);
     Value *phys_src(Register);
 
+    void translate_jmp(const Operand &target);
     void translate_mov(const Operand &dst, const Operand &src);
     void translate_pop(const Operand &dst);
     void translate_push(const Operand &src);

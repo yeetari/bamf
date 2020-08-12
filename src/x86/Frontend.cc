@@ -16,6 +16,17 @@ Value *Frontend::phys_src(Register reg) {
     return m_block->append<LoadInst>(m_phys_regs[reg]);
 }
 
+void Frontend::translate_jmp(const Operand &target) {
+    auto addr = target.imm;
+    if (!m_blocks.contains(addr)) {
+        m_blocks.emplace(addr, m_function->insert_block());
+    }
+
+    auto *block = m_blocks[addr];
+    m_block->append<BranchInst>(block);
+    m_block = block;
+}
+
 void Frontend::translate_mov(const Operand &dst, const Operand &src) {
     Value *store_dst = nullptr;
     switch (dst.type) {
@@ -109,6 +120,9 @@ std::unique_ptr<Program> Frontend::run() {
         auto inst = m_decoder->next_inst();
         dump_inst(inst);
         switch (inst.opcode) {
+        case Opcode::Jmp:
+            translate_jmp(inst.operands[0]);
+            break;
         case Opcode::Mov:
             translate_mov(inst.operands[0], inst.operands[1]);
             break;
