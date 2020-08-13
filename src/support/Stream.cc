@@ -24,4 +24,8 @@ std::uint64_t Stream::read() {
     return read<std::uint32_t>() | (static_cast<std::uint64_t>(read<std::uint32_t>()) << 32U);
 }
 
+void Stream::reset() {
+    m_bytes_read = 0;
+}
+
 } // namespace bamf

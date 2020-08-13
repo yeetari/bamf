@@ -21,6 +21,7 @@ public:
 
     template <typename T>
     T read();
+    void reset();
 
     bool has_more() const { return m_bytes_read < m_length; }
     std::size_t bytes_read() const { return m_bytes_read; }
