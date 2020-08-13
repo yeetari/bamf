@@ -6,7 +6,8 @@
 #include <bamf/ir/Value.hh>
 #include <bamf/support/NonCopyable.hh>
 #include <bamf/support/NonMovable.hh>
-#include <bamf/x86/Decoder.hh>
+#include <bamf/support/Stream.hh>
+#include <bamf/x86/MachineInst.hh>
 
 #include <cstdint>
 #include <memory>
@@ -15,7 +16,7 @@
 namespace bamf::x86 {
 
 class Frontend {
-    Decoder *const m_decoder;
+    Stream *const m_stream;
     DecompilationContext *const m_decomp_ctx;
     Program *m_program{nullptr};
     Function *m_function{nullptr};
@@ -35,7 +36,7 @@ class Frontend {
     void translate_shl(const Operand &dst, const Operand &src);
 
 public:
-    Frontend(Decoder *decoder, DecompilationContext *decomp_ctx) : m_decoder(decoder), m_decomp_ctx(decomp_ctx) {}
+    Frontend(Stream *stream, DecompilationContext *decomp_ctx) : m_stream(stream), m_decomp_ctx(decomp_ctx) {}
 
     std::unique_ptr<Program> run();
 };

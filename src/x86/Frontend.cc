@@ -2,6 +2,7 @@
 
 #include <bamf/ir/Constant.hh>
 #include <bamf/ir/Instructions.hh>
+#include <bamf/x86/Decoder.hh>
 
 #include <cassert>
 #include <stdexcept>
@@ -116,8 +117,9 @@ std::unique_ptr<Program> Frontend::run() {
         m_phys_regs[reg] = global;
     }
 
-    while (m_decoder->has_next()) {
-        auto inst = m_decoder->next_inst();
+    Decoder decoder(m_stream);
+    while (decoder.has_next()) {
+        auto inst = decoder.next_inst();
         dump_inst(inst);
         switch (inst.opcode) {
         case Opcode::Jmp:

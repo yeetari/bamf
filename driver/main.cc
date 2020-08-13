@@ -69,15 +69,15 @@ int main(int argc, char **argv) {
     }
 
     Stream stream(executable.code, executable.code_size);
-    x86::Decoder decoder(&stream);
     if (mode == "disasm") {
+        x86::Decoder decoder(&stream);
         while (decoder.has_next()) {
             auto inst = decoder.next_inst();
             x86::dump_inst(inst);
         }
     } else if (mode == "decomp") {
         DecompilationContext decomp_ctx;
-        x86::Frontend frontend(&decoder, &decomp_ctx);
+        x86::Frontend frontend(&stream, &decomp_ctx);
         auto program = frontend.run();
         PassManager pass_manager;
         pass_manager.add<StackSimulator>(decomp_ctx);
