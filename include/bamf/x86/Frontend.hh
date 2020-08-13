@@ -35,6 +35,9 @@ class Frontend {
     void translate_ret();
     void translate_shl(const Operand &dst, const Operand &src);
 
+    void build_jump_targets();
+    void build_registers();
+
 public:
     Frontend(Stream *stream, DecompilationContext *decomp_ctx) : m_stream(stream), m_decomp_ctx(decomp_ctx) {}
 

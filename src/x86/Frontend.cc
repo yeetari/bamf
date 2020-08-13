@@ -18,12 +18,7 @@ Value *Frontend::phys_src(Register reg) {
 }
 
 void Frontend::translate_jmp(const Operand &target) {
-    auto addr = target.imm;
-    if (!m_blocks.contains(addr)) {
-        m_blocks.emplace(addr, m_function->insert_block());
-    }
-
-    auto *block = m_blocks[addr];
+    auto *block = m_blocks.at(target.imm);
     m_block->append<BranchInst>(block);
     m_block = block;
 }
@@ -101,6 +96,35 @@ void Frontend::translate_ret() {
     m_block->append<RetInst>(phys_src(Register::Rax));
 }
 
+void Frontend::build_jump_targets() {
+    Decoder decoder(m_stream);
+    while (decoder.has_next()) {
+        auto inst = decoder.next_inst();
+        auto addr = inst.operands[0].imm;
+        switch (inst.opcode) {
+        case Opcode::Jmp: {
+            if (!m_blocks.contains(addr)) {
+                auto *block = m_function->insert_block();
+                m_blocks.emplace(addr, block);
+            }
+            break;
+        }
+        default:
+            break;
+        }
+    }
+}
+
+void Frontend::build_registers() {
+    for (int i = 0; i < 16; i++) {
+        auto reg = static_cast<Register>(i);
+        auto *global = m_program->add_global();
+        global->set_name(reg_to_str(reg, 64));
+        m_decomp_ctx->add_phys_reg(global);
+        m_phys_regs[reg] = global;
+    }
+}
+
 std::unique_ptr<Program> Frontend::run() {
     auto program = std::make_unique<Program>();
     m_program = program.get();
@@ -109,13 +133,9 @@ std::unique_ptr<Program> Frontend::run() {
     m_program->set_main(m_function);
     m_function->set_entry(m_block);
 
-    for (int i = 0; i < 16; i++) {
-        auto reg = static_cast<Register>(i);
-        auto *global = m_program->add_global();
-        global->set_name(reg_to_str(reg, 64));
-        m_decomp_ctx->add_phys_reg(global);
-        m_phys_regs[reg] = global;
-    }
+    build_jump_targets();
+    build_registers();
+    m_stream->reset();
 
     Decoder decoder(m_stream);
     while (decoder.has_next()) {
