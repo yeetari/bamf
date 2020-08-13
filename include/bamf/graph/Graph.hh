@@ -35,14 +35,18 @@ public:
     V *emplace(Args &&... args);
     void remove(const V *vertex);
 
+    template <template <typename> typename T, typename U = T<V>>
+    typename U::result run() const {
+        return U().run(const_cast<Graph<V> *>(this));
+    }
+
     void set_entry(V *entry) { m_entry = entry; }
 
     std::vector<V *> preds_of(const V *vertex);
     std::vector<V *> succs_of(const V *vertex);
 
     std::size_t size() const;
-    V *entry() { return m_entry; }
-    const V *entry() const { return m_entry; }
+    V *entry() const { return m_entry; }
 };
 
 template <typename V>
