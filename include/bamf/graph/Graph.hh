@@ -15,8 +15,9 @@ namespace bamf {
 
 template <typename V>
 class Graph {
-    std::unordered_map<const V *, std::vector<std::unique_ptr<Edge<V>>>> m_preds;
-    std::unordered_map<const V *, std::vector<std::unique_ptr<Edge<V>>>> m_succs;
+    std::unordered_map<const V *, std::vector<Edge<V> *>> m_preds;
+    std::unordered_map<const V *, std::vector<Edge<V> *>> m_succs;
+    std::vector<std::unique_ptr<Edge<V>>> m_edges;
     std::vector<std::unique_ptr<V>> m_vertices;
     V *m_entry{nullptr};
 
@@ -52,8 +53,11 @@ public:
 template <typename V>
 template <typename E, typename... Args>
 void Graph<V>::connect(V *src, V *dst, Args &&... args) {
-    m_preds[dst].emplace_back(new E(src, dst, std::forward<Args>(args)...));
-    m_succs[src].emplace_back(new E(src, dst, std::forward<Args>(args)...));
+    auto ptr = std::make_unique<E>(src, dst, std::forward<Args>(args)...);
+    auto *edge = ptr.get();
+    m_edges.push_back(std::move(ptr));
+    m_preds[dst].push_back(edge);
+    m_succs[src].push_back(edge);
 }
 
 template <typename V>
