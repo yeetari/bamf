@@ -50,6 +50,30 @@ public:
     BasicBlock *dst() const { return m_dst; }
 };
 
+class CondBranchInst : public Instruction {
+    Value *m_cond;
+    BasicBlock *m_false_dst;
+    BasicBlock *m_true_dst;
+
+public:
+    CondBranchInst(Value *cond, BasicBlock *false_dst, BasicBlock *true_dst)
+        : m_cond(cond), m_false_dst(false_dst), m_true_dst(true_dst) {
+        m_cond->add_use(&m_cond);
+        m_cond->add_user(this);
+    }
+
+    ~CondBranchInst() override {
+        if (m_cond != nullptr) {
+            m_cond->remove_use(&m_cond);
+            m_cond->remove_user(this);
+        }
+    }
+
+    Value *cond() const { return m_cond; }
+    BasicBlock *false_dst() const { return m_false_dst; }
+    BasicBlock *true_dst() const { return m_true_dst; }
+};
+
 class LoadInst : public Instruction {
     Value *m_ptr;
 

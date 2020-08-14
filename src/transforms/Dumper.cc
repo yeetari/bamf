@@ -47,6 +47,10 @@ void Dumper::run_on(Function *function) {
 
             if (auto *branch = inst->as<BranchInst>()) {
                 std::cout << "br " << printable_block(branch->dst());
+            } else if (auto *cond_branch = inst->as<CondBranchInst>()) {
+                std::cout << "br " << printable_value(cond_branch->cond());
+                std::cout << ", " << printable_block(cond_branch->true_dst());
+                std::cout << ", " << printable_block(cond_branch->false_dst());
             } else if (auto *store = inst->as<StoreInst>()) {
                 std::cout << "store " << printable_value(store->ptr());
                 std::cout << ", " << printable_value(store->val());

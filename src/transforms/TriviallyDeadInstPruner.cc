@@ -31,7 +31,7 @@ void TriviallyDeadInstPruner::run_on(Function *function) {
         }
 
         // Terminators are never explictly used, and therefore can never be trivially dead.
-        if (inst->is<BranchInst>() || inst->is<RetInst>()) {
+        if (inst->is<BranchInst>() || inst->is<CondBranchInst>() || inst->is<RetInst>()) {
             continue;
         }
 
