@@ -1,5 +1,6 @@
 add_executable(bamf-tests
     graph/DepthFirstSearchTest.cc
+    graph/DominanceComputerTest.cc
     graph/GraphTest.cc
     support/StackTest.cc
     x86/DecoderTest.cc)
