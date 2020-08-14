@@ -3,7 +3,6 @@
 #include <bamf/graph/Edge.hh>
 #include <bamf/support/Iterator.hh>
 #include <bamf/support/NonCopyable.hh>
-#include <bamf/support/NonMovable.hh>
 
 #include <algorithm>
 #include <memory>
@@ -24,10 +23,12 @@ class Graph {
 public:
     BAMF_MAKE_ITERABLE(m_vertices)
     BAMF_MAKE_NON_COPYABLE(Graph)
-    BAMF_MAKE_NON_MOVABLE(Graph)
 
     Graph() = default;
+    Graph(Graph &&) noexcept = default;
     ~Graph() = default;
+
+    Graph &operator=(Graph &&) = default;
 
     template <typename E, typename... Args>
     void connect(V *src, V *dst, Args &&... args);
