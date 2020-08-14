@@ -131,7 +131,6 @@ std::unique_ptr<Program> Frontend::run() {
     m_function = program->create_function("main");
     m_block = m_function->insert_block();
     m_program->set_main(m_function);
-    m_function->set_entry(m_block);
 
     build_jump_targets();
     build_registers();

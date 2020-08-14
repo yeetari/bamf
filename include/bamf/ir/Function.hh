@@ -1,6 +1,5 @@
 #pragma once
 
-#include <bamf/graph/Graph.hh>
 #include <bamf/ir/BasicBlock.hh>
 #include <bamf/support/Iterator.hh>
 #include <bamf/support/NonCopyable.hh>
@@ -14,10 +13,10 @@ namespace bamf {
 
 class Function {
     const std::string m_name;
-    Graph<BasicBlock> m_cfg;
+    std::vector<std::unique_ptr<BasicBlock>> m_blocks;
 
 public:
-    BAMF_MAKE_ITERABLE(m_cfg)
+    BAMF_MAKE_ITERABLE(m_blocks)
     BAMF_MAKE_NON_COPYABLE(Function)
     BAMF_MAKE_NON_MOVABLE(Function)
 
@@ -25,15 +24,13 @@ public:
     ~Function() = default;
 
     BasicBlock *insert_block() {
-        auto *block = m_cfg.emplace();
+        auto *block = m_blocks.emplace_back(new BasicBlock).get();
         block->set_parent(this);
         return block;
     }
 
-    void set_entry(BasicBlock *block) { m_cfg.set_entry(block); }
-    BasicBlock *entry() { return m_cfg.entry(); }
-
     const std::string &name() const { return m_name; }
+    BasicBlock *entry() { return m_blocks.front().get(); }
 };
 
 } // namespace bamf
