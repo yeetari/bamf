@@ -43,6 +43,7 @@ public:
 
     void set_entry(V *entry) { m_entry = entry; }
 
+    std::vector<Edge<V> *> edges_of(const V *vertex) const;
     std::vector<V *> preds_of(const V *vertex);
     std::vector<V *> succs_of(const V *vertex);
 
@@ -78,6 +79,19 @@ void Graph<V>::remove(const V *vertex) {
     if (it != m_vertices.end()) {
         m_vertices.erase(it);
     }
+}
+
+template <typename V>
+std::vector<Edge<V> *> Graph<V>::edges_of(const V *vertex) const {
+    if (!m_preds.contains(vertex)) {
+        return {};
+    }
+
+    std::vector<Edge<V> *> ret;
+    for (const auto &pred : m_preds.at(vertex)) {
+        ret.push_back(pred);
+    }
+    return ret;
 }
 
 template <typename V>
