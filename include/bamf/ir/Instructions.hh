@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bamf/ir/Instruction.hh>
+#include <bamf/support/Iterator.hh>
 
 namespace bamf {
 
@@ -91,6 +92,29 @@ public:
     }
 
     Value *ptr() const { return m_ptr; }
+};
+
+class PhiInst : public Instruction {
+    std::unordered_map<BasicBlock *, Value *> m_incoming;
+
+public:
+    BAMF_MAKE_ITERABLE(m_incoming)
+
+    PhiInst() = default;
+    ~PhiInst() override {
+        for (auto [block, value] : m_incoming) {
+            if (value != nullptr) {
+                value->remove_use(&m_incoming[block]);
+                value->remove_user(this);
+            }
+        }
+    }
+
+    void add_incoming(BasicBlock *block, Value *value) {
+        m_incoming[block] = value;
+        value->add_use(&m_incoming[block]);
+        value->add_user(this);
+    }
 };
 
 class StoreInst : public Instruction {

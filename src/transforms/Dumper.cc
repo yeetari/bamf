@@ -78,6 +78,17 @@ void Dumper::run_on(Function *function) {
                 std::cout << ", " << printable_value(binary->rhs());
             } else if (auto *load = inst->as<LoadInst>()) {
                 std::cout << "load " << printable_value(load->ptr());
+            } else if (auto *phi = inst->as<PhiInst>()) {
+                std::cout << "phi (";
+                for (bool first = true; auto [block, value] : *phi) {
+                    if (!first) {
+                        std::cout << ", ";
+                    }
+                    first = false;
+                    std::cout << printable_block(block) << ": ";
+                    std::cout << printable_value(value);
+                }
+                std::cout << ")";
             }
             std::cout << '\n';
         }
