@@ -12,6 +12,7 @@ add_library(bamf
     transforms/AllocPromoter.cc
     transforms/CfgSimplifier.cc
     transforms/ConstantBranchEvaluator.cc
+    transforms/ConstantFolder.cc
     transforms/Dumper.cc
     transforms/RegisterLocaliser.cc
     transforms/StackSimulator.cc

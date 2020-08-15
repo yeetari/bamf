@@ -8,6 +8,7 @@
 #include <bamf/transforms/AllocPromoter.hh>
 #include <bamf/transforms/CfgSimplifier.hh>
 #include <bamf/transforms/ConstantBranchEvaluator.hh>
+#include <bamf/transforms/ConstantFolder.hh>
 #include <bamf/transforms/Dumper.hh>
 #include <bamf/transforms/RegisterLocaliser.hh>
 #include <bamf/transforms/StackSimulator.hh>
@@ -88,6 +89,7 @@ int main(int argc, char **argv) {
         pass_manager.add<TriviallyDeadInstPruner>();
         pass_manager.add<ConstantBranchEvaluator>();
         pass_manager.add<CfgSimplifier>();
+        pass_manager.add<ConstantFolder>();
         pass_manager.add<Dumper>();
         pass_manager.run(program.get());
     } else {

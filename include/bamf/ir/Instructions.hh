@@ -119,6 +119,7 @@ public:
     }
 
     void remove_incoming(BasicBlock *block);
+    const std::unordered_map<BasicBlock *, Value *> &incoming() const { return m_incoming; }
 };
 
 class StoreInst : public Instruction {
