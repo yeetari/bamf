@@ -117,6 +117,8 @@ public:
         value->add_use(&m_incoming[block]);
         value->add_user(this);
     }
+
+    void remove_incoming(BasicBlock *block);
 };
 
 class StoreInst : public Instruction {

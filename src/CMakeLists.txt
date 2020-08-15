@@ -5,6 +5,7 @@ add_library(bamf
     ir/BasicBlock.cc
     ir/Function.cc
     ir/Instruction.cc
+    ir/Instructions.cc
     ir/Value.cc
     pass/PassManager.cc
     support/Stream.cc
