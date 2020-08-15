@@ -3,6 +3,8 @@
 #include <bamf/ir/Instruction.hh>
 #include <bamf/support/Iterator.hh>
 
+#include <unordered_map>
+
 namespace bamf {
 
 struct AllocInst : public Instruction {};
