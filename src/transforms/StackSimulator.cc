@@ -43,14 +43,11 @@ struct StackOffset {
 
 // TODO: Build a proper tree (Graph<Value *>) of this
 Value *find_root_value(Value *start) {
+    if (auto *alloc = start->as<AllocInst>()) {
+        return start;
+    }
     if (auto *binary = start->as<BinaryInst>()) {
         return find_root_value(binary->lhs());
-    }
-    if (auto *constant = start->as<Constant>()) {
-        return constant;
-    }
-    if (auto *global = start->as<GlobalVariable>()) {
-        return global;
     }
     if (auto *load = start->as<LoadInst>()) {
         return find_root_value(load->ptr());
@@ -58,7 +55,9 @@ Value *find_root_value(Value *start) {
     if (auto *store = start->as<StoreInst>()) {
         return find_root_value(store->ptr());
     }
-    return nullptr;
+
+    assert(!start->is<Instruction>());
+    return start;
 }
 
 } // namespace
