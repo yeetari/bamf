@@ -22,22 +22,20 @@ class BinaryInst : public Instruction {
 
 public:
     BinaryInst(BinaryOp op, Value *lhs, Value *rhs) : m_op(op), m_lhs(lhs), m_rhs(rhs) {
-        m_lhs->add_use(&m_lhs);
-        m_rhs->add_use(&m_rhs);
         m_lhs->add_user(this);
         m_rhs->add_user(this);
     }
 
     ~BinaryInst() override {
         if (m_lhs != nullptr) {
-            m_lhs->remove_use(&m_lhs);
             m_lhs->remove_user(this);
         }
         if (m_rhs != nullptr) {
-            m_rhs->remove_use(&m_rhs);
             m_rhs->remove_user(this);
         }
     }
+
+    void replace_uses_of_with(Value *a, Value *b) override;
 
     BinaryOp op() const { return m_op; }
     Value *lhs() const { return m_lhs; }
@@ -61,13 +59,11 @@ class CondBranchInst : public Instruction {
 public:
     CondBranchInst(Value *cond, BasicBlock *false_dst, BasicBlock *true_dst)
         : m_cond(cond), m_false_dst(false_dst), m_true_dst(true_dst) {
-        m_cond->add_use(&m_cond);
         m_cond->add_user(this);
     }
 
     ~CondBranchInst() override {
         if (m_cond != nullptr) {
-            m_cond->remove_use(&m_cond);
             m_cond->remove_user(this);
         }
     }
@@ -81,17 +77,14 @@ class LoadInst : public Instruction {
     Value *m_ptr;
 
 public:
-    explicit LoadInst(Value *ptr) : m_ptr(ptr) {
-        m_ptr->add_use(&m_ptr);
-        m_ptr->add_user(this);
-    }
-
+    explicit LoadInst(Value *ptr) : m_ptr(ptr) { m_ptr->add_user(this); }
     ~LoadInst() override {
         if (m_ptr != nullptr) {
-            m_ptr->remove_use(&m_ptr);
             m_ptr->remove_user(this);
         }
     }
+
+    void replace_uses_of_with(Value *a, Value *b) override;
 
     Value *ptr() const { return m_ptr; }
 };
@@ -106,7 +99,6 @@ public:
     ~PhiInst() override {
         for (auto [block, value] : m_incoming) {
             if (value != nullptr) {
-                value->remove_use(&m_incoming[block]);
                 value->remove_user(this);
             }
         }
@@ -114,9 +106,10 @@ public:
 
     void add_incoming(BasicBlock *block, Value *value) {
         m_incoming[block] = value;
-        value->add_use(&m_incoming[block]);
         value->add_user(this);
     }
+
+    void replace_uses_of_with(Value *a, Value *b) override;
 
     void remove_incoming(BasicBlock *block);
     const std::unordered_map<BasicBlock *, Value *> &incoming() const { return m_incoming; }
@@ -128,22 +121,20 @@ class StoreInst : public Instruction {
 
 public:
     StoreInst(Value *ptr, Value *val) : m_ptr(ptr), m_val(val) {
-        m_ptr->add_use(&m_ptr);
-        m_val->add_use(&m_val);
         m_ptr->add_user(this);
         m_val->add_user(this);
     }
 
     ~StoreInst() override {
         if (m_ptr != nullptr) {
-            m_ptr->remove_use(&m_ptr);
             m_ptr->remove_user(this);
         }
         if (m_val != nullptr) {
-            m_val->remove_use(&m_val);
             m_val->remove_user(this);
         }
     }
+
+    void replace_uses_of_with(Value *a, Value *b) override;
 
     Value *ptr() const { return m_ptr; }
     Value *val() const { return m_val; }
@@ -153,17 +144,14 @@ class RetInst : public Instruction {
     Value *m_ret_val;
 
 public:
-    explicit RetInst(Value *ret_val) : m_ret_val(ret_val) {
-        m_ret_val->add_use(&m_ret_val);
-        m_ret_val->add_user(this);
-    }
-
+    explicit RetInst(Value *ret_val) : m_ret_val(ret_val) { m_ret_val->add_user(this); }
     ~RetInst() override {
         if (m_ret_val != nullptr) {
-            m_ret_val->remove_use(&m_ret_val);
             m_ret_val->remove_user(this);
         }
     }
+
+    void replace_uses_of_with(Value *a, Value *b) override;
 
     Value *ret_val() const { return m_ret_val; }
 };

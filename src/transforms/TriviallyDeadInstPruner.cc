@@ -20,8 +20,8 @@ void TriviallyDeadInstPruner::run_on(Function *function) {
         auto *inst = work_queue.back();
         work_queue.pop_back();
 
-        // If an instruction has uses, it isn't dead.
-        if (!inst->uses().empty()) {
+        // If an instruction has users, it isn't dead.
+        if (!inst->users().empty()) {
             continue;
         }
 

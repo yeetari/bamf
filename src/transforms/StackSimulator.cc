@@ -120,16 +120,11 @@ void StackSimulator::run_on(Function *function) {
     }
 
     for (auto [load, offset] : load_map) {
-        // TODO: This is a mess
         auto *alloc = alloc_map[offset];
-        auto old_uses = load->uses();
-        auto position = load->parent()->remove(load);
-        auto *new_load = load->parent()->insert<LoadInst>(position, alloc);
-
-        for (auto **use : old_uses) {
-            *use = new_load;
-            new_load->add_use(use);
-        }
+        auto *block = load->parent();
+        auto *new_load = block->insert<LoadInst>(block->position_of(load), alloc);
+        load->replace_all_uses_with(new_load);
+        load->remove_from_parent();
     }
 
     m_logger.trace("Created {} allocs", alloc_map.size());

@@ -1,19 +1,9 @@
 #include <bamf/ir/Value.hh>
 
 #include <algorithm>
+#include <cassert>
 
 namespace bamf {
-
-void Value::add_use(Value **use) {
-    m_uses.push_back(use);
-}
-
-void Value::remove_use(Value **use) {
-    auto it = std::find(m_uses.begin(), m_uses.end(), use);
-    if (it != m_uses.end()) {
-        m_uses.erase(it);
-    }
-}
 
 void Value::add_user(Value *user) {
     m_users.push_back(user);
@@ -27,19 +17,17 @@ void Value::remove_user(Value *user) {
 }
 
 void Value::replace_all_uses_with(Value *value) {
-    for (auto **use : m_uses) {
-        *use = value;
-        if (value != nullptr) {
-            value->add_use(use);
-        }
-    }
     for (auto *user : m_users) {
+        user->replace_uses_of_with(this, value);
         if (value != nullptr) {
             value->add_user(user);
         }
     }
-    m_uses.clear();
     m_users.clear();
+}
+
+void Value::replace_uses_of_with(Value *, Value *) {
+    assert(false);
 }
 
 } // namespace bamf
