@@ -1,5 +1,7 @@
 #pragma once
 
+// TODO: Remove BasicBlock include once we move more stuff to cc file
+#include <bamf/ir/BasicBlock.hh>
 #include <bamf/ir/Instruction.hh>
 #include <bamf/support/Iterator.hh>
 
@@ -46,7 +48,12 @@ class BranchInst : public Instruction {
     BasicBlock *m_dst;
 
 public:
-    explicit BranchInst(BasicBlock *dst) : m_dst(dst) {}
+    explicit BranchInst(BasicBlock *dst) : m_dst(dst) { m_dst->add_user(this); }
+    ~BranchInst() override {
+        if (m_dst != nullptr) {
+            m_dst->remove_user(this);
+        }
+    }
 
     BasicBlock *dst() const { return m_dst; }
 };
@@ -60,11 +67,19 @@ public:
     CondBranchInst(Value *cond, BasicBlock *false_dst, BasicBlock *true_dst)
         : m_cond(cond), m_false_dst(false_dst), m_true_dst(true_dst) {
         m_cond->add_user(this);
+        m_false_dst->add_user(this);
+        m_true_dst->add_user(this);
     }
 
     ~CondBranchInst() override {
         if (m_cond != nullptr) {
             m_cond->remove_user(this);
+        }
+        if (m_false_dst != nullptr) {
+            m_false_dst->remove_user(this);
+        }
+        if (m_true_dst != nullptr) {
+            m_true_dst->remove_user(this);
         }
     }
 

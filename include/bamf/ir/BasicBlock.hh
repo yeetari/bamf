@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bamf/ir/Instruction.hh>
+#include <bamf/ir/Value.hh>
 #include <bamf/support/Iterator.hh>
 #include <bamf/support/NonCopyable.hh>
 #include <bamf/support/NonMovable.hh>
@@ -14,7 +15,7 @@ namespace bamf {
 
 class Function;
 
-class BasicBlock {
+class BasicBlock : public Value {
     Function *m_parent{nullptr};
     std::vector<std::unique_ptr<Instruction>> m_instructions;
 
