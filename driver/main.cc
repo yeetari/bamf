@@ -7,6 +7,7 @@
 #include <bamf/support/Stream.hh>
 #include <bamf/transforms/AllocPromoter.hh>
 #include <bamf/transforms/Dumper.hh>
+#include <bamf/transforms/ConstantBranchEvaluator.hh>
 #include <bamf/transforms/RegisterLocaliser.hh>
 #include <bamf/transforms/StackSimulator.hh>
 #include <bamf/transforms/TriviallyDeadInstPruner.hh>
@@ -84,6 +85,7 @@ int main(int argc, char **argv) {
         pass_manager.add<RegisterLocaliser>(decomp_ctx);
         pass_manager.add<AllocPromoter>();
         pass_manager.add<TriviallyDeadInstPruner>();
+        pass_manager.add<ConstantBranchEvaluator>();
         pass_manager.add<Dumper>();
         pass_manager.run(program.get());
     } else {

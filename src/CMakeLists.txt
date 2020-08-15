@@ -8,6 +8,7 @@ add_library(bamf
     pass/PassManager.cc
     support/Stream.cc
     transforms/AllocPromoter.cc
+    transforms/ConstantBranchEvaluator.cc
     transforms/Dumper.cc
     transforms/RegisterLocaliser.cc
     transforms/StackSimulator.cc
