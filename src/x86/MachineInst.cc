@@ -16,6 +16,8 @@ const char *mnemonic(Opcode opcode) {
         return "call";
     case Opcode::Cmp:
         return "cmp";
+    case Opcode::Jge:
+        return "jge";
     case Opcode::Jmp:
         return "jmp";
     case Opcode::Lea:

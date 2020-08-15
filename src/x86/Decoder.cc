@@ -41,6 +41,11 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
         inst.default_operand_width = 64;
         inst.operands[0] = {OperandInfoType::OpcodeGpr};
     });
+    BUILD(0x7D, 1, {
+        inst.opcode = Opcode::Jge;
+        inst.default_address_width = 8;
+        inst.operands[0] = {OperandInfoType::Rel};
+    });
     BUILD(0x83, 1, {
         inst.opcode = Opcode::Cmp;
         inst.mod_rm = true;
