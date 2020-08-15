@@ -3,6 +3,7 @@ add_library(bamf
     core/ElfLoader.cc
     core/InputFile.cc
     ir/BasicBlock.cc
+    ir/Function.cc
     ir/Instruction.cc
     ir/Value.cc
     pass/PassManager.cc

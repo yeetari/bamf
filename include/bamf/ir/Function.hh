@@ -29,6 +29,9 @@ public:
         return block;
     }
 
+    const_iterator position_of(BasicBlock *block) const;
+    const_iterator remove(BasicBlock *block);
+
     const std::string &name() const { return m_name; }
     BasicBlock *entry() { return m_blocks.front().get(); }
 };
