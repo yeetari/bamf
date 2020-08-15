@@ -26,7 +26,10 @@ enum class OperandInfoType {
 
 struct OperandInfo {
     OperandInfoType type;
-    std::uint8_t constant{0};
+    union {
+        std::uint8_t constant;
+        std::uint8_t imm_width;
+    };
 };
 
 struct InstructionInfo {

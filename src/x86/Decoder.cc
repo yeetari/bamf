@@ -41,6 +41,15 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
         inst.default_operand_width = 64;
         inst.operands[0] = {OperandInfoType::OpcodeGpr};
     });
+    BUILD(0x83, 1, {
+        inst.opcode = Opcode::Cmp;
+        inst.mod_rm = true;
+        inst.default_address_width = 64;
+        inst.default_operand_width = 32;
+        inst.operands[0] = {OperandInfoType::ModRmRm};
+        inst.operands[1] = {OperandInfoType::Imm};
+        inst.operands[1].imm_width = 8;
+    });
     BUILD(0x89, 1, {
         inst.opcode = Opcode::Mov;
         inst.mod_rm = true;
@@ -180,6 +189,8 @@ MachineInst Decoder::next_inst() {
             std::uint8_t width = operand_info.type == OperandInfoType::Imm ? inst.operand_width : inst.address_width;
             if (operand_info.type == OperandInfoType::Constant) {
                 width = 0;
+            } else if (operand_info.type == OperandInfoType::Imm) {
+                width = operand_info.imm_width != 0 ? operand_info.imm_width : width;
             }
 
             operand.type = OperandType::Imm;
