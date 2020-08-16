@@ -5,19 +5,20 @@
 #include <bamf/ir/Function.hh>
 #include <bamf/ir/Instruction.hh>
 #include <bamf/ir/Instructions.hh>
+#include <bamf/support/Stack.hh>
 
 namespace bamf {
 
 namespace {
 
 bool run(Function *function, int *no_preds_pruned_count) {
-    // Build CFG
-    // TODO: Move this into an analysis pass
+    // Build control flow graph.
+    // TODO: Move this into an analysis pass.
     Graph<BasicBlock> cfg;
     cfg.set_entry(function->entry());
     for (auto &block : *function) {
         for (auto &inst : *block) {
-            // TODO: Make Edge<V> the default template arg for connect
+            // TODO: Make Edge<V> the default template arg for connect.
             if (auto *branch = inst->as<BranchInst>()) {
                 cfg.connect<Edge<BasicBlock>>(branch->parent(), branch->dst());
             } else if (auto *cond_branch = inst->as<CondBranchInst>()) {
@@ -28,24 +29,26 @@ bool run(Function *function, int *no_preds_pruned_count) {
     }
 
     bool changed = false;
-    for (auto &block : *function) {
+    Stack<BasicBlock> remove_queue;
+    for (auto &b : *function) {
+        auto *block = b.get();
         // Remove blocks with no predecessors. This can happen after running, for example, the ConstantBranchEvaluator
         // pass where conditional branches (with two basic block destinations) are promoted into unconditional branches
         // (with only one basic block destination).
-        if (cfg.preds_of(block.get()).empty() && block.get() != cfg.entry()) {
-            // Removing the block from all PHIs
-            // TODO: Store the PHI users inside the basic block
-            for (auto &b : *function) {
-                for (auto &inst : *b) {
-                    if (auto *phi = inst->as<PhiInst>()) {
-                        phi->remove_incoming(block.get());
-                    }
+        if (cfg.preds_of(block).empty() && block != cfg.entry()) {
+            // Removing the block from all PHIs.
+            for (auto *user : block->users()) {
+                if (auto *phi = user->as<PhiInst>()) {
+                    phi->remove_incoming(block);
                 }
             }
-            function->remove(block.get());
+            remove_queue.push(block);
             changed = true;
             (*no_preds_pruned_count)++;
         }
+    }
+    while (!remove_queue.empty()) {
+        function->remove(remove_queue.pop());
     }
     return changed;
 }
