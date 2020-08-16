@@ -25,8 +25,15 @@ void LoadInst::replace_uses_of_with(Value *a, Value *b) {
 }
 
 void PhiInst::replace_uses_of_with(Value *a, Value *b) {
-    // TODO: Implement
-    assert(false);
+    for (auto [block, value] : m_incoming) {
+        if (block == a) {
+            remove_incoming(block);
+            add_incoming(b->as<BasicBlock>(), value);
+        }
+        if (value == a) {
+            m_incoming[block] = b;
+        }
+    }
 }
 
 void PhiInst::remove_incoming(BasicBlock *block) {
