@@ -117,6 +117,7 @@ public:
     PhiInst() = default;
     ~PhiInst() override {
         for (auto [block, value] : m_incoming) {
+            block->remove_user(this);
             if (value != nullptr) {
                 value->remove_user(this);
             }
@@ -125,6 +126,7 @@ public:
 
     void add_incoming(BasicBlock *block, Value *value) {
         m_incoming[block] = value;
+        block->add_user(this);
         value->add_user(this);
     }
 
