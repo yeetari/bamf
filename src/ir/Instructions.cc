@@ -10,6 +10,16 @@ void BinaryInst::replace_uses_of_with(Value *a, Value *b) {
     m_rhs = m_rhs == a ? b : m_rhs;
 }
 
+void BranchInst::replace_uses_of_with(Value *a, Value *b) {
+    m_dst = m_dst == a ? b->as<BasicBlock>() : m_dst;
+}
+
+void CondBranchInst::replace_uses_of_with(Value *a, Value *b) {
+    m_cond = m_cond == a ? b : m_cond;
+    m_false_dst = m_false_dst == a ? b->as<BasicBlock>() : m_false_dst;
+    m_true_dst = m_true_dst == a ? b->as<BasicBlock>() : m_true_dst;
+}
+
 void LoadInst::replace_uses_of_with(Value *a, Value *b) {
     m_ptr = m_ptr == a ? b : m_ptr;
 }

@@ -55,6 +55,8 @@ public:
         }
     }
 
+    void replace_uses_of_with(Value *a, Value *b) override;
+
     BasicBlock *dst() const { return m_dst; }
 };
 
@@ -82,6 +84,8 @@ public:
             m_true_dst->remove_user(this);
         }
     }
+
+    void replace_uses_of_with(Value *a, Value *b) override;
 
     Value *cond() const { return m_cond; }
     BasicBlock *false_dst() const { return m_false_dst; }
