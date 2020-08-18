@@ -20,6 +20,7 @@ Constant *fold_binary(BinaryOp op, Constant *lhs, Constant *rhs) {
     case BinaryOp::Shl:
         return new Constant(lhs->value() << rhs->value());
     }
+    return nullptr;
 }
 
 } // namespace
@@ -56,7 +57,12 @@ void ConstantFolder::run_on(Function *function) {
                 }
             }
 
-            binary->replace_all_uses_with(fold_binary(binary->op(), lhs, rhs));
+            auto *folded = fold_binary(binary->op(), lhs, rhs);
+            if (folded == nullptr) {
+                m_logger.warn("Failed to fold constant binary instruction");
+                continue;
+            }
+            binary->replace_all_uses_with(folded);
             remove_list.push(binary);
             folded_binary_count++;
         }
