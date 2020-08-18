@@ -35,6 +35,12 @@ void Frontend::translate_cmp(const Operand &lhs_op, const Operand &rhs_op) {
     m_block->append<StoreInst>(m_sf, cmp_ltz);
 }
 
+void Frontend::translate_inc(const Operand &dst) {
+    assert(dst.type == OperandType::Reg);
+    auto *added = m_block->append<BinaryInst>(BinaryOp::Add, phys_src(dst.reg), new Constant(1));
+    m_block->append<StoreInst>(phys_dst(dst.reg), added);
+}
+
 void Frontend::translate_jmp(const Operand &target) {
     auto *block = m_blocks.at(target.imm);
     m_block->append<BranchInst>(block);
@@ -174,6 +180,9 @@ std::unique_ptr<Program> Frontend::run() {
         switch (inst.opcode) {
         case Opcode::Cmp:
             translate_cmp(inst.operands[0], inst.operands[1]);
+            break;
+        case Opcode::Inc:
+            translate_inc(inst.operands[0]);
             break;
         case Opcode::Jmp:
             translate_jmp(inst.operands[0]);
