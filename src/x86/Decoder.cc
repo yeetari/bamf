@@ -13,7 +13,7 @@ namespace bamf::x86 {
 // clang-format off
 #define BUILD(op, range, block) \
     do { \
-        for (std::uint8_t i = op; i < (op) + (range); i++ ) { \
+        for (std::uint16_t i = op; i < (op) + (range); i++ ) { \
             auto &inst = m_table[i]; \
             inst.present = true; \
             inst.base_op = op; \
@@ -104,6 +104,12 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
         inst.opcode = Opcode::Jmp;
         inst.default_address_width = 8;
         inst.operands[0] = {OperandInfoType::Rel};
+    });
+    BUILD(0xFF, 1, {
+        inst.opcode = Opcode::Inc;
+        inst.mod_rm = true;
+        inst.default_operand_width = 32;
+        inst.operands[0] = {OperandInfoType::ModRmRm};
     });
 }
 

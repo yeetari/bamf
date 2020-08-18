@@ -37,6 +37,7 @@ struct Operand {
 enum class Opcode {
     Call,
     Cmp,
+    Inc,
     Jge,
     Jmp,
     Lea,

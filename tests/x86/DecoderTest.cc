@@ -54,6 +54,33 @@ TEST(x86DecoderTest, CmpRegImm64) {
     EXPECT_EQ(inst.operand_width, 64);
 }
 
+TEST(x86DecoderTest, IncReg16) {
+    // inc ax
+    auto inst = decode_single_inst(0x66, 0xFF, 0xC0);
+    EXPECT_EQ(inst.opcode, Opcode::Inc);
+    EXPECT_EQ(inst.operands[0].type, OperandType::Reg);
+    EXPECT_EQ(inst.operands[0].reg, Register::Rax);
+    EXPECT_EQ(inst.operand_width, 16);
+}
+
+TEST(x86DecoderTest, IncReg32) {
+    // inc eax
+    auto inst = decode_single_inst(0xFF, 0xC0);
+    EXPECT_EQ(inst.opcode, Opcode::Inc);
+    EXPECT_EQ(inst.operands[0].type, OperandType::Reg);
+    EXPECT_EQ(inst.operands[0].reg, Register::Rax);
+    EXPECT_EQ(inst.operand_width, 32);
+}
+
+TEST(x86DecoderTest, IncReg64) {
+    // inc rax
+    auto inst = decode_single_inst(0x48, 0xFF, 0xC0);
+    EXPECT_EQ(inst.opcode, Opcode::Inc);
+    EXPECT_EQ(inst.operands[0].type, OperandType::Reg);
+    EXPECT_EQ(inst.operands[0].reg, Register::Rax);
+    EXPECT_EQ(inst.operand_width, 64);
+}
+
 TEST(x86DecoderTest, JgeRel8) {
     auto inst = decode_single_inst(0x7D, 0x05);
     EXPECT_EQ(inst.opcode, Opcode::Jge);
