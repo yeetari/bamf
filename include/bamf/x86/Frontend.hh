@@ -32,6 +32,7 @@ class Frontend {
 
     void translate_cmp(const Operand &lhs, const Operand &rhs);
     void translate_inc(const Operand &dst);
+    void translate_jge(const Operand &target, BasicBlock *false_block);
     void translate_jmp(const Operand &target);
     void translate_mov(const Operand &dst, const Operand &src);
     void translate_pop(const Operand &dst);

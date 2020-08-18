@@ -41,6 +41,14 @@ void Frontend::translate_inc(const Operand &dst) {
     m_block->append<StoreInst>(phys_dst(dst.reg), added);
 }
 
+void Frontend::translate_jge(const Operand &target, BasicBlock *false_block) {
+    auto *of = m_block->append<LoadInst>(m_of);
+    auto *sf = m_block->append<LoadInst>(m_sf);
+    auto *cond = m_block->append<CompareInst>(ComparePred::Eq, of, sf);
+    auto *true_block = m_blocks.at(target.imm);
+    m_block->append<CondBranchInst>(cond, false_block, true_block);
+}
+
 void Frontend::translate_jmp(const Operand &target) {
     auto *block = m_blocks.at(target.imm);
     m_block->append<BranchInst>(block);
@@ -125,10 +133,19 @@ void Frontend::build_jump_targets() {
         auto inst = decoder.next_inst();
         auto addr = inst.operands[0].imm;
         switch (inst.opcode) {
+        case Opcode::Jge:
         case Opcode::Jmp: {
             if (!m_blocks.contains(addr)) {
-                auto *block = m_function->insert_block();
-                m_blocks.emplace(addr, block);
+                auto *true_block = m_function->insert_block();
+                m_blocks.emplace(addr, true_block);
+            }
+
+            if (inst.opcode != Opcode::Jmp) {
+                auto false_addr = inst.offset + inst.length;
+                if (!m_blocks.contains(false_addr)) {
+                    auto *false_block = m_function->insert_block();
+                    m_blocks.emplace(false_addr, false_block);
+                }
             }
             break;
         }
@@ -183,6 +200,9 @@ std::unique_ptr<Program> Frontend::run() {
             break;
         case Opcode::Inc:
             translate_inc(inst.operands[0]);
+            break;
+        case Opcode::Jge:
+            translate_jge(inst.operands[0], m_blocks.at(inst.offset + inst.length));
             break;
         case Opcode::Jmp:
             translate_jmp(inst.operands[0]);
