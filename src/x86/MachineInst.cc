@@ -1,10 +1,13 @@
 #include <bamf/x86/MachineInst.hh>
 
+#include <bamf/x86/Register.hh>
+
 #include <cassert>
 #include <cstdint>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <string>
 
 namespace bamf::x86 {
 

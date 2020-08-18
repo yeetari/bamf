@@ -1,5 +1,8 @@
 #include <bamf/core/DecompilationContext.hh>
 
+#include <bamf/ir/GlobalVariable.hh>
+#include <bamf/ir/Value.hh>
+
 #include <algorithm>
 
 namespace bamf {

@@ -1,8 +1,14 @@
 #include <bamf/x86/Frontend.hh>
 
+#include <bamf/core/DecompilationContext.hh>
+#include <bamf/ir/BasicBlock.hh>
 #include <bamf/ir/Constant.hh>
+#include <bamf/ir/Function.hh>
+#include <bamf/ir/GlobalVariable.hh>
 #include <bamf/ir/Instructions.hh>
+#include <bamf/support/Stream.hh>
 #include <bamf/x86/Decoder.hh>
+#include <bamf/x86/MachineInst.hh>
 
 #include <cassert>
 #include <stdexcept>

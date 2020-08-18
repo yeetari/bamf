@@ -2,7 +2,6 @@
 
 #include <bamf/ir/BasicBlock.hh>
 #include <bamf/ir/Function.hh>
-#include <bamf/ir/Instruction.hh>
 #include <bamf/ir/Instructions.hh>
 
 namespace bamf {

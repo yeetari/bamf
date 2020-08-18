@@ -5,6 +5,7 @@
 #include <bamf/x86/MachineInst.hh>
 
 #include <array>
+#include <cstdint>
 
 namespace bamf {
 

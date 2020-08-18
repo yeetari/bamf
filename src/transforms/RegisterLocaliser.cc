@@ -2,7 +2,6 @@
 
 #include <bamf/core/DecompilationContext.hh>
 #include <bamf/ir/BasicBlock.hh>
-#include <bamf/ir/Constant.hh>
 #include <bamf/ir/Function.hh>
 #include <bamf/ir/GlobalVariable.hh>
 #include <bamf/ir/Instructions.hh>

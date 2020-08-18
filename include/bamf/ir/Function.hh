@@ -5,6 +5,7 @@
 #include <bamf/support/NonCopyable.hh>
 #include <bamf/support/NonMovable.hh>
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>

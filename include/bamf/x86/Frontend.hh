@@ -1,19 +1,26 @@
 #pragma once
 
-#include <bamf/core/DecompilationContext.hh>
-#include <bamf/ir/GlobalVariable.hh>
 #include <bamf/ir/Program.hh>
-#include <bamf/ir/Value.hh>
-#include <bamf/support/NonCopyable.hh>
-#include <bamf/support/NonMovable.hh>
-#include <bamf/support/Stream.hh>
-#include <bamf/x86/MachineInst.hh>
+#include <bamf/x86/Register.hh>
 
 #include <cstdint>
 #include <memory>
 #include <unordered_map>
 
+namespace bamf {
+
+class BasicBlock;
+class DecompilationContext;
+class Function;
+struct GlobalVariable;
+class Stream;
+class Value;
+
+} // namespace bamf
+
 namespace bamf::x86 {
+
+struct Operand;
 
 class Frontend {
     Stream *const m_stream;

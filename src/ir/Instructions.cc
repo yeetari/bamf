@@ -1,7 +1,6 @@
 #include <bamf/ir/Instructions.hh>
 
-#include <algorithm>
-#include <cassert>
+#include <bamf/ir/BasicBlock.hh>
 
 namespace bamf {
 

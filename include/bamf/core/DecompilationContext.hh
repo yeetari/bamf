@@ -1,10 +1,11 @@
 #pragma once
 
-#include <bamf/ir/GlobalVariable.hh>
-
 #include <vector>
 
 namespace bamf {
+
+struct GlobalVariable;
+class Value;
 
 // TODO: Make this an analysis result
 class DecompilationContext {

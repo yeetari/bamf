@@ -2,10 +2,10 @@
 
 #include <bamf/graph/DepthFirstSearch.hh>
 #include <bamf/graph/DominanceComputer.hh>
+#include <bamf/graph/DominatorTree.hh>
 #include <bamf/graph/Graph.hh>
 #include <bamf/ir/BasicBlock.hh>
 #include <bamf/ir/Function.hh>
-#include <bamf/ir/Instruction.hh>
 #include <bamf/ir/Instructions.hh>
 #include <bamf/support/Stack.hh>
 

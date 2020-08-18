@@ -1,6 +1,7 @@
 #include <bamf/x86/Decoder.hh>
 
 #include <bamf/support/Stream.hh>
+#include <bamf/x86/MachineInst.hh>
 #include <bamf/x86/Register.hh>
 
 #include <cassert>
