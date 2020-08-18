@@ -171,7 +171,7 @@ bool run(Function *function, int *propagated_load_count, int *pruned_store_count
             }
         }
 
-        for (auto *succ : cfg.succs_of(block)) {
+        for (auto *succ : tree.succs_of(block)) {
             work_queue.push(succ);
         }
     }
