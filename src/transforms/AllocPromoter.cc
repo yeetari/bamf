@@ -163,7 +163,10 @@ bool run(Function *function, int *propagated_load_count, int *pruned_store_count
                         continue;
                     }
                     auto &var_info = vars.at(reverse_map.at(phi));
-                    phi->add_incoming(block, var_info.def_stack.peek());
+                    auto &def_stack = var_info.def_stack;
+                    if (!def_stack.empty()) {
+                        phi->add_incoming(block, def_stack.peek());
+                    }
                 }
             }
         }
