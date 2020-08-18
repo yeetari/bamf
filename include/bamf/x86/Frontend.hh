@@ -24,6 +24,8 @@ class Frontend {
 
     std::unordered_map<std::uintptr_t, BasicBlock *> m_blocks;
     std::unordered_map<Register, GlobalVariable *> m_phys_regs;
+    GlobalVariable *m_of{nullptr};
+    GlobalVariable *m_sf{nullptr};
 
     Value *phys_dst(Register);
     Value *phys_src(Register);

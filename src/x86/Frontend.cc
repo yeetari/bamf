@@ -123,6 +123,15 @@ void Frontend::build_registers() {
         m_decomp_ctx->add_phys_reg(global);
         m_phys_regs[reg] = global;
     }
+
+    auto make_flag = [&](const char *name) {
+        auto *flag = m_program->add_global();
+        flag->set_name(name);
+        m_decomp_ctx->add_phys_reg(flag);
+        return flag;
+    };
+    m_of = make_flag("of");
+    m_sf = make_flag("sf");
 }
 
 std::unique_ptr<Program> Frontend::run() {
