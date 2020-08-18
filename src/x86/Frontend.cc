@@ -20,7 +20,6 @@ Value *Frontend::phys_src(Register reg) {
 void Frontend::translate_jmp(const Operand &target) {
     auto *block = m_blocks.at(target.imm);
     m_block->append<BranchInst>(block);
-    m_block = block;
 }
 
 void Frontend::translate_mov(const Operand &dst, const Operand &src) {
@@ -149,6 +148,11 @@ std::unique_ptr<Program> Frontend::run() {
     while (decoder.has_next()) {
         auto inst = decoder.next_inst();
         dump_inst(inst);
+
+        if (m_blocks.contains(inst.offset)) {
+            m_block = m_blocks.at(inst.offset);
+        }
+
         switch (inst.opcode) {
         case Opcode::Jmp:
             translate_jmp(inst.operands[0]);
