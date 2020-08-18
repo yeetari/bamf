@@ -17,6 +17,24 @@ Value *Frontend::phys_src(Register reg) {
     return m_block->append<LoadInst>(m_phys_regs[reg]);
 }
 
+void Frontend::translate_cmp(const Operand &lhs_op, const Operand &rhs_op) {
+    assert(lhs_op.type == OperandType::Reg);
+    assert(rhs_op.type == OperandType::Imm);
+    auto *lhs = phys_src(lhs_op.reg);
+    auto *rhs = new Constant(rhs_op.imm);
+    auto *cmp = m_block->append<BinaryInst>(BinaryOp::Sub, lhs, rhs);
+
+    // Set overflow flag.
+    auto *xor0 = m_block->append<BinaryInst>(BinaryOp::Xor, lhs, rhs);
+    auto *xor1 = m_block->append<BinaryInst>(BinaryOp::Xor, lhs, cmp);
+    auto *and0 = m_block->append<BinaryInst>(BinaryOp::And, xor0, xor1);
+    m_block->append<StoreInst>(m_of, m_block->append<CompareInst>(ComparePred::Slt, and0, new Constant(0)));
+
+    // Set sign flag based on if cmp is less than zero.
+    auto *cmp_ltz = m_block->append<CompareInst>(ComparePred::Slt, cmp, new Constant(0));
+    m_block->append<StoreInst>(m_sf, cmp_ltz);
+}
+
 void Frontend::translate_jmp(const Operand &target) {
     auto *block = m_blocks.at(target.imm);
     m_block->append<BranchInst>(block);
@@ -154,6 +172,9 @@ std::unique_ptr<Program> Frontend::run() {
         }
 
         switch (inst.opcode) {
+        case Opcode::Cmp:
+            translate_cmp(inst.operands[0], inst.operands[1]);
+            break;
         case Opcode::Jmp:
             translate_jmp(inst.operands[0]);
             break;

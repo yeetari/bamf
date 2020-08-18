@@ -30,6 +30,7 @@ class Frontend {
     Value *phys_dst(Register);
     Value *phys_src(Register);
 
+    void translate_cmp(const Operand &lhs, const Operand &rhs);
     void translate_jmp(const Operand &target);
     void translate_mov(const Operand &dst, const Operand &src);
     void translate_pop(const Operand &dst);
