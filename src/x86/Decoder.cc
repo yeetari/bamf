@@ -228,7 +228,9 @@ MachineInst Decoder::next_inst() {
             }
 
             if (operand_info.type == OperandInfoType::Rel) {
-                operand.imm += inst.length + inst.offset;
+                auto rel = static_cast<std::uint8_t>(operand.imm);
+                rel += inst.length + inst.offset;
+                operand.imm = rel;
             }
             break;
         }
