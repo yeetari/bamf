@@ -76,6 +76,18 @@ void Dumper::run_on(Function *function) {
                 }
                 std::cout << printable_value(binary->lhs());
                 std::cout << ", " << printable_value(binary->rhs());
+            } else if (auto *compare = inst->as<CompareInst>()) {
+                std::cout << "cmp ";
+                switch (compare->pred()) {
+                case ComparePred::Eq:
+                    std::cout << "eq ";
+                    break;
+                case ComparePred::Slt:
+                    std::cout << "slt ";
+                    break;
+                }
+                std::cout << printable_value(compare->lhs());
+                std::cout << ", " << printable_value(compare->rhs());
             } else if (auto *load = inst->as<LoadInst>()) {
                 std::cout << "load " << printable_value(load->ptr());
             } else if (auto *phi = inst->as<PhiInst>()) {

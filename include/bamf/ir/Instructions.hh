@@ -60,6 +60,38 @@ public:
     BasicBlock *dst() const { return m_dst; }
 };
 
+enum class ComparePred {
+    Eq,
+    Slt,
+};
+
+class CompareInst : public Instruction {
+    ComparePred m_pred;
+    Value *m_lhs;
+    Value *m_rhs;
+
+public:
+    CompareInst(ComparePred pred, Value *lhs, Value *rhs) : m_pred(pred), m_lhs(lhs), m_rhs(rhs) {
+        m_lhs->add_user(this);
+        m_rhs->add_user(this);
+    }
+
+    ~CompareInst() override {
+        if (m_lhs != nullptr) {
+            m_lhs->remove_user(this);
+        }
+        if (m_rhs != nullptr) {
+            m_rhs->remove_user(this);
+        }
+    }
+
+    void replace_uses_of_with(Value *a, Value *b) override;
+
+    ComparePred pred() const { return m_pred; }
+    Value *lhs() const { return m_lhs; }
+    Value *rhs() const { return m_rhs; }
+};
+
 class CondBranchInst : public Instruction {
     Value *m_cond;
     BasicBlock *m_false_dst;

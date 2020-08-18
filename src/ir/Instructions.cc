@@ -14,6 +14,11 @@ void BranchInst::replace_uses_of_with(Value *a, Value *b) {
     m_dst = m_dst == a ? b->as<BasicBlock>() : m_dst;
 }
 
+void CompareInst::replace_uses_of_with(Value *a, Value *b) {
+    m_lhs = m_lhs == a ? b : m_lhs;
+    m_rhs = m_rhs == a ? b : m_rhs;
+}
+
 void CondBranchInst::replace_uses_of_with(Value *a, Value *b) {
     m_cond = m_cond == a ? b : m_cond;
     m_false_dst = m_false_dst == a ? b->as<BasicBlock>() : m_false_dst;
