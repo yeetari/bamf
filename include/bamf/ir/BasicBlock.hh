@@ -26,7 +26,7 @@ public:
     BAMF_MAKE_NON_MOVABLE(BasicBlock)
 
     BasicBlock() = default;
-    ~BasicBlock();
+    ~BasicBlock() override;
 
     template <typename Inst, typename... Args>
     Inst *insert(const_iterator position, Args &&... args) requires std::derived_from<Inst, Instruction> {
