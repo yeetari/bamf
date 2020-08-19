@@ -224,8 +224,8 @@ MachineInst Decoder::next_inst() {
                 break;
             }
 
-            for (int i = 0; i < width / 8; i++) {
-                inst.bytes[inst.length++] = operand.imm_bytes[i];
+            for (int j = 0; j < width / 8; j++) {
+                inst.bytes[inst.length++] = operand.imm_bytes[j];
             }
 
             if (operand_info.type == OperandInfoType::Rel) {
