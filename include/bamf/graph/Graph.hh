@@ -28,7 +28,7 @@ public:
     Graph(Graph &&) noexcept = default;
     ~Graph() = default;
 
-    Graph &operator=(Graph &&) = default;
+    Graph &operator=(Graph &&) noexcept = default;
 
     template <typename E = Edge<V>, typename... Args>
     void connect(V *src, V *dst, Args &&... args);
