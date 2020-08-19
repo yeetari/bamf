@@ -30,7 +30,7 @@ public:
 
     Graph &operator=(Graph &&) = default;
 
-    template <typename E, typename... Args>
+    template <typename E = Edge<V>, typename... Args>
     void connect(V *src, V *dst, Args &&... args);
 
     template <typename... Args>

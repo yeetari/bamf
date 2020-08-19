@@ -50,12 +50,11 @@ bool run(Function *function, const Statistic &propagated_load_count, const Stati
     cfg.set_entry(function->entry());
     for (auto &block : *function) {
         for (auto &inst : *block) {
-            // TODO: Make Edge<V> the default template arg for connect
             if (auto *branch = inst->as<BranchInst>()) {
-                cfg.connect<Edge<BasicBlock>>(branch->parent(), branch->dst());
+                cfg.connect(branch->parent(), branch->dst());
             } else if (auto *cond_branch = inst->as<CondBranchInst>()) {
-                cfg.connect<Edge<BasicBlock>>(cond_branch->parent(), cond_branch->false_dst());
-                cfg.connect<Edge<BasicBlock>>(cond_branch->parent(), cond_branch->true_dst());
+                cfg.connect(cond_branch->parent(), cond_branch->false_dst());
+                cfg.connect(cond_branch->parent(), cond_branch->true_dst());
             }
         }
     }
