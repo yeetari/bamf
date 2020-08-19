@@ -3,6 +3,7 @@
 #include <bamf/ir/BasicBlock.hh>
 #include <bamf/ir/Function.hh>
 #include <bamf/ir/Instructions.hh>
+#include <bamf/pass/Statistic.hh>
 
 namespace bamf {
 
@@ -14,7 +15,7 @@ void TriviallyDeadInstPruner::run_on(Function *function) {
         }
     }
 
-    int pruned_count = 0;
+    Statistic pruned_count(m_logger, "Pruned {} trivially dead instructions");
     while (!work_queue.empty()) {
         auto *inst = work_queue.back();
         work_queue.pop_back();
@@ -35,9 +36,8 @@ void TriviallyDeadInstPruner::run_on(Function *function) {
         }
 
         inst->remove_from_parent();
-        pruned_count++;
+        ++pruned_count;
     }
-    m_logger.trace("Pruned {} trivially dead instructions", pruned_count);
 }
 
 } // namespace bamf

@@ -4,6 +4,7 @@
 #include <bamf/ir/Constant.hh>
 #include <bamf/ir/Function.hh>
 #include <bamf/ir/Instructions.hh>
+#include <bamf/pass/Statistic.hh>
 #include <bamf/support/Stack.hh>
 
 namespace bamf {
@@ -32,8 +33,8 @@ void ConstantFolder::run_on(Function *function) {
         }
     }
 
-    int folded_binary_count = 0;
-    int folded_phi_count = 0;
+    Statistic folded_binary_count(m_logger, "Folded {} binary instructions");
+    Statistic folded_phi_count(m_logger, "Folded {} phi instructions");
     Stack<Instruction> remove_list;
     while (!work_queue.empty()) {
         auto *inst = work_queue.pop();
@@ -63,7 +64,7 @@ void ConstantFolder::run_on(Function *function) {
             }
             binary->replace_all_uses_with(folded);
             remove_list.push(binary);
-            folded_binary_count++;
+            ++folded_binary_count;
         }
 
         // Propagate PHIs with only one incoming value
@@ -78,7 +79,7 @@ void ConstantFolder::run_on(Function *function) {
                 }
             }
 
-            folded_phi_count++;
+            ++folded_phi_count;
             for (auto [block, value] : *phi) {
                 phi->replace_all_uses_with(value);
             }
@@ -89,9 +90,6 @@ void ConstantFolder::run_on(Function *function) {
     for (auto *inst : remove_list) {
         inst->remove_from_parent();
     }
-
-    m_logger.trace("Folded {} binary instructions", folded_binary_count);
-    m_logger.trace("Folded {} phi instructions", folded_phi_count);
 }
 
 } // namespace bamf

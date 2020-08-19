@@ -4,11 +4,12 @@
 #include <bamf/ir/Constant.hh>
 #include <bamf/ir/Function.hh>
 #include <bamf/ir/Instructions.hh>
+#include <bamf/pass/Statistic.hh>
 
 namespace bamf {
 
 void ConstantBranchEvaluator::run_on(Function *function) {
-    int evaluated_count = 0;
+    Statistic evaluated_count(m_logger, "Evaluated {} conditional branches");
     for (auto &block : *function) {
         for (auto &inst : *block) {
             auto *cond_branch = inst->as<CondBranchInst>();
@@ -24,10 +25,9 @@ void ConstantBranchEvaluator::run_on(Function *function) {
             auto *new_dst = constant->value() == 1 ? cond_branch->true_dst() : cond_branch->false_dst();
             block->append<BranchInst>(new_dst);
             block->remove(cond_branch);
-            evaluated_count++;
+            ++evaluated_count;
         }
     }
-    m_logger.trace("Evaluated {} conditional branches", evaluated_count);
 }
 
 } // namespace bamf

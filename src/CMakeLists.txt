@@ -8,6 +8,7 @@ add_library(bamf
     ir/Instructions.cc
     ir/Value.cc
     pass/PassManager.cc
+    pass/Statistic.cc
     support/Stream.cc
     transforms/AllocPromoter.cc
     transforms/CfgSimplifier.cc

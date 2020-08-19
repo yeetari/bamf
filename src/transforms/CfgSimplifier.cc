@@ -4,13 +4,14 @@
 #include <bamf/ir/BasicBlock.hh>
 #include <bamf/ir/Function.hh>
 #include <bamf/ir/Instructions.hh>
+#include <bamf/pass/Statistic.hh>
 #include <bamf/support/Stack.hh>
 
 namespace bamf {
 
 namespace {
 
-bool run(Function *function, int *no_preds_pruned_count) {
+bool run(Function *function, const Statistic &no_preds_pruned_count) {
     // Build control flow graph.
     // TODO: Move this into an analysis pass.
     Graph<BasicBlock> cfg;
@@ -43,7 +44,7 @@ bool run(Function *function, int *no_preds_pruned_count) {
             }
             remove_queue.push(block);
             changed = true;
-            (*no_preds_pruned_count)++;
+            ++no_preds_pruned_count;
         }
     }
     while (!remove_queue.empty()) {
@@ -55,12 +56,11 @@ bool run(Function *function, int *no_preds_pruned_count) {
 } // namespace
 
 void CfgSimplifier::run_on(Function *function) {
-    int no_preds_pruned_count = 0;
     bool changed = false;
+    Statistic no_preds_pruned_count(m_logger, "Pruned {} blocks with no predecessors");
     do {
-        changed = run(function, &no_preds_pruned_count);
+        changed = run(function, no_preds_pruned_count);
     } while (changed);
-    m_logger.trace("Pruned {} blocks with no predecessors", no_preds_pruned_count);
 }
 
 } // namespace bamf

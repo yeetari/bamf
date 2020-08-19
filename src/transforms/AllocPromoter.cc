@@ -7,6 +7,7 @@
 #include <bamf/ir/BasicBlock.hh>
 #include <bamf/ir/Function.hh>
 #include <bamf/ir/Instructions.hh>
+#include <bamf/pass/Statistic.hh>
 #include <bamf/support/Stack.hh>
 
 #include <cassert>
@@ -43,7 +44,7 @@ bool is_promotable(AllocInst *alloc) {
     return true;
 }
 
-bool run(Function *function, int *propagated_load_count, int *pruned_store_count) {
+bool run(Function *function, const Statistic &propagated_load_count, const Statistic &pruned_store_count) {
     // Build CFG
     Graph<BasicBlock> cfg;
     cfg.set_entry(function->entry());
@@ -147,7 +148,7 @@ bool run(Function *function, int *propagated_load_count, int *pruned_store_count
                     load->replace_all_uses_with(def_stack.peek());
 
                     changed = true;
-                    (*propagated_load_count)++;
+                    ++propagated_load_count;
                 }
             } else if (auto *phi = inst->as<PhiInst>()) {
                 def_stack.push(phi);
@@ -184,7 +185,7 @@ bool run(Function *function, int *propagated_load_count, int *pruned_store_count
             store->remove_from_parent();
 
             changed = true;
-            (*pruned_store_count)++;
+            ++pruned_store_count;
         }
     }
 
@@ -194,16 +195,12 @@ bool run(Function *function, int *propagated_load_count, int *pruned_store_count
 } // namespace
 
 void AllocPromoter::run_on(Function *function) {
-    int propagated_load_count = 0;
-    int pruned_store_count = 0;
-
     bool changed = false;
+    Statistic propagated_load_count(m_logger, "Propagated {} loads");
+    Statistic pruned_store_count(m_logger, "Pruned {} stores");
     do {
-        changed = run(function, &propagated_load_count, &pruned_store_count);
+        changed = run(function, propagated_load_count, pruned_store_count);
     } while (changed);
-
-    m_logger.trace("Propagated {} loads", propagated_load_count);
-    m_logger.trace("Pruned {} stores", pruned_store_count);
 }
 
 } // namespace bamf
