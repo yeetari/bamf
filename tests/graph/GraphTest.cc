@@ -19,6 +19,28 @@ struct TestEdge : public Edge<TestVertex> {
     constexpr TestEdge(TestVertex *src, TestVertex *dst) : Edge(src, dst) {}
 };
 
+TEST(GraphTest, Disconnect) {
+    Graph<TestVertex> graph;
+    auto *a = graph.emplace(0);
+    auto *b = graph.emplace(1);
+    auto *c = graph.emplace(2);
+    auto *d = graph.emplace(3);
+    graph.connect<TestEdge>(a, b);
+    graph.connect<TestEdge>(a, c);
+    graph.connect<TestEdge>(b, d);
+    graph.connect<TestEdge>(c, d);
+    EXPECT_EQ(graph.preds_of(d).size(), 2);
+    EXPECT_EQ(graph.preds_of(d)[0], b);
+    EXPECT_EQ(graph.preds_of(d)[1], c);
+
+    graph.disconnect(c, d);
+    EXPECT_EQ(graph.preds_of(d).size(), 1);
+    EXPECT_EQ(graph.preds_of(d)[0], b);
+
+    graph.disconnect(b, d);
+    EXPECT_EQ(graph.preds_of(d).size(), 0);
+}
+
 TEST(GraphTest, Iterator) {
     Graph<TestVertex> graph;
     for (int i = 0; i < 10; i++) {

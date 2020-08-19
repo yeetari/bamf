@@ -32,6 +32,7 @@ public:
 
     template <typename E = Edge<V>, typename... Args>
     void connect(V *src, V *dst, Args &&... args);
+    void disconnect(V *src, V *dst);
 
     template <typename... Args>
     V *emplace(Args &&... args);
@@ -59,6 +60,20 @@ void Graph<V>::connect(V *src, V *dst, Args &&... args) {
     m_edges.push_back(std::move(ptr));
     m_preds[dst].push_back(edge);
     m_succs[src].push_back(edge);
+}
+
+template <typename V>
+void Graph<V>::disconnect(V *src, V *dst) {
+    auto predicate = [src, dst](const Edge<V> *edge) {
+        return edge->src() == src && edge->dst() == dst;
+    };
+
+    auto &pred_vec = m_preds.at(dst);
+    auto &succ_vec = m_succs.at(src);
+    auto pred_it = std::find_if(pred_vec.begin(), pred_vec.end(), predicate);
+    auto succ_it = std::find_if(succ_vec.begin(), succ_vec.end(), predicate);
+    pred_vec.erase(pred_it);
+    succ_vec.erase(succ_it);
 }
 
 template <typename V>
