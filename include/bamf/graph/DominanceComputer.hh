@@ -5,6 +5,7 @@
 #include <bamf/graph/Graph.hh>
 
 #include <algorithm>
+#include <cassert>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -21,43 +22,42 @@ protected:
 
 template <typename V>
 typename DominanceComputer<V>::result DominanceComputer<V>::run(Graph<V> *graph) {
-    // Build post order
+    // Build post order traversal.
+    // TODO: Avoid copying of post order vector here.
     auto dfs = graph->template run<DepthFirstSearch>();
     auto order = dfs.post_order();
 
-    // Build post order index map
+    // Build map of vertices to index in the post order traversal vector.
     std::unordered_map<V *, std::size_t> index_map;
     for (auto *vertex : order) {
         index_map.emplace(vertex, index_map.size());
     }
 
-    // Transform into reverse post order
+    // Transform into reverse post order.
     std::reverse(order.begin(), order.end());
 
     std::unordered_map<V *, V *> doms;
     doms.emplace(graph->entry(), graph->entry());
-    auto intersect = [&](V *b1, V *b2) {
-        auto *finger1 = b1;
-        auto *finger2 = b2;
-        while (index_map[finger1] != index_map[finger2]) {
-            while (index_map[finger1] < index_map[finger2]) {
-                finger1 = doms[finger1];
+    auto intersect = [&](V *finger1, V *finger2) {
+        while (index_map.at(finger1) != index_map.at(finger2)) {
+            while (index_map.at(finger1) < index_map.at(finger2)) {
+                finger1 = doms.at(finger1);
             }
-            while (index_map[finger2] < index_map[finger1]) {
-                finger2 = doms[finger2];
+            while (index_map.at(finger2) < index_map.at(finger1)) {
+                finger2 = doms.at(finger2);
             }
         }
         return finger1;
     };
 
+    // Remove graph entry from order.
+    assert(order.front() == graph->entry());
+    order.erase(order.begin());
+
     bool changed = true;
     while (changed) {
         changed = false;
         for (auto *b : order) {
-            if (b == graph->entry()) {
-                continue;
-            }
-
             auto *new_idom = graph->preds_of(b)[0];
             for (auto *p : graph->preds_of(b)) {
                 if (p != new_idom && doms.contains(p)) {
@@ -65,17 +65,16 @@ typename DominanceComputer<V>::result DominanceComputer<V>::run(Graph<V> *graph)
                 }
             }
 
-            if (doms[b] != new_idom) {
-                doms[b] = new_idom;
-                changed = true;
-            }
+            changed = doms[b] == new_idom;
+            doms[b] = new_idom;
         }
     }
 
+    // Build idom tree.
     DominatorTree<V> tree;
     tree.set_entry(graph->entry());
     for (auto [vertex, dom] : doms) {
-        // Ignore self-domination (non-strict)
+        // Ignore self-domination (non-strict).
         if (vertex != dom) {
             tree.template connect(dom, vertex);
         }
