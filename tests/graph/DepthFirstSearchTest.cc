@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace bamf;
+namespace bamf {
 
 namespace {
 
@@ -41,3 +41,5 @@ TEST(DepthFirstSearchTest, Diamond) {
 }
 
 } // namespace
+
+} // namespace bamf

@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace bamf;
+namespace bamf {
 
 namespace {
 
@@ -81,3 +81,5 @@ TEST(GraphTest, Remove) {
 }
 
 } // namespace
+
+} // namespace bamf

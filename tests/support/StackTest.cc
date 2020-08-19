@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace bamf;
+namespace bamf {
 
 namespace {
 
@@ -27,3 +27,5 @@ TEST(StackTest, PushPeekPop) {
 }
 
 } // namespace
+
+} // namespace bamf

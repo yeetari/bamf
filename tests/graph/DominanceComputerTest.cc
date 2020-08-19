@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace bamf;
+namespace bamf {
 
 namespace {
 
@@ -52,3 +52,5 @@ TEST(DominanceComputerTest, Test) {
 }
 
 } // namespace
+
+} // namespace bamf

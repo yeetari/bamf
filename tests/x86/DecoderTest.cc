@@ -6,8 +6,7 @@
 #include <array>
 #include <cstdint>
 
-using namespace bamf;
-using namespace bamf::x86;
+namespace bamf::x86 {
 
 namespace {
 
@@ -259,3 +258,5 @@ TEST(x86DecoderTest, XorRegReg32) {
 }
 
 } // namespace
+
+} // namespace bamf::x86
