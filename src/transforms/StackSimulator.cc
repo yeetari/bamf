@@ -42,7 +42,7 @@ struct StackOffset {
 
 // TODO: Build a proper tree (Graph<Value *>) of this
 Value *find_root_value(Value *start) {
-    if (auto *alloc = start->as<AllocInst>()) {
+    if (start->is<AllocInst>()) {
         return start;
     }
     if (auto *binary = start->as<BinaryInst>()) {
