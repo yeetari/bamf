@@ -24,6 +24,19 @@ namespace bamf::x86 {
     } while (false)
 // clang-format on
 
+// clang-format off
+#define BUILD_0F(op, range, block) \
+    do { \
+        for (std::uint16_t i = op; i < (op) + (range); i++ ) { \
+            auto &inst = m_table_0f[i]; \
+            inst.present = true; \
+            inst.base_op = op; \
+            do block \
+            while (false); \
+        } \
+    } while (false)
+// clang-format on
+
 Decoder::Decoder(Stream *stream) : m_stream(stream) {
     BUILD(0x31, 1, {
         inst.opcode = Opcode::Xor;
@@ -162,7 +175,13 @@ MachineInst Decoder::next_inst() {
         inst.bytes[inst.length++] = op;
     }
 
-    auto &info = m_table[op];
+    bool is_0f = op == 0x0F;
+    if (is_0f) {
+        op = m_stream->read<std::uint8_t>();
+        inst.bytes[inst.length++] = op;
+    }
+
+    auto &info = !is_0f ? m_table[op] : m_table_0f[op];
     if (!info.present) {
         std::stringstream ss;
         ss << "Unknown opcode: " << std::hex;

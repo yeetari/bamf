@@ -46,6 +46,7 @@ struct InstructionInfo {
 class Decoder {
     Stream *const m_stream;
     std::array<InstructionInfo, 256> m_table{};
+    std::array<InstructionInfo, 256> m_table_0f{};
 
 public:
     BAMF_MAKE_NON_COPYABLE(Decoder)
