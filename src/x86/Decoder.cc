@@ -125,6 +125,11 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
         inst.default_operand_width = 32;
         inst.operands[0] = {OperandInfoType::ModRmRm};
     });
+    BUILD_0F(0x8E, 1, {
+        inst.opcode = Opcode::Jle;
+        inst.default_address_width = 32;
+        inst.operands[0] = {OperandInfoType::Rel};
+    });
 }
 
 MachineInst Decoder::next_inst() {

@@ -39,6 +39,7 @@ enum class Opcode {
     Cmp,
     Inc,
     Jge,
+    Jle,
     Jmp,
     Lea,
     Mov,

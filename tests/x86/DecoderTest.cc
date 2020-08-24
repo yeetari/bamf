@@ -88,6 +88,14 @@ TEST(x86DecoderTest, JgeRel8) {
     EXPECT_EQ(inst.address_width, 8);
 }
 
+TEST(x86DecoderTest, JleRel32) {
+    auto inst = decode_single_inst(0x0F, 0x8E, 0x02, 0x00, 0x00, 0x00);
+    EXPECT_EQ(inst.opcode, Opcode::Jle);
+    EXPECT_EQ(inst.operands[0].type, OperandType::Imm);
+    EXPECT_EQ(inst.operands[0].imm, 0x08);
+    EXPECT_EQ(inst.address_width, 32);
+}
+
 TEST(x86DecoderTest, MovRegImm16) {
     // mov si, 1
     auto inst = decode_single_inst(0x66, 0xBE, 0x01, 0x00);
