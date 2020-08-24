@@ -1,9 +1,11 @@
 #include <bamf/transforms/CfgSimplifier.hh>
 
-#include <bamf/graph/Graph.hh>
+#include <bamf/analyses/ControlFlowAnalyser.hh>
+#include <bamf/analyses/ControlFlowAnalysis.hh>
 #include <bamf/ir/BasicBlock.hh>
 #include <bamf/ir/Function.hh>
 #include <bamf/ir/Instructions.hh>
+#include <bamf/pass/PassUsage.hh>
 #include <bamf/pass/Statistic.hh>
 #include <bamf/support/Stack.hh>
 
@@ -11,22 +13,7 @@ namespace bamf {
 
 namespace {
 
-bool run(Function *function, const Statistic &no_preds_pruned_count) {
-    // Build control flow graph.
-    // TODO: Move this into an analysis pass.
-    Graph<BasicBlock> cfg;
-    cfg.set_entry(function->entry());
-    for (auto &block : *function) {
-        for (auto &inst : *block) {
-            if (auto *branch = inst->as<BranchInst>()) {
-                cfg.connect(branch->parent(), branch->dst());
-            } else if (auto *cond_branch = inst->as<CondBranchInst>()) {
-                cfg.connect(cond_branch->parent(), cond_branch->false_dst());
-                cfg.connect(cond_branch->parent(), cond_branch->true_dst());
-            }
-        }
-    }
-
+bool run(Function *function, ControlFlowAnalysis *cfa, const Statistic &no_preds_pruned_count) {
     bool changed = false;
     Stack<BasicBlock> remove_queue;
     for (auto &b : *function) {
@@ -34,7 +21,7 @@ bool run(Function *function, const Statistic &no_preds_pruned_count) {
         // Remove blocks with no predecessors. This can happen after running, for example, the ConstantBranchEvaluator
         // pass where conditional branches (with two basic block destinations) are promoted into unconditional branches
         // (with only one basic block destination).
-        if (cfg.preds_of(block).empty() && block != cfg.entry()) {
+        if (cfa->preds(block).empty() && block != cfa->entry()) {
             // Removing the block from all PHIs.
             for (auto *user : block->users()) {
                 if (auto *phi = user->as<PhiInst>()) {
@@ -54,11 +41,16 @@ bool run(Function *function, const Statistic &no_preds_pruned_count) {
 
 } // namespace
 
+void CfgSimplifier::build_usage(PassUsage *usage) {
+    usage->depends_on<ControlFlowAnalyser>();
+}
+
 void CfgSimplifier::run_on(Function *function) {
     bool changed = false;
     Statistic no_preds_pruned_count(m_logger, "Pruned {} blocks with no predecessors");
     do {
-        changed = run(function, no_preds_pruned_count);
+        auto *cfa = m_manager->get<ControlFlowAnalysis>(function);
+        changed = run(function, cfa, no_preds_pruned_count);
     } while (changed);
 }
 
