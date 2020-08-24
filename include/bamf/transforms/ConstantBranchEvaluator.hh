@@ -5,7 +5,7 @@
 namespace bamf {
 
 struct ConstantBranchEvaluator : public Pass {
-    ConstantBranchEvaluator() : Pass("constant-branch-evaluator") {}
+    explicit ConstantBranchEvaluator(PassManager *manager) : Pass(manager, "constant-branch-evaluator") {}
 
     void run_on(Function *function) override;
 };

@@ -5,7 +5,7 @@
 namespace bamf {
 
 struct CfgSimplifier : public Pass {
-    CfgSimplifier() : Pass("cfg-simplifier") {}
+    explicit CfgSimplifier(PassManager *manager) : Pass(manager, "cfg-simplifier") {}
 
     void run_on(Function *function) override;
 };

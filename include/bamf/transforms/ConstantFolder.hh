@@ -5,7 +5,7 @@
 namespace bamf {
 
 struct ConstantFolder : public Pass {
-    ConstantFolder() : Pass("constant-folder") {}
+    explicit ConstantFolder(PassManager *manager) : Pass(manager, "constant-folder") {}
 
     void run_on(Function *function) override;
 };

@@ -21,7 +21,7 @@ public:
 
     template <typename T, typename... Args>
     void add(Args &&... args) requires std::derived_from<T, Pass> {
-        m_passes.emplace_back(new T(std::forward<Args>(args)...));
+        m_passes.emplace_back(new T(this, std::forward<Args>(args)...));
     }
 
     void run(Program *program) const;

@@ -5,7 +5,7 @@
 namespace bamf {
 
 struct AllocPromoter : public Pass {
-    AllocPromoter() : Pass("alloc-promoter") {}
+    explicit AllocPromoter(PassManager *manager) : Pass(manager, "alloc-promoter") {}
 
     void run_on(Function *function) override;
 };

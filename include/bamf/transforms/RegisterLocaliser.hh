@@ -10,8 +10,8 @@ class RegisterLocaliser : public Pass {
     const DecompilationContext &m_decomp_ctx;
 
 public:
-    explicit RegisterLocaliser(const DecompilationContext &decomp_ctx)
-        : Pass("register-localiser"), m_decomp_ctx(decomp_ctx) {}
+    RegisterLocaliser(PassManager *manager, const DecompilationContext &decomp_ctx)
+        : Pass(manager, "register-localiser"), m_decomp_ctx(decomp_ctx) {}
 
     void run_on(Program *program) override;
 };

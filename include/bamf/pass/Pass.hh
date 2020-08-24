@@ -10,14 +10,17 @@
 namespace bamf {
 
 class Function;
+class PassManager;
 class Program;
 
 class Pass {
     const std::string m_name;
 
 protected:
-    Logger m_logger;
-    explicit Pass(std::string name) : m_name(std::move(name)), m_logger(m_name) {}
+    PassManager *const m_manager;
+    const Logger m_logger;
+
+    Pass(PassManager *manager, std::string name) : m_manager(manager), m_name(std::move(name)), m_logger(m_name) {}
 
 public:
     BAMF_MAKE_NON_COPYABLE(Pass)
