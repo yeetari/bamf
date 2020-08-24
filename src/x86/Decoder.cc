@@ -111,8 +111,8 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
     });
     BUILD(0xE8, 1, {
         inst.opcode = Opcode::Call;
-        inst.default_operand_width = 32;
-        inst.operands[0] = {OperandInfoType::Imm};
+        inst.default_address_width = 32;
+        inst.operands[0] = {OperandInfoType::Rel};
     });
     BUILD(0xEB, 1, {
         inst.opcode = Opcode::Jmp;

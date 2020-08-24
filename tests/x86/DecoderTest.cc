@@ -141,19 +141,22 @@ TEST(x86DecoderTest, MovRegReg32) {
 }
 
 TEST(x86DecoderTest, NearCall16) {
-    auto inst = decode_single_inst(0x66, 0xE8, 0xFF, 0xFF);
+    // call 0
+    // TODO: I think `call rel16` is invalid in 64-bit mode?
+    auto inst = decode_single_inst(0x66, 0xE8, 0xFA, 0xFF);
     EXPECT_EQ(inst.opcode, Opcode::Call);
     EXPECT_EQ(inst.operands[0].type, OperandType::Imm);
-    EXPECT_EQ(inst.operands[0].imm, 0xFFFF);
+    EXPECT_EQ(inst.operands[0].imm, 0);
     EXPECT_EQ(inst.operand_width, 16);
 }
 
 TEST(x86DecoderTest, NearCall32) {
-    auto inst = decode_single_inst(0xE8, 0xFF, 0xFF, 0xFF, 0xFF);
+    // call
+    auto inst = decode_single_inst(0xE8, 0xFB, 0xFF, 0xFF, 0xFF);
     EXPECT_EQ(inst.opcode, Opcode::Call);
     EXPECT_EQ(inst.operands[0].type, OperandType::Imm);
-    EXPECT_EQ(inst.operands[0].imm, 0xFFFFFFFF);
-    EXPECT_EQ(inst.operand_width, 32);
+    EXPECT_EQ(inst.operands[0].imm, 0);
+    EXPECT_EQ(inst.address_width, 32);
 }
 
 TEST(x86DecoderTest, NearJmpRel8) {
