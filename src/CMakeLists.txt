@@ -1,4 +1,6 @@
 add_library(bamf
+    analyses/ControlFlowAnalyser.cc
+    analyses/ControlFlowAnalysis.cc
     core/DecompilationContext.cc
     core/ElfLoader.cc
     core/InputFile.cc
