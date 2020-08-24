@@ -45,8 +45,7 @@ bool is_promotable(AllocInst *alloc) {
 
 bool run(Function *function, ControlFlowAnalysis *cfa, const Statistic &propagated_load_count,
          const Statistic &pruned_store_count) {
-
-    // Build store-load (def-use) info
+    // Build store-load info for each variable.
     std::unordered_map<AllocInst *, VarInfo> vars;
     std::unordered_map<Value *, AllocInst *> reverse_map;
     for (auto &block : *function) {
@@ -77,42 +76,47 @@ bool run(Function *function, ControlFlowAnalysis *cfa, const Statistic &propagat
         }
     }
 
+    // Insert phis.
     for (auto &[var, info] : vars) {
         std::unordered_set<BasicBlock *> visited;
         for (auto *store : info.stores) {
             for (auto *df : cfa->frontiers(store->parent())) {
-                if (visited.contains(df)) {
+                if (!visited.insert(df).second) {
                     continue;
                 }
-                visited.insert(df);
-                // TODO: A phi insertion count statistic
+                // TODO: A phi insertion count statistic.
                 auto *phi = df->prepend<PhiInst>();
                 reverse_map[phi] = var;
             }
         }
     }
 
+    // Iteratively replace all uses of every load of a var with the reaching def of the var (either a phi or RHS of a
+    // store). This has the side effect of making all loads and stores dead.
     bool changed = false;
     Stack<BasicBlock> work_queue;
     work_queue.push(cfa->entry());
     while (!work_queue.empty()) {
         auto *block = work_queue.pop();
-        for (auto &inst : *block) {
-            if (!reverse_map.contains(inst.get())) {
+        for (auto &i : *block) {
+            auto *inst = i.get();
+            if (!reverse_map.contains(inst)) {
                 continue;
             }
 
-            // TODO: Avoid allocating a Stack<Value> for single store allocs
-            auto &info = vars.at(reverse_map.at(inst.get()));
+            // TODO: Avoid allocating a Stack<Value> for single store allocs.
+            auto &info = vars.at(reverse_map.at(inst));
             auto &def_stack = info.def_stack;
             if (auto *load = inst->as<LoadInst>()) {
-                if (!def_stack.empty()) {
-                    // Load will become trivially dead
-                    load->replace_all_uses_with(def_stack.peek());
-
-                    changed = true;
-                    ++propagated_load_count;
+                // Don't propagate if there is no def.
+                // TODO: Assert here?
+                if (def_stack.empty()) {
+                    continue;
                 }
+                // Load will become trivially dead.
+                load->replace_all_uses_with(def_stack.peek());
+                changed = true;
+                ++propagated_load_count;
             } else if (auto *phi = inst->as<PhiInst>()) {
                 def_stack.push(phi);
             } else if (auto *store = inst->as<StoreInst>()) {
@@ -120,38 +124,37 @@ bool run(Function *function, ControlFlowAnalysis *cfa, const Statistic &propagat
             }
         }
 
+        // Add this block as an incoming value to all phis of successor blocks.
         for (auto *succ : cfa->succs(block)) {
             for (auto &inst : *succ) {
-                if (auto *phi = inst->as<PhiInst>()) {
-                    if (!reverse_map.contains(phi)) {
-                        continue;
-                    }
-                    auto &var_info = vars.at(reverse_map.at(phi));
-                    auto &def_stack = var_info.def_stack;
-                    if (!def_stack.empty()) {
-                        phi->add_incoming(block, def_stack.peek());
-                    }
+                auto *phi = inst->as<PhiInst>();
+                if (phi == nullptr || !reverse_map.contains(phi)) {
+                    continue;
+                }
+                auto &var_info = vars.at(reverse_map.at(phi));
+                auto &def_stack = var_info.def_stack;
+                if (!def_stack.empty()) {
+                    phi->add_incoming(block, def_stack.peek());
                 }
             }
         }
 
-        for (auto *succ : cfa->tree_succs(block)) {
-            work_queue.push(succ);
+        // Add blocks that this block immediately dominates to queue.
+        for (auto *idom : cfa->tree_succs(block)) {
+            work_queue.push(idom);
         }
     }
 
+    // Remove the now dead stores. We have to do this here, since the dead instruction pruner pass won't be able to
+    // tell that this store is dead (since it technically still has uses).
     for (auto &[var, info] : vars) {
-        // Remove (now dead) stores. We have to do this here, since the dead instruction pruner pass won't be able to
-        // tell that this store is dead (since it technically still has uses).
         for (auto *store : info.stores) {
             assert(store->users().empty());
             store->remove_from_parent();
-
             changed = true;
             ++pruned_store_count;
         }
     }
-
     return changed;
 }
 
@@ -162,13 +165,12 @@ void AllocPromoter::build_usage(PassUsage *usage) {
 }
 
 void AllocPromoter::run_on(Function *function) {
-    bool changed = false;
     Statistic propagated_load_count(m_logger, "Propagated {} loads");
     Statistic pruned_store_count(m_logger, "Pruned {} stores");
-    do {
+    for (bool changed = true; changed;) {
         auto *cfa = m_manager->get<ControlFlowAnalysis>(function);
         changed = run(function, cfa, propagated_load_count, pruned_store_count);
-    } while (changed);
+    }
 }
 
 } // namespace bamf
