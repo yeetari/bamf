@@ -51,7 +51,7 @@ public:
         return static_cast<T *>(m_results.at(function).at(std::type_index(typeid(T))).get());
     }
 
-    void run(Program *program) const;
+    void run(Program *program);
 };
 
 template <typename T, typename... Args>
