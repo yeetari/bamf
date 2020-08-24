@@ -48,6 +48,7 @@ public:
 
     const_iterator position_of(Instruction *inst) const;
     const_iterator remove(Instruction *inst);
+    Instruction *terminator();
 
     void set_parent(Function *parent) { m_parent = parent; }
     Function *parent() const { return m_parent; }

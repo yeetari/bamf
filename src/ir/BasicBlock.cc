@@ -25,4 +25,11 @@ BasicBlock::const_iterator BasicBlock::remove(Instruction *inst) {
     return it;
 }
 
+Instruction *BasicBlock::terminator() {
+    if (m_instructions.empty()) {
+        return nullptr;
+    }
+    return m_instructions.back().get();
+}
+
 } // namespace bamf
