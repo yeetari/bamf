@@ -11,6 +11,7 @@ namespace bamf {
 
 class Function;
 class PassManager;
+class PassUsage;
 class Program;
 
 class Pass {
@@ -27,6 +28,7 @@ public:
     BAMF_MAKE_NON_MOVABLE(Pass)
     virtual ~Pass() = default;
 
+    virtual void build_usage(PassUsage *usage) {}
     virtual void run_on(Program *program) {}
     virtual void run_on(Function *function) {}
 
