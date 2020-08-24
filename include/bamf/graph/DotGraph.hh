@@ -35,7 +35,7 @@ std::string DotGraph<V>::to_string() const {
     auto dfs = m_graph.template run<DepthFirstSearch>();
     for (auto *vertex : dfs.pre_order()) {
         ss << "\t" << unique_id(vertex) << " [];\n";
-        for (auto *edge : m_graph.edges_of(vertex)) {
+        for (auto *edge : m_graph.edges(vertex)) {
             ss << "\t" << unique_id(edge->src()) << " -> " << unique_id(edge->dst()) << "[];\n";
         }
     }

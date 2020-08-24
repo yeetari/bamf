@@ -45,9 +45,9 @@ public:
 
     void set_entry(V *entry) { m_entry = entry; }
 
-    std::vector<Edge<V> *> edges_of(const V *vertex) const;
-    std::vector<V *> preds_of(const V *vertex);
-    std::vector<V *> succs_of(const V *vertex);
+    std::vector<Edge<V> *> edges(const V *vertex) const;
+    std::vector<V *> preds(const V *vertex);
+    std::vector<V *> succs(const V *vertex);
 
     std::size_t size() const;
     V *entry() const { return m_entry; }
@@ -98,7 +98,7 @@ void Graph<V>::remove(const V *vertex) {
 }
 
 template <typename V>
-std::vector<Edge<V> *> Graph<V>::edges_of(const V *vertex) const {
+std::vector<Edge<V> *> Graph<V>::edges(const V *vertex) const {
     if (!m_preds.contains(vertex)) {
         return {};
     }
@@ -111,7 +111,7 @@ std::vector<Edge<V> *> Graph<V>::edges_of(const V *vertex) const {
 }
 
 template <typename V>
-std::vector<V *> Graph<V>::preds_of(const V *vertex) {
+std::vector<V *> Graph<V>::preds(const V *vertex) {
     std::vector<V *> ret;
     for (const auto &pred : m_preds[vertex]) {
         ret.push_back(pred->src());
@@ -120,7 +120,7 @@ std::vector<V *> Graph<V>::preds_of(const V *vertex) {
 }
 
 template <typename V>
-std::vector<V *> Graph<V>::succs_of(const V *vertex) {
+std::vector<V *> Graph<V>::succs(const V *vertex) {
     std::vector<V *> ret;
     for (const auto &succ : m_succs[vertex]) {
         ret.push_back(succ->dst());

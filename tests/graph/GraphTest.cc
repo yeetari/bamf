@@ -29,16 +29,16 @@ TEST(GraphTest, Disconnect) {
     graph.connect<TestEdge>(a, c);
     graph.connect<TestEdge>(b, d);
     graph.connect<TestEdge>(c, d);
-    EXPECT_EQ(graph.preds_of(d).size(), 2);
-    EXPECT_EQ(graph.preds_of(d)[0], b);
-    EXPECT_EQ(graph.preds_of(d)[1], c);
+    EXPECT_EQ(graph.preds(d).size(), 2);
+    EXPECT_EQ(graph.preds(d)[0], b);
+    EXPECT_EQ(graph.preds(d)[1], c);
 
     graph.disconnect(c, d);
-    EXPECT_EQ(graph.preds_of(d).size(), 1);
-    EXPECT_EQ(graph.preds_of(d)[0], b);
+    EXPECT_EQ(graph.preds(d).size(), 1);
+    EXPECT_EQ(graph.preds(d)[0], b);
 
     graph.disconnect(b, d);
-    EXPECT_EQ(graph.preds_of(d).size(), 0);
+    EXPECT_EQ(graph.preds(d).size(), 0);
 }
 
 TEST(GraphTest, Iterator) {
@@ -65,25 +65,25 @@ TEST(GraphTest, PredSucc) {
     graph.connect<TestEdge>(b, d);
     graph.connect<TestEdge>(c, d);
 
-    EXPECT_EQ(graph.preds_of(a).size(), 0);
-    EXPECT_EQ(graph.succs_of(a).size(), 2);
-    EXPECT_EQ(graph.succs_of(a)[0], b);
-    EXPECT_EQ(graph.succs_of(a)[1], c);
+    EXPECT_EQ(graph.preds(a).size(), 0);
+    EXPECT_EQ(graph.succs(a).size(), 2);
+    EXPECT_EQ(graph.succs(a)[0], b);
+    EXPECT_EQ(graph.succs(a)[1], c);
 
-    EXPECT_EQ(graph.preds_of(b).size(), 1);
-    EXPECT_EQ(graph.preds_of(b)[0], a);
-    EXPECT_EQ(graph.succs_of(b).size(), 1);
-    EXPECT_EQ(graph.succs_of(b)[0], d);
+    EXPECT_EQ(graph.preds(b).size(), 1);
+    EXPECT_EQ(graph.preds(b)[0], a);
+    EXPECT_EQ(graph.succs(b).size(), 1);
+    EXPECT_EQ(graph.succs(b)[0], d);
 
-    EXPECT_EQ(graph.preds_of(c).size(), 1);
-    EXPECT_EQ(graph.preds_of(c)[0], a);
-    EXPECT_EQ(graph.succs_of(c).size(), 1);
-    EXPECT_EQ(graph.succs_of(c)[0], d);
+    EXPECT_EQ(graph.preds(c).size(), 1);
+    EXPECT_EQ(graph.preds(c)[0], a);
+    EXPECT_EQ(graph.succs(c).size(), 1);
+    EXPECT_EQ(graph.succs(c)[0], d);
 
-    EXPECT_EQ(graph.preds_of(d).size(), 2);
-    EXPECT_EQ(graph.preds_of(d)[0], b);
-    EXPECT_EQ(graph.preds_of(d)[1], c);
-    EXPECT_EQ(graph.succs_of(d).size(), 0);
+    EXPECT_EQ(graph.preds(d).size(), 2);
+    EXPECT_EQ(graph.preds(d)[0], b);
+    EXPECT_EQ(graph.preds(d)[1], c);
+    EXPECT_EQ(graph.succs(d).size(), 0);
 }
 
 TEST(GraphTest, Remove) {

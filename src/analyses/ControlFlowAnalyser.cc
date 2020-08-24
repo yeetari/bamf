@@ -33,14 +33,14 @@ void ControlFlowAnalyser::run_on(Function *function) {
     auto tree_dfs = tree.run<DepthFirstSearch>();
     for (auto *post_idom : tree_dfs.post_order()) {
         //
-        for (auto *succ : cfg.succs_of(post_idom)) {
+        for (auto *succ : cfg.succs(post_idom)) {
             if (tree.idom(succ) != post_idom) {
                 frontiers[post_idom].insert(succ);
             }
         }
 
         //
-        for (auto *f : tree.succs_of(post_idom)) {
+        for (auto *f : tree.succs(post_idom)) {
             for (auto *ff : frontiers[f]) {
                 if (tree.idom(ff) != post_idom) {
                     frontiers[post_idom].insert(ff);

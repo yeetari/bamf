@@ -11,7 +11,7 @@ struct DominatorTree : public Graph<V> {
 
 template <typename V>
 V *DominatorTree<V>::idom(const V *vertex) {
-    return this->preds_of(vertex)[0];
+    return this->preds(vertex)[0];
 }
 
 } // namespace bamf

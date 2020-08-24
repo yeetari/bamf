@@ -39,16 +39,16 @@ TEST(DominanceComputerTest, Test) {
     auto tree = graph.run<DominanceComputer>();
     ASSERT_EQ(tree.entry(), graph.entry());
 
-    EXPECT_EQ(tree.preds_of(a).size(), 0);
-    EXPECT_EQ(tree.succs_of(a).size(), 1);
-    EXPECT_EQ(tree.succs_of(a)[0], b);
+    EXPECT_EQ(tree.preds(a).size(), 0);
+    EXPECT_EQ(tree.succs(a).size(), 1);
+    EXPECT_EQ(tree.succs(a)[0], b);
 
-    EXPECT_EQ(tree.preds_of(b).size(), 1);
-    EXPECT_EQ(tree.succs_of(b).size(), 4);
-    EXPECT_EQ(tree.succs_of(b)[0], e);
-    EXPECT_EQ(tree.succs_of(b)[1], c);
-    EXPECT_EQ(tree.succs_of(b)[2], d);
-    EXPECT_EQ(tree.succs_of(b)[3], f);
+    EXPECT_EQ(tree.preds(b).size(), 1);
+    EXPECT_EQ(tree.succs(b).size(), 4);
+    EXPECT_EQ(tree.succs(b)[0], e);
+    EXPECT_EQ(tree.succs(b)[1], c);
+    EXPECT_EQ(tree.succs(b)[2], d);
+    EXPECT_EQ(tree.succs(b)[3], f);
 }
 
 } // namespace

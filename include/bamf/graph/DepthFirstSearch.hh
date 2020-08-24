@@ -36,7 +36,7 @@ public:
 template <typename V>
 void DepthFirstSearch<V>::dfs(Graph<V> *graph, V *vertex) {
     m_pre_order.push_back(vertex);
-    for (auto *succ : graph->succs_of(vertex)) {
+    for (auto *succ : graph->succs(vertex)) {
         if (m_state[succ] != State::Unexplored) {
             continue;
         }
