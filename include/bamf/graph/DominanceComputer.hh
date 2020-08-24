@@ -58,7 +58,13 @@ typename DominanceComputer<V>::result DominanceComputer<V>::run(Graph<V> *graph)
     while (changed) {
         changed = false;
         for (auto *b : order) {
-            auto *new_idom = graph->preds_of(b)[0];
+            V *new_idom = nullptr;
+            for (auto *pred : graph->preds_of(b)) {
+                if (!graph->preds_of(pred).empty() || pred == graph->entry()) {
+                    new_idom = pred;
+                    break;
+                }
+            }
             for (auto *p : graph->preds_of(b)) {
                 if (p != new_idom && doms.contains(p)) {
                     new_idom = intersect(p, new_idom);
