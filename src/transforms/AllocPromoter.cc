@@ -1,12 +1,11 @@
 #include <bamf/transforms/AllocPromoter.hh>
 
-#include <bamf/graph/DepthFirstSearch.hh>
-#include <bamf/graph/DominanceComputer.hh>
-#include <bamf/graph/DominatorTree.hh>
-#include <bamf/graph/Graph.hh>
+#include <bamf/analyses/ControlFlowAnalyser.hh>
+#include <bamf/analyses/ControlFlowAnalysis.hh>
 #include <bamf/ir/BasicBlock.hh>
 #include <bamf/ir/Function.hh>
 #include <bamf/ir/Instructions.hh>
+#include <bamf/pass/PassUsage.hh>
 #include <bamf/pass/Statistic.hh>
 #include <bamf/support/Stack.hh>
 
@@ -44,43 +43,8 @@ bool is_promotable(AllocInst *alloc) {
     return true;
 }
 
-bool run(Function *function, const Statistic &propagated_load_count, const Statistic &pruned_store_count) {
-    // Build CFG
-    Graph<BasicBlock> cfg;
-    cfg.set_entry(function->entry());
-    for (auto &block : *function) {
-        for (auto &inst : *block) {
-            if (auto *branch = inst->as<BranchInst>()) {
-                cfg.connect(branch->parent(), branch->dst());
-            } else if (auto *cond_branch = inst->as<CondBranchInst>()) {
-                cfg.connect(cond_branch->parent(), cond_branch->false_dst());
-                cfg.connect(cond_branch->parent(), cond_branch->true_dst());
-            }
-        }
-    }
-
-    // Build dominance frontiers
-    // TODO: Move this into DominatorTree
-    auto tree = cfg.run<DominanceComputer>();
-    auto tree_dfs = tree.run<DepthFirstSearch>();
-    std::unordered_map<BasicBlock *, std::unordered_set<BasicBlock *>> frontiers;
-    for (auto *post_idom : tree_dfs.post_order()) {
-        //
-        for (auto *succ : cfg.succs_of(post_idom)) {
-            if (tree.idom(succ) != post_idom) {
-                frontiers[post_idom].insert(succ);
-            }
-        }
-
-        //
-        for (auto *f : tree.succs_of(post_idom)) {
-            for (auto *ff : frontiers[f]) {
-                if (tree.idom(ff) != post_idom) {
-                    frontiers[post_idom].insert(ff);
-                }
-            }
-        }
-    }
+bool run(Function *function, ControlFlowAnalysis *cfa, const Statistic &propagated_load_count,
+         const Statistic &pruned_store_count) {
 
     // Build store-load (def-use) info
     std::unordered_map<AllocInst *, VarInfo> vars;
@@ -116,7 +80,7 @@ bool run(Function *function, const Statistic &propagated_load_count, const Stati
     for (auto &[var, info] : vars) {
         std::unordered_set<BasicBlock *> visited;
         for (auto *store : info.stores) {
-            for (auto *df : frontiers[store->parent()]) {
+            for (auto *df : cfa->frontiers(store->parent())) {
                 if (visited.contains(df)) {
                     continue;
                 }
@@ -130,7 +94,7 @@ bool run(Function *function, const Statistic &propagated_load_count, const Stati
 
     bool changed = false;
     Stack<BasicBlock> work_queue;
-    work_queue.push(cfg.entry());
+    work_queue.push(cfa->entry());
     while (!work_queue.empty()) {
         auto *block = work_queue.pop();
         for (auto &inst : *block) {
@@ -156,7 +120,7 @@ bool run(Function *function, const Statistic &propagated_load_count, const Stati
             }
         }
 
-        for (auto *succ : cfg.succs_of(block)) {
+        for (auto *succ : cfa->succs(block)) {
             for (auto &inst : *succ) {
                 if (auto *phi = inst->as<PhiInst>()) {
                     if (!reverse_map.contains(phi)) {
@@ -171,7 +135,7 @@ bool run(Function *function, const Statistic &propagated_load_count, const Stati
             }
         }
 
-        for (auto *succ : tree.succs_of(block)) {
+        for (auto *succ : cfa->tree_succs(block)) {
             work_queue.push(succ);
         }
     }
@@ -193,12 +157,17 @@ bool run(Function *function, const Statistic &propagated_load_count, const Stati
 
 } // namespace
 
+void AllocPromoter::build_usage(PassUsage *usage) {
+    usage->depends_on<ControlFlowAnalyser>();
+}
+
 void AllocPromoter::run_on(Function *function) {
     bool changed = false;
     Statistic propagated_load_count(m_logger, "Propagated {} loads");
     Statistic pruned_store_count(m_logger, "Pruned {} stores");
     do {
-        changed = run(function, propagated_load_count, pruned_store_count);
+        auto *cfa = m_manager->get<ControlFlowAnalysis>(function);
+        changed = run(function, cfa, propagated_load_count, pruned_store_count);
     } while (changed);
 }
 
