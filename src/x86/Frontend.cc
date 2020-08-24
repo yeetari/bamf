@@ -198,7 +198,14 @@ std::unique_ptr<Program> Frontend::run() {
         dump_inst(inst);
 
         if (m_blocks.contains(inst.offset)) {
-            m_block = m_blocks.at(inst.offset);
+            auto *next = m_blocks.at(inst.offset);
+            auto *term = m_block->terminator();
+            if (term != nullptr) {
+                if (!term->is<BranchInst>() && !term->is<CondBranchInst>()) {
+                    m_block->append<BranchInst>(next);
+                }
+            }
+            m_block = next;
         }
 
         switch (inst.opcode) {
