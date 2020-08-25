@@ -7,12 +7,12 @@
 namespace bamf {
 
 class Constant : public Value {
-    const std::size_t m_value;
+    const std::uint64_t m_value;
 
 public:
-    explicit Constant(std::size_t value) : m_value(value) {}
+    explicit Constant(std::uint64_t value) : m_value(value) {}
 
-    std::size_t value() const { return m_value; }
+    std::uint64_t value() const { return m_value; }
 };
 
 } // namespace bamf
