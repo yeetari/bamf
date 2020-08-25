@@ -66,6 +66,7 @@ public:
 
 enum class ComparePred {
     Eq,
+    Ne,
     Slt,
 };
 

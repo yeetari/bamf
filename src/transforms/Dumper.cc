@@ -91,6 +91,9 @@ void Dumper::run_on(Function *function) {
                 case ComparePred::Eq:
                     std::cout << "eq ";
                     break;
+                case ComparePred::Ne:
+                    std::cout << "ne ";
+                    break;
                 case ComparePred::Slt:
                     std::cout << "slt ";
                     break;
