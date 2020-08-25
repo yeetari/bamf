@@ -1,4 +1,4 @@
-#include <bamf/transforms/RegisterLocaliser.hh>
+#include <bamf/frontend/RegisterLocaliser.hh>
 
 #include <bamf/core/DecompilationContext.hh>
 #include <bamf/ir/BasicBlock.hh>

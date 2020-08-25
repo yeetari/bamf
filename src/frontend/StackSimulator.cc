@@ -1,4 +1,4 @@
-#include <bamf/transforms/StackSimulator.hh>
+#include <bamf/frontend/StackSimulator.hh>
 
 #include <bamf/core/DecompilationContext.hh>
 #include <bamf/ir/BasicBlock.hh>

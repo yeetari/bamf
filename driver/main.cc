@@ -3,6 +3,8 @@
 #include <bamf/core/Executable.hh>
 #include <bamf/core/InputFile.hh>
 #include <bamf/debug/Dumper.hh>
+#include <bamf/frontend/RegisterLocaliser.hh>
+#include <bamf/frontend/StackSimulator.hh>
 #include <bamf/pass/PassManager.hh>
 #include <bamf/support/Logger.hh>
 #include <bamf/support/Stream.hh>
@@ -10,8 +12,6 @@
 #include <bamf/transforms/CfgSimplifier.hh>
 #include <bamf/transforms/ConstantBranchEvaluator.hh>
 #include <bamf/transforms/ConstantFolder.hh>
-#include <bamf/transforms/RegisterLocaliser.hh>
-#include <bamf/transforms/StackSimulator.hh>
 #include <bamf/transforms/TriviallyDeadInstPruner.hh>
 #include <bamf/x86/Decoder.hh>
 #include <bamf/x86/Frontend.hh>
