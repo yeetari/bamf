@@ -107,9 +107,12 @@ void StackSimulator::run_on(Function *function) {
 
     std::unordered_map<StackOffset, AllocInst *, StackOffset::Hasher, StackOffset::EqualFn> alloc_map;
     for (int i = 0; auto [store, offset] : store_map) {
-        auto *alloc = function->entry()->prepend<AllocInst>();
-        alloc->set_name("svar" + std::to_string(i++));
-        alloc_map[offset] = alloc;
+        if (!alloc_map.contains(offset)) {
+            auto *alloc = function->entry()->prepend<AllocInst>();
+            alloc->set_name("svar" + std::to_string(i++));
+            alloc_map[offset] = alloc;
+        }
+        auto *alloc = alloc_map.at(offset);
         replace_map[store]->replace_all_uses_with(alloc);
 
         // TODO: Replace this with a Instruction::remove_from_parent()
