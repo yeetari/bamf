@@ -29,6 +29,19 @@ Constant *fold_binary(BinaryOp op, Constant *lhs, Constant *rhs) {
     return nullptr;
 }
 
+Constant *fold_compare(ComparePred pred, Constant *lhs, Constant *rhs) {
+    switch (pred) {
+    case ComparePred::Eq:
+        return new Constant(static_cast<std::uint64_t>(lhs->value() == rhs->value()));
+    case ComparePred::Ne:
+        return new Constant(static_cast<std::uint64_t>(lhs->value() != rhs->value()));
+    case ComparePred::Slt:
+        return new Constant(static_cast<std::uint64_t>(static_cast<std::int64_t>(lhs->value()) <
+                                                       static_cast<std::int64_t>(rhs->value())));
+    }
+    return nullptr;
+}
+
 } // namespace
 
 void ConstantFolder::run_on(Function *function) {
@@ -40,6 +53,7 @@ void ConstantFolder::run_on(Function *function) {
     }
 
     Statistic folded_binary_count(m_logger, "Folded {} binary instructions");
+    Statistic folded_compare_count(m_logger, "Folded {} compare instructions");
     Statistic folded_phi_count(m_logger, "Folded {} phi instructions");
     Stack<Instruction> remove_list;
     while (!work_queue.empty()) {
@@ -71,6 +85,34 @@ void ConstantFolder::run_on(Function *function) {
             binary->replace_all_uses_with(folded);
             remove_list.push(binary);
             ++folded_binary_count;
+        }
+
+        // Fold compare instructions that have a constant value for both the LHS and RHS.
+        if (auto *compare = inst->as<CompareInst>()) {
+            auto *lhs = compare->lhs()->as<Constant>();
+            if (lhs == nullptr) {
+                continue;
+            }
+
+            auto *rhs = compare->rhs()->as<Constant>();
+            if (rhs == nullptr) {
+                continue;
+            }
+
+            for (auto *user : compare->users()) {
+                if (auto *inst = user->as<Instruction>()) {
+                    work_queue.push(inst);
+                }
+            }
+
+            auto *folded = fold_compare(compare->pred(), lhs, rhs);
+            if (folded == nullptr) {
+                m_logger.warn("Failed to fold constant compare instruction");
+                continue;
+            }
+            compare->replace_all_uses_with(folded);
+            remove_list.push(compare);
+            ++folded_compare_count;
         }
 
         // Propagate PHIs with only one incoming value
