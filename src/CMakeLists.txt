@@ -4,6 +4,7 @@ add_library(bamf
     core/DecompilationContext.cc
     core/ElfLoader.cc
     core/InputFile.cc
+    debug/Dumper.cc
     ir/BasicBlock.cc
     ir/Function.cc
     ir/Instruction.cc
@@ -16,7 +17,6 @@ add_library(bamf
     transforms/CfgSimplifier.cc
     transforms/ConstantBranchEvaluator.cc
     transforms/ConstantFolder.cc
-    transforms/Dumper.cc
     transforms/RegisterLocaliser.cc
     transforms/StackSimulator.cc
     transforms/TriviallyDeadInstPruner.cc

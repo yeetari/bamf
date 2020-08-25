@@ -1,4 +1,4 @@
-#include <bamf/transforms/Dumper.hh>
+#include <bamf/debug/Dumper.hh>
 
 #include <bamf/ir/BasicBlock.hh>
 #include <bamf/ir/Constant.hh>
