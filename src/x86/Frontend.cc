@@ -70,6 +70,10 @@ void Frontend::translate_cmp(const Operand &lhs_op, const Operand &rhs_op) {
     // Set sign flag based on if cmp is less than zero.
     auto *cmp_ltz = m_block->append<CompareInst>(ComparePred::Slt, cmp, new Constant(0));
     m_block->append<StoreInst>(m_sf, cmp_ltz);
+
+    // Set zero flag if cmp is zero.
+    auto *cmp_eqz = m_block->append<CompareInst>(ComparePred::Eq, cmp, new Constant(0));
+    m_block->append<StoreInst>(m_zf, cmp_eqz);
 }
 
 void Frontend::translate_inc(const Operand &dst) {
@@ -165,6 +169,7 @@ void Frontend::build_registers() {
     };
     m_of = make_flag("of");
     m_sf = make_flag("sf");
+    m_zf = make_flag("zf");
 }
 
 std::unique_ptr<Program> Frontend::run() {
