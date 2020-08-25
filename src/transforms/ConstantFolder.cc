@@ -15,10 +15,16 @@ Constant *fold_binary(BinaryOp op, Constant *lhs, Constant *rhs) {
     switch (op) {
     case BinaryOp::Add:
         return new Constant(lhs->value() + rhs->value());
+    case BinaryOp::And:
+        return new Constant(lhs->value() & rhs->value());
+    case BinaryOp::Or:
+        return new Constant(lhs->value() | rhs->value());
     case BinaryOp::Sub:
         return new Constant(lhs->value() - rhs->value());
     case BinaryOp::Shl:
         return new Constant(lhs->value() << rhs->value());
+    case BinaryOp::Xor:
+        return new Constant(lhs->value() ^ rhs->value());
     }
     return nullptr;
 }
