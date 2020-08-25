@@ -90,6 +90,16 @@ void Frontend::translate_jge(const Operand &target, BasicBlock *false_block) {
     m_block->append<CondBranchInst>(cond, false_block, true_block);
 }
 
+void Frontend::translate_jle(const Operand &target, BasicBlock *false_block) {
+    auto *of = m_block->append<LoadInst>(m_of);
+    auto *sf = m_block->append<LoadInst>(m_sf);
+    auto *zf = m_block->append<LoadInst>(m_zf);
+    auto *ofsf = m_block->append<CompareInst>(ComparePred::Ne, of, sf);
+    auto *cond = m_block->append<BinaryInst>(BinaryOp::Or, ofsf, zf);
+    auto *true_block = m_blocks.at(target.imm);
+    m_block->append<CondBranchInst>(cond, false_block, true_block);
+}
+
 void Frontend::translate_jmp(const Operand &target) {
     auto *block = m_blocks.at(target.imm);
     m_block->append<BranchInst>(block);
@@ -131,6 +141,7 @@ void Frontend::build_jump_targets() {
         auto addr = inst.operands[0].imm;
         switch (inst.opcode) {
         case Opcode::Jge:
+        case Opcode::Jle:
         case Opcode::Jmp: {
             if (!m_blocks.contains(addr)) {
                 auto *true_block = m_function->insert_block();
@@ -209,6 +220,9 @@ std::unique_ptr<Program> Frontend::run() {
             break;
         case Opcode::Jge:
             translate_jge(inst.operands[0], m_blocks.at(inst.offset + inst.length));
+            break;
+        case Opcode::Jle:
+            translate_jle(inst.operands[0], m_blocks.at(inst.offset + inst.length));
             break;
         case Opcode::Jmp:
             translate_jmp(inst.operands[0]);
