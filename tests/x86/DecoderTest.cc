@@ -167,6 +167,14 @@ TEST(x86DecoderTest, NearJmpRel8) {
     EXPECT_EQ(inst.address_width, 8);
 }
 
+TEST(x86DecoderTest, NearJmpRel32) {
+    auto inst = decode_single_inst(0xE9, 0x00, 0x00, 0x00, 0x00);
+    EXPECT_EQ(inst.opcode, Opcode::Jmp);
+    EXPECT_EQ(inst.operands[0].type, OperandType::Imm);
+    EXPECT_EQ(inst.operands[0].imm, 0x05);
+    EXPECT_EQ(inst.address_width, 32);
+}
+
 TEST(x86DecoderTest, NearRet) {
     // ret
     auto inst = decode_single_inst(0xC3);
