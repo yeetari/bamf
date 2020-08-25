@@ -70,6 +70,9 @@ void Dumper::run_on(Function *function) {
                 case BinaryOp::And:
                     std::cout << "and ";
                     break;
+                case BinaryOp::Or:
+                    std::cout << "or ";
+                    break;
                 case BinaryOp::Shl:
                     std::cout << "shl ";
                     break;

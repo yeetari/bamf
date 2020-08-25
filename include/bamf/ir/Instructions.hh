@@ -15,6 +15,7 @@ struct AllocInst : public Instruction {};
 enum class BinaryOp {
     Add,
     And,
+    Or,
     Shl,
     Sub,
     Xor,
