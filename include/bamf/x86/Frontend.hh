@@ -36,6 +36,8 @@ class Frontend {
 
     Value *phys_dst(Register);
     Value *phys_src(Register);
+    Value *load_op(const Operand &src_op);
+    void store_op(const Operand &dst_op, Value *val);
 
     void translate_cmp(const Operand &lhs, const Operand &rhs);
     void translate_inc(const Operand &dst);

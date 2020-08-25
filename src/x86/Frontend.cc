@@ -23,11 +23,42 @@ Value *Frontend::phys_src(Register reg) {
     return m_block->append<LoadInst>(m_phys_regs[reg]);
 }
 
+Value *Frontend::load_op(const Operand &src_op) {
+    switch (src_op.type) {
+    case OperandType::Imm:
+        return new Constant(src_op.imm);
+    case OperandType::MemBaseDisp: {
+        auto *base = phys_src(src_op.base);
+        auto *displaced = m_block->append<BinaryInst>(BinaryOp::Add, base, new Constant(src_op.disp));
+        return m_block->append<LoadInst>(displaced);
+    }
+    case OperandType::Reg:
+        return phys_src(src_op.reg);
+    default:
+        throw std::runtime_error("Unsupported load src type");
+    }
+}
+
+void Frontend::store_op(const Operand &dst_op, Value *val) {
+    Value *ptr = nullptr;
+    switch (dst_op.type) {
+    case OperandType::MemBaseDisp: {
+        auto *base = phys_src(dst_op.base);
+        ptr = m_block->append<BinaryInst>(BinaryOp::Add, base, new Constant(dst_op.disp));
+        break;
+    }
+    case OperandType::Reg:
+        ptr = phys_dst(dst_op.reg);
+        break;
+    default:
+        throw std::runtime_error("Unsupported store dst type");
+    }
+    m_block->append<StoreInst>(ptr, val);
+}
+
 void Frontend::translate_cmp(const Operand &lhs_op, const Operand &rhs_op) {
-    assert(lhs_op.type == OperandType::Reg);
-    assert(rhs_op.type == OperandType::Imm);
-    auto *lhs = phys_src(lhs_op.reg);
-    auto *rhs = new Constant(rhs_op.imm);
+    auto *lhs = load_op(lhs_op);
+    auto *rhs = load_op(rhs_op);
     auto *cmp = m_block->append<BinaryInst>(BinaryOp::Sub, lhs, rhs);
 
     // Set overflow flag.
@@ -61,72 +92,28 @@ void Frontend::translate_jmp(const Operand &target) {
 }
 
 void Frontend::translate_mov(const Operand &dst, const Operand &src) {
-    Value *store_dst = nullptr;
-    switch (dst.type) {
-    case OperandType::MemBaseDisp: {
-        auto *base = phys_src(dst.base);
-        store_dst = m_block->append<BinaryInst>(BinaryOp::Add, base, new Constant(dst.disp));
-        break;
-    }
-    case OperandType::Reg:
-        store_dst = phys_dst(dst.reg);
-        break;
-    default:
-        throw std::runtime_error("Unsupported mov dst type");
-    }
-
-    switch (src.type) {
-    case OperandType::Imm:
-        m_block->append<StoreInst>(store_dst, new Constant(src.imm));
-        break;
-    case OperandType::MemBaseDisp: {
-        auto *base = phys_src(src.base);
-        auto *displaced = m_block->append<BinaryInst>(BinaryOp::Add, base, new Constant(src.disp));
-        m_block->append<StoreInst>(store_dst, m_block->append<LoadInst>(displaced));
-        break;
-    }
-    case OperandType::Reg:
-        m_block->append<StoreInst>(store_dst, phys_src(src.reg));
-        break;
-    default:
-        throw std::runtime_error("Unsupported mov src type");
-    }
+    store_op(dst, load_op(src));
 }
 
 void Frontend::translate_pop(const Operand &dst) {
-    assert(dst.type == OperandType::Reg);
     auto *sp = phys_src(Register::Rsp);
     auto *stack_top = m_block->append<LoadInst>(sp);
-    m_block->append<StoreInst>(phys_dst(dst.reg), stack_top);
+    store_op(dst, stack_top);
 
     auto *new_sp = m_block->append<BinaryInst>(BinaryOp::Add, sp, new Constant(8));
     m_block->append<StoreInst>(phys_dst(Register::Rsp), new_sp);
 }
 
 void Frontend::translate_push(const Operand &src) {
-    Value *val = nullptr;
-    switch (src.type) {
-    case OperandType::Imm:
-        val = new Constant(src.imm);
-        break;
-    case OperandType::Reg:
-        val = phys_src(src.reg);
-        break;
-    default:
-        throw std::runtime_error("Unsupported push src type");
-    }
-
     auto *sp = phys_src(Register::Rsp);
     auto *new_sp = m_block->append<BinaryInst>(BinaryOp::Sub, sp, new Constant(8));
-    m_block->append<StoreInst>(new_sp, val);
+    m_block->append<StoreInst>(new_sp, load_op(src));
     m_block->append<StoreInst>(phys_dst(Register::Rsp), new_sp);
 }
 
 void Frontend::translate_shl(const Operand &dst, const Operand &src) {
-    assert(dst.type == OperandType::Reg);
-    assert(src.type == OperandType::Imm);
-    auto *shl = m_block->append<BinaryInst>(BinaryOp::Shl, phys_src(dst.reg), new Constant(src.imm));
-    m_block->append<StoreInst>(phys_dst(dst.reg), shl);
+    auto *shl = m_block->append<BinaryInst>(BinaryOp::Shl, load_op(dst), load_op(src));
+    store_op(dst, shl);
 }
 
 void Frontend::translate_ret() {
