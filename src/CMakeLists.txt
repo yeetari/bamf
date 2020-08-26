@@ -5,6 +5,7 @@ add_library(bamf
     core/ElfLoader.cc
     core/InputFile.cc
     debug/Dumper.cc
+    debug/Verifier.cc
     frontend/RegisterLocaliser.cc
     frontend/StackSimulator.cc
     ir/BasicBlock.cc
