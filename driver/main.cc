@@ -3,6 +3,7 @@
 #include <bamf/core/Executable.hh>
 #include <bamf/core/InputFile.hh>
 #include <bamf/debug/Dumper.hh>
+#include <bamf/debug/Verifier.hh>
 #include <bamf/frontend/RegisterLocaliser.hh>
 #include <bamf/frontend/StackSimulator.hh>
 #include <bamf/pass/PassManager.hh>
@@ -83,6 +84,7 @@ int main(int argc, char **argv) {
         x86::Frontend frontend(&stream, &decomp_ctx);
         auto program = frontend.run();
         PassManager pass_manager;
+        pass_manager.add<Verifier>();
         pass_manager.add<StackSimulator>(decomp_ctx);
         pass_manager.add<RegisterLocaliser>(decomp_ctx);
         pass_manager.add<AllocPromoter>();
