@@ -17,6 +17,15 @@ std::vector<BasicBlock *> ControlFlowAnalysis::succs(BasicBlock *block) {
     return m_cfg.succs(block);
 }
 
+bool ControlFlowAnalysis::dominates(Instruction *dominator, Instruction *dominatee) {
+    auto *dominator_block = dominator->parent();
+    auto *dominatee_block = dominatee->parent();
+    if (dominator_block != dominatee_block) {
+        return std::distance(dominator_block->position_of(dominator), dominatee_block->position_of(dominatee)) > 0;
+    }
+    return m_dom_tree.dominates(dominator_block, dominatee_block);
+}
+
 std::vector<BasicBlock *> ControlFlowAnalysis::tree_succs(BasicBlock *block) {
     return m_dom_tree.succs(block);
 }

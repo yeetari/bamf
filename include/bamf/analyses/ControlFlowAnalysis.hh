@@ -25,6 +25,8 @@ public:
     BasicBlock *entry();
     std::vector<BasicBlock *> preds(BasicBlock *block);
     std::vector<BasicBlock *> succs(BasicBlock *block);
+
+    bool dominates(Instruction *dominator, Instruction *dominatee);
     std::vector<BasicBlock *> tree_succs(BasicBlock *block);
     const std::unordered_set<BasicBlock *> &frontiers(BasicBlock *block);
 };
