@@ -33,12 +33,8 @@ public:
     }
 
     ~BinaryInst() override {
-        if (m_lhs != nullptr) {
-            m_lhs->remove_user(this);
-        }
-        if (m_rhs != nullptr) {
-            m_rhs->remove_user(this);
-        }
+        m_lhs->remove_user(this);
+        m_rhs->remove_user(this);
     }
 
     void replace_uses_of_with(Value *a, Value *b) override;
@@ -53,11 +49,7 @@ class BranchInst : public Instruction {
 
 public:
     explicit BranchInst(BasicBlock *dst) : m_dst(dst) { m_dst->add_user(this); }
-    ~BranchInst() override {
-        if (m_dst != nullptr) {
-            m_dst->remove_user(this);
-        }
-    }
+    ~BranchInst() override { m_dst->remove_user(this); }
 
     void replace_uses_of_with(Value *a, Value *b) override;
 
@@ -82,12 +74,8 @@ public:
     }
 
     ~CompareInst() override {
-        if (m_lhs != nullptr) {
-            m_lhs->remove_user(this);
-        }
-        if (m_rhs != nullptr) {
-            m_rhs->remove_user(this);
-        }
+        m_lhs->remove_user(this);
+        m_rhs->remove_user(this);
     }
 
     void replace_uses_of_with(Value *a, Value *b) override;
@@ -111,15 +99,9 @@ public:
     }
 
     ~CondBranchInst() override {
-        if (m_cond != nullptr) {
-            m_cond->remove_user(this);
-        }
-        if (m_false_dst != nullptr) {
-            m_false_dst->remove_user(this);
-        }
-        if (m_true_dst != nullptr) {
-            m_true_dst->remove_user(this);
-        }
+        m_cond->remove_user(this);
+        m_false_dst->remove_user(this);
+        m_true_dst->remove_user(this);
     }
 
     void replace_uses_of_with(Value *a, Value *b) override;
@@ -134,11 +116,7 @@ class LoadInst : public Instruction {
 
 public:
     explicit LoadInst(Value *ptr) : m_ptr(ptr) { m_ptr->add_user(this); }
-    ~LoadInst() override {
-        if (m_ptr != nullptr) {
-            m_ptr->remove_user(this);
-        }
-    }
+    ~LoadInst() override { m_ptr->remove_user(this); }
 
     void replace_uses_of_with(Value *a, Value *b) override;
 
@@ -155,9 +133,7 @@ public:
     ~PhiInst() override {
         for (auto [block, value] : m_incoming) {
             block->remove_user(this);
-            if (value != nullptr) {
-                value->remove_user(this);
-            }
+            value->remove_user(this);
         }
     }
 
@@ -184,12 +160,8 @@ public:
     }
 
     ~StoreInst() override {
-        if (m_ptr != nullptr) {
-            m_ptr->remove_user(this);
-        }
-        if (m_val != nullptr) {
-            m_val->remove_user(this);
-        }
+        m_ptr->remove_user(this);
+        m_val->remove_user(this);
     }
 
     void replace_uses_of_with(Value *a, Value *b) override;
@@ -203,11 +175,7 @@ class RetInst : public Instruction {
 
 public:
     explicit RetInst(Value *ret_val) : m_ret_val(ret_val) { m_ret_val->add_user(this); }
-    ~RetInst() override {
-        if (m_ret_val != nullptr) {
-            m_ret_val->remove_user(this);
-        }
-    }
+    ~RetInst() override { m_ret_val->remove_user(this); }
 
     void replace_uses_of_with(Value *a, Value *b) override;
 
