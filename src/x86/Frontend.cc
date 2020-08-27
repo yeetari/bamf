@@ -241,7 +241,7 @@ std::unique_ptr<Program> Frontend::run() {
             translate_shl(inst.operands[0], inst.operands[1]);
             break;
         default:
-            throw std::runtime_error("Unsupported machine instruction");
+            throw std::runtime_error("Unsupported machine instruction " + std::string(mnemonic(inst.opcode)));
         }
     }
 
