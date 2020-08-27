@@ -63,6 +63,7 @@ struct MachineInst {
     std::uint8_t operand_width;
 };
 
+const char *mnemonic(Opcode opcode);
 void dump_inst(const MachineInst &inst);
 
 } // namespace bamf::x86

@@ -11,9 +11,7 @@
 
 namespace bamf::x86 {
 
-namespace {
-
-constexpr const char *mnemonic(Opcode opcode) {
+const char *mnemonic(Opcode opcode) {
     switch (opcode) {
     case Opcode::Add:
         return "add";
@@ -47,8 +45,6 @@ constexpr const char *mnemonic(Opcode opcode) {
         return "xor";
     }
 }
-
-} // namespace
 
 void dump_inst(const MachineInst &inst) {
     std::stringstream ss;
