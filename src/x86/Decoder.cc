@@ -142,6 +142,15 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
         inst.default_address_width = 32;
         inst.operands[0] = {OperandInfoType::Rel};
     });
+    BUILD_SLASH(0x83, 1, 0, {
+        inst.opcode = Opcode::Add;
+        inst.mod_rm = true;
+        inst.default_address_width = 64;
+        inst.default_operand_width = 32;
+        inst.operands[0] = {OperandInfoType::ModRmRm};
+        inst.operands[1] = {OperandInfoType::Imm};
+        inst.operands[1].imm_width = 8;
+    });
     BUILD_SLASH(0x83, 1, 7, {
         inst.opcode = Opcode::Cmp;
         inst.mod_rm = true;
