@@ -198,8 +198,6 @@ std::unique_ptr<Program> Frontend::run() {
     Decoder decoder(m_stream);
     while (decoder.has_next()) {
         auto inst = decoder.next_inst();
-        dump_inst(inst);
-
         if (m_blocks.contains(inst.offset)) {
             auto *next = m_blocks.at(inst.offset);
             auto *term = m_block->terminator();
