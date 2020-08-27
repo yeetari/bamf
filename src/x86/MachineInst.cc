@@ -21,6 +21,8 @@ constexpr const char *mnemonic(Opcode opcode) {
         return "cmp";
     case Opcode::Inc:
         return "inc";
+    case Opcode::Jg:
+        return "jg";
     case Opcode::Jge:
         return "jge";
     case Opcode::Jle:

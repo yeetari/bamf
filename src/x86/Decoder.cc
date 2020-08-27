@@ -135,6 +135,11 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
         inst.default_address_width = 32;
         inst.operands[0] = {OperandInfoType::Rel};
     });
+    BUILD_0F(0x8F, 1, {
+        inst.opcode = Opcode::Jg;
+        inst.default_address_width = 32;
+        inst.operands[0] = {OperandInfoType::Rel};
+    });
 }
 
 MachineInst Decoder::next_inst() {

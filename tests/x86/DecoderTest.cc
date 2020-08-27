@@ -80,6 +80,14 @@ TEST(x86DecoderTest, IncReg64) {
     EXPECT_EQ(inst.operand_width, 64);
 }
 
+TEST(x86DecoderTest, JgRel32) {
+    auto inst = decode_single_inst(0x0F, 0x8F, 0x02, 0x00, 0x00, 0x00);
+    EXPECT_EQ(inst.opcode, Opcode::Jg);
+    EXPECT_EQ(inst.operands[0].type, OperandType::Imm);
+    EXPECT_EQ(inst.operands[0].imm, 0x08);
+    EXPECT_EQ(inst.address_width, 32);
+}
+
 TEST(x86DecoderTest, JgeRel8) {
     auto inst = decode_single_inst(0x7D, 0x05);
     EXPECT_EQ(inst.opcode, Opcode::Jge);

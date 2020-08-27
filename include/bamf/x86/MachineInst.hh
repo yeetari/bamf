@@ -38,6 +38,7 @@ enum class Opcode {
     Call,
     Cmp,
     Inc,
+    Jg,
     Jge,
     Jle,
     Jmp,
