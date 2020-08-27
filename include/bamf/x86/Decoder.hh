@@ -37,10 +37,12 @@ struct InstructionInfo {
     bool present;
     std::uint8_t base_op;
     Opcode opcode;
+    bool has_slash;
     bool mod_rm;
     int default_address_width;
     int default_operand_width;
     std::array<OperandInfo, 4> operands;
+    InstructionInfo *slashes;
 };
 
 class Decoder {

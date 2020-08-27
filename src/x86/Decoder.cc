@@ -37,6 +37,24 @@ namespace bamf::x86 {
     } while (false)
 // clang-format on
 
+// clang-format off
+#define BUILD_SLASH(op, range, slash, block) \
+    do { \
+        for (std::uint16_t i = op; i < (op) + (range); i++ ) { \
+            auto &top_level = m_table[i]; \
+            top_level.present = true; \
+            top_level.has_slash = true; \
+            if (top_level.slashes == nullptr) { \
+                top_level.slashes = new InstructionInfo[8]; \
+            } \
+            auto &inst = top_level.slashes[slash]; \
+            inst.present = true; \
+            do block \
+            while (false); \
+        } \
+    } while (false)
+// clang-format on
+
 Decoder::Decoder(Stream *stream) : m_stream(stream) {
     BUILD(0x31, 1, {
         inst.opcode = Opcode::Xor;
@@ -59,15 +77,6 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
         inst.opcode = Opcode::Jge;
         inst.default_address_width = 8;
         inst.operands[0] = {OperandInfoType::Rel};
-    });
-    BUILD(0x83, 1, {
-        inst.opcode = Opcode::Cmp;
-        inst.mod_rm = true;
-        inst.default_address_width = 64;
-        inst.default_operand_width = 32;
-        inst.operands[0] = {OperandInfoType::ModRmRm};
-        inst.operands[1] = {OperandInfoType::Imm};
-        inst.operands[1].imm_width = 8;
     });
     BUILD(0x89, 1, {
         inst.opcode = Opcode::Mov;
@@ -100,15 +109,6 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
         inst.operands[0] = {OperandInfoType::ModRmRm};
         inst.operands[1] = {OperandInfoType::Imm};
     });
-    BUILD(0xD1, 1, {
-        inst.opcode = Opcode::Shl;
-        inst.mod_rm = true;
-        inst.default_address_width = 32;
-        inst.default_operand_width = 32;
-        inst.operands[0] = {OperandInfoType::ModRmRm};
-        inst.operands[1] = {OperandInfoType::Constant};
-        inst.operands[1].constant = 1;
-    });
     BUILD(0xE8, 1, {
         inst.opcode = Opcode::Call;
         inst.default_address_width = 32;
@@ -124,12 +124,6 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
         inst.default_address_width = 8;
         inst.operands[0] = {OperandInfoType::Rel};
     });
-    BUILD(0xFF, 1, {
-        inst.opcode = Opcode::Inc;
-        inst.mod_rm = true;
-        inst.default_operand_width = 32;
-        inst.operands[0] = {OperandInfoType::ModRmRm};
-    });
     BUILD_0F(0x8E, 1, {
         inst.opcode = Opcode::Jle;
         inst.default_address_width = 32;
@@ -139,6 +133,30 @@ Decoder::Decoder(Stream *stream) : m_stream(stream) {
         inst.opcode = Opcode::Jg;
         inst.default_address_width = 32;
         inst.operands[0] = {OperandInfoType::Rel};
+    });
+    BUILD_SLASH(0x83, 1, 7, {
+        inst.opcode = Opcode::Cmp;
+        inst.mod_rm = true;
+        inst.default_address_width = 64;
+        inst.default_operand_width = 32;
+        inst.operands[0] = {OperandInfoType::ModRmRm};
+        inst.operands[1] = {OperandInfoType::Imm};
+        inst.operands[1].imm_width = 8;
+    });
+    BUILD_SLASH(0xD1, 1, 4, {
+        inst.opcode = Opcode::Shl;
+        inst.mod_rm = true;
+        inst.default_address_width = 32;
+        inst.default_operand_width = 32;
+        inst.operands[0] = {OperandInfoType::ModRmRm};
+        inst.operands[1] = {OperandInfoType::Constant};
+        inst.operands[1].constant = 1;
+    });
+    BUILD_SLASH(0xFF, 1, 0, {
+        inst.opcode = Opcode::Inc;
+        inst.mod_rm = true;
+        inst.default_operand_width = 32;
+        inst.operands[0] = {OperandInfoType::ModRmRm};
     });
 }
 
@@ -196,24 +214,20 @@ MachineInst Decoder::next_inst() {
         inst.bytes[inst.length++] = op;
     }
 
-    auto &info = !is_0f ? m_table[op] : m_table_0f[op];
-    if (!info.present) {
+    auto *info = !is_0f ? &m_table[op] : &m_table_0f[op];
+    if (!info->present) {
         std::stringstream ss;
         ss << "Unknown opcode: " << std::hex;
         ss << (static_cast<unsigned int>(op) & 0xFFU);
         throw std::runtime_error(ss.str());
     }
 
-    inst.opcode = info.opcode;
-    inst.address_width = inst.address_width == 0 ? info.default_address_width : inst.address_width;
-    inst.operand_width = inst.operand_width == 0 ? info.default_operand_width : inst.operand_width;
-
     struct {
         std::uint8_t mod;
         std::uint8_t reg;
         std::uint8_t rm;
     } mod_rm{};
-    if (info.mod_rm) {
+    if (info->mod_rm || info->has_slash) {
         auto mod_rm_byte = m_stream->read<std::uint8_t>();
         inst.bytes[inst.length++] = mod_rm_byte;
         mod_rm.mod = (mod_rm_byte >> 6U) & 0b11U;
@@ -221,8 +235,23 @@ MachineInst Decoder::next_inst() {
         mod_rm.rm = mod_rm_byte & 0b111U;
     }
 
+    if (info->has_slash) {
+        info = &info->slashes[mod_rm.reg];
+        if (!info->present) {
+            std::stringstream ss;
+            ss << "Unknown opcode: " << std::hex;
+            ss << (static_cast<unsigned int>(op) & 0xFFU);
+            ss << " /" << (static_cast<unsigned int>(mod_rm.reg) & 0xFFU);
+            throw std::runtime_error(ss.str());
+        }
+    }
+
+    inst.opcode = info->opcode;
+    inst.address_width = inst.address_width == 0 ? info->default_address_width : inst.address_width;
+    inst.operand_width = inst.operand_width == 0 ? info->default_operand_width : inst.operand_width;
+
     for (int i = 0; i < 4; i++) {
-        const auto &operand_info = info.operands[i];
+        const auto &operand_info = info->operands[i];
         auto &operand = inst.operands[i];
         if (operand_info.type == OperandInfoType::None) {
             break;
@@ -310,7 +339,7 @@ MachineInst Decoder::next_inst() {
         }
         case OperandInfoType::OpcodeGpr:
             operand.type = OperandType::Reg;
-            operand.reg = static_cast<Register>(op - info.base_op);
+            operand.reg = static_cast<Register>(op - info->base_op);
             break;
         case OperandInfoType::Rel: {
             operand.type = OperandType::Imm;
