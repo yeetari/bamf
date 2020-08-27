@@ -18,8 +18,8 @@ enum class OperandType {
 struct Operand {
     OperandType type;
     union {
-        std::size_t imm;
-        std::array<std::uint8_t, sizeof(std::size_t)> imm_bytes;
+        std::uint64_t imm;
+        std::array<std::uint8_t, sizeof(std::uint64_t)> imm_bytes;
         struct {
             Register base;
             union {
