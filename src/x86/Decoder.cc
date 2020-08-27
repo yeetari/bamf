@@ -225,8 +225,7 @@ MachineInst Decoder::next_inst() {
 
         switch (operand_info.type) {
         case OperandInfoType::Constant:
-        case OperandInfoType::Imm:
-        case OperandInfoType::Rel: {
+        case OperandInfoType::Imm: {
             std::uint8_t width = operand_info.type == OperandInfoType::Imm ? inst.operand_width : inst.address_width;
             if (operand_info.type == OperandInfoType::Constant) {
                 width = 0;
@@ -255,12 +254,6 @@ MachineInst Decoder::next_inst() {
 
             for (int j = 0; j < width / 8; j++) {
                 inst.bytes[inst.length++] = operand.imm_bytes[j];
-            }
-
-            if (operand_info.type == OperandInfoType::Rel) {
-                auto rel = static_cast<std::uint8_t>(operand.imm);
-                rel += inst.length + inst.offset;
-                operand.imm = rel;
             }
             break;
         }
@@ -314,6 +307,28 @@ MachineInst Decoder::next_inst() {
             operand.type = OperandType::Reg;
             operand.reg = static_cast<Register>(op - info.base_op);
             break;
+        case OperandInfoType::Rel: {
+            operand.type = OperandType::Imm;
+            switch (inst.address_width) {
+            case 8:
+                operand.imm = static_cast<std::int8_t>(m_stream->read<std::uint8_t>());
+                break;
+            case 16:
+                operand.imm = static_cast<std::int16_t>(m_stream->read<std::uint16_t>());
+                break;
+            case 32:
+                operand.imm = static_cast<std::int32_t>(m_stream->read<std::uint32_t>());
+                break;
+            case 64:
+                operand.imm = static_cast<std::int64_t>(m_stream->read<std::uint64_t>());
+                break;
+            }
+            for (int j = 0; j < inst.address_width / 8; j++) {
+                inst.bytes[inst.length++] = operand.imm_bytes[j];
+            }
+            operand.imm += inst.length + inst.offset;
+            break;
+        }
         default:
             throw std::runtime_error("Unsupported operand decode method");
         }
