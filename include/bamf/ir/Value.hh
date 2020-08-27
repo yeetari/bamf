@@ -31,7 +31,7 @@ public:
     void add_user(Value *user);
     void remove_user(Value *user);
     void replace_all_uses_with(Value *value);
-    virtual void replace_uses_of_with(Value *a, Value *b);
+    virtual void replace_uses_of_with(Value *orig, Value *repl);
 
     void set_name(std::string name) { m_name = std::move(name); }
     bool has_name() const { return !m_name.empty(); }

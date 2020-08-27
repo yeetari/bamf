@@ -37,7 +37,7 @@ public:
         m_rhs->remove_user(this);
     }
 
-    void replace_uses_of_with(Value *a, Value *b) override;
+    void replace_uses_of_with(Value *orig, Value *repl) override;
 
     BinaryOp op() const { return m_op; }
     Value *lhs() const { return m_lhs; }
@@ -51,7 +51,7 @@ public:
     explicit BranchInst(BasicBlock *dst) : m_dst(dst) { m_dst->add_user(this); }
     ~BranchInst() override { m_dst->remove_user(this); }
 
-    void replace_uses_of_with(Value *a, Value *b) override;
+    void replace_uses_of_with(Value *orig, Value *repl) override;
 
     BasicBlock *dst() const { return m_dst; }
 };
@@ -78,7 +78,7 @@ public:
         m_rhs->remove_user(this);
     }
 
-    void replace_uses_of_with(Value *a, Value *b) override;
+    void replace_uses_of_with(Value *orig, Value *repl) override;
 
     ComparePred pred() const { return m_pred; }
     Value *lhs() const { return m_lhs; }
@@ -104,7 +104,7 @@ public:
         m_true_dst->remove_user(this);
     }
 
-    void replace_uses_of_with(Value *a, Value *b) override;
+    void replace_uses_of_with(Value *orig, Value *repl) override;
 
     Value *cond() const { return m_cond; }
     BasicBlock *false_dst() const { return m_false_dst; }
@@ -118,7 +118,7 @@ public:
     explicit LoadInst(Value *ptr) : m_ptr(ptr) { m_ptr->add_user(this); }
     ~LoadInst() override { m_ptr->remove_user(this); }
 
-    void replace_uses_of_with(Value *a, Value *b) override;
+    void replace_uses_of_with(Value *orig, Value *repl) override;
 
     Value *ptr() const { return m_ptr; }
 };
@@ -143,7 +143,7 @@ public:
         value->add_user(this);
     }
 
-    void replace_uses_of_with(Value *a, Value *b) override;
+    void replace_uses_of_with(Value *orig, Value *repl) override;
 
     void remove_incoming(BasicBlock *block);
     const std::unordered_map<BasicBlock *, Value *> &incoming() const { return m_incoming; }
@@ -164,7 +164,7 @@ public:
         m_val->remove_user(this);
     }
 
-    void replace_uses_of_with(Value *a, Value *b) override;
+    void replace_uses_of_with(Value *orig, Value *repl) override;
 
     Value *ptr() const { return m_ptr; }
     Value *val() const { return m_val; }
@@ -177,7 +177,7 @@ public:
     explicit RetInst(Value *ret_val) : m_ret_val(ret_val) { m_ret_val->add_user(this); }
     ~RetInst() override { m_ret_val->remove_user(this); }
 
-    void replace_uses_of_with(Value *a, Value *b) override;
+    void replace_uses_of_with(Value *orig, Value *repl) override;
 
     Value *ret_val() const { return m_ret_val; }
 };
