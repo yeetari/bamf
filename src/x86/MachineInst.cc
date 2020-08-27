@@ -13,7 +13,7 @@ namespace bamf::x86 {
 
 namespace {
 
-const char *mnemonic(Opcode opcode) {
+constexpr const char *mnemonic(Opcode opcode) {
     switch (opcode) {
     case Opcode::Call:
         return "call";
