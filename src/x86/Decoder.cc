@@ -56,6 +56,14 @@ namespace bamf::x86 {
 // clang-format on
 
 Decoder::Decoder(Stream *stream) : m_stream(stream) {
+    BUILD(0x03, 1, {
+        inst.opcode = Opcode::Add;
+        inst.mod_rm = true;
+        inst.default_address_width = 64;
+        inst.default_operand_width = 32;
+        inst.operands[0] = {OperandInfoType::ModRmGpr};
+        inst.operands[1] = {OperandInfoType::ModRmRm};
+    });
     BUILD(0x31, 1, {
         inst.opcode = Opcode::Xor;
         inst.mod_rm = true;

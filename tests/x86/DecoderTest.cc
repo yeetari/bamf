@@ -20,6 +20,39 @@ MachineInst decode_single_inst(Args &&... args) {
 
 // TODO: Test all possible registers for each test
 
+TEST(x86DecoderTest, AddRegReg16) {
+    // add ax, ax
+    auto inst = decode_single_inst(0x66, 0x03, 0xC0);
+    EXPECT_EQ(inst.opcode, Opcode::Add);
+    EXPECT_EQ(inst.operands[0].type, OperandType::Reg);
+    EXPECT_EQ(inst.operands[0].reg, Register::Rax);
+    EXPECT_EQ(inst.operands[1].type, OperandType::Reg);
+    EXPECT_EQ(inst.operands[1].reg, Register::Rax);
+    EXPECT_EQ(inst.operand_width, 16);
+}
+
+TEST(x86DecoderTest, AddRegReg32) {
+    // add eax, eax
+    auto inst = decode_single_inst(0x03, 0xC0);
+    EXPECT_EQ(inst.opcode, Opcode::Add);
+    EXPECT_EQ(inst.operands[0].type, OperandType::Reg);
+    EXPECT_EQ(inst.operands[0].reg, Register::Rax);
+    EXPECT_EQ(inst.operands[1].type, OperandType::Reg);
+    EXPECT_EQ(inst.operands[1].reg, Register::Rax);
+    EXPECT_EQ(inst.operand_width, 32);
+}
+
+TEST(x86DecoderTest, AddRegReg64) {
+    // add rax, rax
+    auto inst = decode_single_inst(0x48, 0x03, 0xC0);
+    EXPECT_EQ(inst.opcode, Opcode::Add);
+    EXPECT_EQ(inst.operands[0].type, OperandType::Reg);
+    EXPECT_EQ(inst.operands[0].reg, Register::Rax);
+    EXPECT_EQ(inst.operands[1].type, OperandType::Reg);
+    EXPECT_EQ(inst.operands[1].reg, Register::Rax);
+    EXPECT_EQ(inst.operand_width, 64);
+}
+
 TEST(x86DecoderTest, CmpRegImm16) {
     // cmp ax, 7
     auto inst = decode_single_inst(0x66, 0x83, 0xF8, 0x07);

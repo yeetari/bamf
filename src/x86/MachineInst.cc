@@ -15,6 +15,8 @@ namespace {
 
 constexpr const char *mnemonic(Opcode opcode) {
     switch (opcode) {
+    case Opcode::Add:
+        return "add";
     case Opcode::Call:
         return "call";
     case Opcode::Cmp:

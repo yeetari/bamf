@@ -35,6 +35,7 @@ struct Operand {
 };
 
 enum class Opcode {
+    Add,
     Call,
     Cmp,
     Inc,
