@@ -82,6 +82,17 @@ void Frontend::translate_inc(const Operand &dst) {
     m_block->append<StoreInst>(phys_dst(dst.reg), added);
 }
 
+void Frontend::translate_jg(const Operand &target, BasicBlock *false_block) {
+    auto *of = m_block->append<LoadInst>(m_of);
+    auto *sf = m_block->append<LoadInst>(m_sf);
+    auto *zf = m_block->append<LoadInst>(m_zf);
+    auto *of_eq_sf = m_block->append<CompareInst>(ComparePred::Eq, of, sf);
+    auto *zf_zero = m_block->append<CompareInst>(ComparePred::Eq, zf, new Constant(0));
+    auto *cond = m_block->append<BinaryInst>(BinaryOp::And, of_eq_sf, zf_zero);
+    auto *true_block = m_blocks.at(target.imm);
+    m_block->append<CondBranchInst>(cond, false_block, true_block);
+}
+
 void Frontend::translate_jge(const Operand &target, BasicBlock *false_block) {
     auto *of = m_block->append<LoadInst>(m_of);
     auto *sf = m_block->append<LoadInst>(m_sf);
@@ -140,6 +151,7 @@ void Frontend::build_jump_targets() {
         auto inst = decoder.next_inst();
         auto addr = inst.operands[0].imm;
         switch (inst.opcode) {
+        case Opcode::Jg:
         case Opcode::Jge:
         case Opcode::Jle:
         case Opcode::Jmp: {
@@ -215,6 +227,9 @@ std::unique_ptr<Program> Frontend::run() {
             break;
         case Opcode::Inc:
             translate_inc(inst.operands[0]);
+            break;
+        case Opcode::Jg:
+            translate_jg(inst.operands[0], m_blocks.at(inst.offset + inst.length));
             break;
         case Opcode::Jge:
             translate_jge(inst.operands[0], m_blocks.at(inst.offset + inst.length));
