@@ -56,6 +56,14 @@ void Frontend::store_op(const Operand &dst_op, Value *val) {
     m_block->append<StoreInst>(ptr, val);
 }
 
+void Frontend::translate_add(const Operand &lhs_op, const Operand &rhs_op) {
+    auto *lhs = load_op(lhs_op);
+    auto *rhs = load_op(rhs_op);
+    auto *added = m_block->append<BinaryInst>(BinaryOp::Add, lhs, rhs);
+    store_op(lhs_op, added);
+    // TODO: Set flags.
+}
+
 void Frontend::translate_cmp(const Operand &lhs_op, const Operand &rhs_op) {
     auto *lhs = load_op(lhs_op);
     auto *rhs = load_op(rhs_op);
@@ -222,6 +230,9 @@ std::unique_ptr<Program> Frontend::run() {
         }
 
         switch (inst.opcode) {
+        case Opcode::Add:
+            translate_add(inst.operands[0], inst.operands[1]);
+            break;
         case Opcode::Cmp:
             translate_cmp(inst.operands[0], inst.operands[1]);
             break;
