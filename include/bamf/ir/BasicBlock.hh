@@ -51,6 +51,7 @@ public:
 
     void set_parent(Function *parent) { m_parent = parent; }
     Function *parent() const { return m_parent; }
+    std::size_t size() const { return m_instructions.size();}
 };
 
 } // namespace bamf
