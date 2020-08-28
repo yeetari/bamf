@@ -13,7 +13,8 @@ namespace bamf {
 
 namespace {
 
-bool run(Function *function, ControlFlowAnalysis *cfa, const Statistic &no_preds_pruned_count) {
+bool run(Function *function, ControlFlowAnalysis *cfa, const Statistic &no_preds_pruned_count,
+         const Statistic &single_branch_pruned_count) {
     bool changed = false;
     Stack<BasicBlock> remove_queue;
     for (auto &b : *function) {
@@ -32,6 +33,18 @@ bool run(Function *function, ControlFlowAnalysis *cfa, const Statistic &no_preds
             changed = true;
             ++no_preds_pruned_count;
         }
+
+        // Remove blocks with an unconditional branch as the only instruction.
+        if (block->size() == 1) {
+            auto *branch = block->terminator()->as<BranchInst>();
+            if (branch == nullptr) {
+                continue;
+            }
+            block->replace_all_uses_with(branch->dst());
+            remove_queue.push(block);
+            changed = true;
+            ++single_branch_pruned_count;
+        }
     }
     while (!remove_queue.empty()) {
         function->remove(remove_queue.pop());
@@ -48,9 +61,10 @@ void CfgSimplifier::build_usage(PassUsage *usage) {
 void CfgSimplifier::run_on(Function *function) {
     bool changed = false;
     Statistic no_preds_pruned_count(m_logger, "Pruned {} blocks with no predecessors");
+    Statistic single_branch_pruned_count(m_logger, "Pruned {} blocks with only a single unconditional branch");
     do {
         auto *cfa = m_manager->get<ControlFlowAnalysis>(function);
-        changed = run(function, cfa, no_preds_pruned_count);
+        changed = run(function, cfa, no_preds_pruned_count, single_branch_pruned_count);
     } while (changed);
 }
 
