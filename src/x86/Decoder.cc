@@ -346,14 +346,15 @@ MachineInst Decoder::next_inst() {
 
             if (mod_rm.mod == 0b01) {
                 // [reg] + disp8
-                auto disp_byte = m_stream->read<std::uint8_t>();
+                auto disp_byte = static_cast<std::int8_t>(m_stream->read<std::uint8_t>());
                 inst.bytes[inst.length++] = disp_byte;
                 operand.type = OperandType::MemBaseDisp;
-                operand.disp = disp_byte;
+                operand.disp = static_cast<std::int32_t>(disp_byte);
                 break;
             }
             throw std::runtime_error("Unsupported ModRM addressing mode");
         }
+
         case OperandInfoType::OpcodeGpr:
             operand.type = OperandType::Reg;
             operand.reg = static_cast<Register>(op - info->base_op);

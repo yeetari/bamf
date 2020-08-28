@@ -76,8 +76,8 @@ void dump_inst(const MachineInst &inst) {
         case OperandType::MemBaseDisp:
             ss << '[';
             ss << reg_to_str(operand.base, inst.address_width);
-            ss << " + ";
-            ss << operand.disp;
+            ss << (operand.disp >= 0 ? " + " : " - ");
+            ss << std::abs(operand.disp);
             ss << ']';
             break;
         case OperandType::MemBaseIndexScale:

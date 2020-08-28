@@ -23,7 +23,7 @@ struct Operand {
         struct {
             Register base;
             union {
-                std::uint32_t disp;
+                std::int32_t disp;
                 struct {
                     Register index;
                     std::uint8_t scale;
