@@ -9,6 +9,8 @@
 #include <bamf/pass/Statistic.hh>
 #include <bamf/support/Stack.hh>
 
+#include <cassert>
+
 namespace bamf {
 
 namespace {
@@ -47,7 +49,9 @@ bool run(Function *function, ControlFlowAnalysis *cfa, const Statistic &no_preds
         }
     }
     while (!remove_queue.empty()) {
-        function->remove(remove_queue.pop());
+        auto *block = remove_queue.pop();
+        assert(block->users().empty());
+        function->remove(block);
     }
     return changed;
 }
