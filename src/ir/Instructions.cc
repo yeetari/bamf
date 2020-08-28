@@ -46,6 +46,7 @@ void PhiInst::remove_incoming(BasicBlock *block) {
     }
 
     auto *value = m_incoming.at(block);
+    block->remove_user(this);
     if (value != nullptr) {
         value->remove_user(this);
     }
