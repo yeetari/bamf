@@ -15,32 +15,7 @@ namespace bamf {
 
 namespace {
 
-struct StackOffset {
-    struct Hasher {
-        std::size_t operator()(const StackOffset &offset) const noexcept {
-            auto h1 = std::hash<std::size_t>{}(offset.offset);
-            auto h2 = std::hash<bool>{}(offset.negative);
-            return h1 ^ h2;
-        }
-    };
-
-    struct EqualFn {
-        bool operator()(const StackOffset &lhs, const StackOffset &rhs) const noexcept {
-            if (lhs.offset != rhs.offset) {
-                return false;
-            }
-            return lhs.negative == rhs.negative;
-        }
-    };
-
-    std::size_t offset{0};
-    bool negative{false};
-
-    StackOffset() = default;
-    StackOffset(std::size_t offset, bool negative) : offset(offset), negative(negative) {}
-};
-
-// TODO: Build a proper tree (Graph<Value *>) of this
+// TODO: Build a proper tree (Graph<Value *>) of this.
 Value *find_root_value(Value *start) {
     if (start->is<AllocInst>()) {
         return start;
@@ -54,7 +29,6 @@ Value *find_root_value(Value *start) {
     if (auto *store = start->as<StoreInst>()) {
         return find_root_value(store->ptr());
     }
-
     assert(!start->is<Instruction>());
     return start;
 }
@@ -62,8 +36,8 @@ Value *find_root_value(Value *start) {
 } // namespace
 
 void StackSimulator::run_on(Function *function) {
-    std::unordered_map<LoadInst *, StackOffset> load_map;
-    std::unordered_map<StoreInst *, StackOffset> store_map;
+    std::unordered_map<LoadInst *, std::int32_t> load_map;
+    std::unordered_map<StoreInst *, std::int32_t> store_map;
     std::unordered_map<StoreInst *, Value *> replace_map;
     for (auto &block : *function) {
         for (auto &inst : *block) {
@@ -94,35 +68,36 @@ void StackSimulator::run_on(Function *function) {
             auto *offset_const = offset_inst->rhs()->as<Constant>();
             assert(offset_const != nullptr);
 
-            StackOffset offset = {offset_const->value(), offset_inst->op() == BinaryOp::Sub};
+            auto offset = static_cast<std::int32_t>(offset_const->value());
             if (load != nullptr) {
-                load_map[load] = offset;
+                assert(!load_map.contains(load));
+                load_map.emplace(load, offset);
             }
             if (store != nullptr) {
-                store_map[store] = offset;
-                replace_map[store] = offset_inst;
+                assert(!store_map.contains(store));
+                assert(!replace_map.contains(store));
+                store_map.emplace(store, offset);
+                replace_map.emplace(store, offset_inst);
             }
         }
     }
 
-    std::unordered_map<StackOffset, AllocInst *, StackOffset::Hasher, StackOffset::EqualFn> alloc_map;
+    std::unordered_map<std::int32_t, AllocInst *> alloc_map;
     for (int i = 0; auto [store, offset] : store_map) {
-        if (!alloc_map.contains(offset)) {
-            auto *alloc = function->entry()->prepend<AllocInst>();
+        auto *&alloc = alloc_map[offset];
+        if (alloc == nullptr) {
+            alloc = function->entry()->prepend<AllocInst>();
             alloc->set_name("svar" + std::to_string(i++));
-            alloc_map[offset] = alloc;
         }
-        auto *alloc = alloc_map.at(offset);
-        replace_map[store]->replace_all_uses_with(alloc);
 
-        // TODO: Replace this with a Instruction::remove_from_parent()
         auto *val = store->val();
         auto position = store->parent()->remove(store);
         store->parent()->insert<StoreInst>(position, alloc, val);
+        replace_map[store]->replace_all_uses_with(alloc);
     }
 
     for (auto [load, offset] : load_map) {
-        auto *alloc = alloc_map[offset];
+        auto *alloc = alloc_map.at(offset);
         auto *block = load->parent();
         auto *new_load = block->insert<LoadInst>(block->position_of(load), alloc);
         load->replace_all_uses_with(new_load);
