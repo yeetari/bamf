@@ -11,14 +11,14 @@ void PassManager::run(Program *program) {
         pass->build_usage(&usage);
         for (auto *dep : usage.m_dependencies) {
             dep->run_on(program);
+            for (auto &function : *program) {
+                dep->run_on(function.get());
+            }
         }
 
         m_logger.debug("Running {}", pass->name());
         pass->run_on(program);
         for (auto &function : *program) {
-            for (auto *dep : usage.m_dependencies) {
-                dep->run_on(function.get());
-            }
             pass->run_on(function.get());
         }
     }
