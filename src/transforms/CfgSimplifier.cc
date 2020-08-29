@@ -21,10 +21,14 @@ bool run(Function *function, ControlFlowAnalysis *cfa, const Statistic &no_preds
     Stack<BasicBlock> remove_queue;
     for (auto &b : *function) {
         auto *block = b.get();
+        if (block == cfa->entry()) {
+            continue;
+        }
+
         // Remove blocks with no predecessors. This can happen after running, for example, the ConstantBranchEvaluator
         // pass where conditional branches (with two basic block destinations) are promoted into unconditional branches
         // (with only one basic block destination).
-        if (cfa->preds(block).empty() && block != cfa->entry()) {
+        if (cfa->preds(block).empty()) {
             // Removing the block from all PHIs.
             for (auto *user : block->users()) {
                 if (auto *phi = user->as<PhiInst>()) {
@@ -34,6 +38,7 @@ bool run(Function *function, ControlFlowAnalysis *cfa, const Statistic &no_preds
             remove_queue.push(block);
             changed = true;
             ++no_preds_pruned_count;
+            continue;
         }
 
         // Remove blocks with an unconditional branch as the only instruction.
@@ -46,6 +51,7 @@ bool run(Function *function, ControlFlowAnalysis *cfa, const Statistic &no_preds
             remove_queue.push(block);
             changed = true;
             ++single_branch_pruned_count;
+            continue;
         }
     }
     while (!remove_queue.empty()) {
