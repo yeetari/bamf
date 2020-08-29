@@ -90,8 +90,8 @@ int main(int argc, char **argv) {
         pass_manager.add<AllocPromoter>();
         pass_manager.add<TriviallyDeadInstPruner>();
         pass_manager.add<ConstantBranchEvaluator>();
-        pass_manager.add<CfgSimplifier>();
         pass_manager.add<ConstantFolder>();
+        pass_manager.add<CfgSimplifier>();
         pass_manager.add<Dumper>();
         pass_manager.run(program.get());
     } else {
