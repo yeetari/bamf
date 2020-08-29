@@ -29,10 +29,17 @@ void LoadInst::replace_uses_of_with(Value *orig, Value *repl) {
 }
 
 void PhiInst::replace_uses_of_with(Value *orig, Value *repl) {
-    for (auto [block, value] : m_incoming) {
+    for (auto it = m_incoming.begin(); it != m_incoming.end();) {
+        auto *block = it->first;
+        auto *value = it->second;
         if (block == orig) {
-            remove_incoming(block);
-            add_incoming(repl->as<BasicBlock>(), value);
+            auto *repl_block = repl->as<BasicBlock>();
+            block->remove_user(this);
+            repl_block->add_user(this);
+            it = m_incoming.erase(it);
+            m_incoming.emplace(repl_block, value);
+        } else {
+            ++it;
         }
         if (value == orig) {
             m_incoming[block] = repl;
