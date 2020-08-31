@@ -1,9 +1,12 @@
 #include <bamf/x86/Backend.hh>
 
+#include <bamf/analyses/ControlFlowAnalyser.hh>
+#include <bamf/analyses/ControlFlowAnalysis.hh>
 #include <bamf/backend/BackendInstVisitor.hh>
 #include <bamf/backend/BackendInstructions.hh>
 #include <bamf/backend/MoveInserter.hh>
 #include <bamf/backend/RegAllocator.hh>
+#include <bamf/graph/DepthFirstSearch.hh>
 #include <bamf/ir/BasicBlock.hh>
 #include <bamf/ir/Constant.hh>
 #include <bamf/ir/Function.hh>
@@ -14,6 +17,7 @@
 
 #include <cassert>
 #include <cstdint>
+#include <unordered_map>
 #include <vector>
 
 namespace bamf::x86 {
@@ -33,9 +37,11 @@ private:
 
         Builder &base_disp(Register base, std::uint32_t disp);
         Builder &imm(std::uint64_t op);
+        Builder &label(int lbl);
         Builder &reg(Register op);
     };
 
+    std::unordered_map<BasicBlock *, int> m_block_map;
     std::vector<MachineInst> m_insts;
 
     Builder emit(Opcode opcode);
@@ -66,6 +72,12 @@ InstTranslator::Builder &InstTranslator::Builder::imm(std::uint64_t op) {
     return *this;
 }
 
+InstTranslator::Builder &InstTranslator::Builder::label(int lbl) {
+    m_inst->operands[m_op_count].type = OperandType::Label;
+    m_inst->operands[m_op_count++].imm = lbl;
+    return *this;
+}
+
 InstTranslator::Builder &InstTranslator::Builder::reg(Register op) {
     m_inst->operands[m_op_count].type = OperandType::Reg;
     m_inst->operands[m_op_count++].reg = op;
@@ -88,8 +100,9 @@ void InstTranslator::visit(BinaryInst *) {
     assert(false);
 }
 
-void InstTranslator::visit(BranchInst *) {
-    assert(false);
+void InstTranslator::visit(BranchInst *branch) {
+    auto dst = m_block_map.at(branch->dst());
+    emit(Opcode::Jmp).label(dst);
 }
 
 void InstTranslator::visit(CompareInst *) {
@@ -125,6 +138,7 @@ void InstTranslator::visit(RetInst *) {
 } // namespace
 
 void Backend::build_usage(PassUsage *usage) {
+    usage->depends_on<ControlFlowAnalyser>();
     usage->depends_on<MoveInserter>();
     usage->depends_on<RegAllocator>();
 }
@@ -132,7 +146,13 @@ void Backend::build_usage(PassUsage *usage) {
 void Backend::run_on(Program *program) {
     InstTranslator translator;
     for (auto &function : *program) {
-        for (auto &block : *function) {
+        auto *cfa = m_manager->get<ControlFlowAnalysis>(function.get());
+        auto dfs = cfa->cfg().run<DepthFirstSearch>();
+        for (int i = 0; auto *block : dfs.pre_order()) {
+            translator.m_block_map.emplace(block, i++);
+        }
+        for (auto *block : dfs.pre_order()) {
+            translator.emit(Opcode::Label).label(translator.m_block_map.at(block));
             for (auto &inst : *block) {
                 inst->accept(&translator);
             }
