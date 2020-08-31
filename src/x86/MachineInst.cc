@@ -43,6 +43,8 @@ const char *mnemonic(Opcode opcode) {
         return "shl";
     case Opcode::Xor:
         return "xor";
+    default:
+        assert(false);
     }
 }
 
