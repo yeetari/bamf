@@ -10,4 +10,9 @@ void MoveInst::accept(InstVisitor *visitor) {
     }
 }
 
+void MoveInst::replace_uses_of_with(Value *orig, Value *repl) {
+    m_dst = m_dst == orig ? repl->as<BackendOperand>() : m_dst;
+    m_val = m_val == orig ? repl : m_val;
+}
+
 } // namespace bamf

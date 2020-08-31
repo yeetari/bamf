@@ -17,9 +17,9 @@ namespace {
 class Visitor : public InstVisitor {
     Function *const m_function;
     BasicBlock *m_block{nullptr};
-    std::unordered_map<Value *, std::size_t> m_reg_map;
+    std::unordered_map<Value *, VirtReg *> m_reg_map;
 
-    std::size_t virt_reg(Value *value);
+    VirtReg *virt_reg(Value *value);
 
 public:
     explicit Visitor(Function *function) : m_function(function) {}
@@ -37,9 +37,9 @@ public:
     void visit(RetInst *) override;
 };
 
-std::size_t Visitor::virt_reg(Value *value) {
+VirtReg *Visitor::virt_reg(Value *value) {
     if (!m_reg_map.contains(value)) {
-        m_reg_map.emplace(value, m_reg_map.size());
+        m_reg_map.emplace(value, new VirtReg);
     }
     return m_reg_map.at(value);
 }

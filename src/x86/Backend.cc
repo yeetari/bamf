@@ -118,9 +118,16 @@ void InstTranslator::visit(LoadInst *) {
 }
 
 void InstTranslator::visit(MoveInst *move) {
-    auto *constant = move->val()->as<Constant>();
-    assert(constant != nullptr);
-    emit(Opcode::Mov).reg(static_cast<Register>(move->dst())).imm(constant->value());
+    auto *dst = move->dst()->as<PhysReg>();
+    assert(dst != nullptr);
+    auto &inst = emit(Opcode::Mov).reg(static_cast<Register>(dst->reg()));
+    if (auto *constant = move->val()->as<Constant>()) {
+        inst.imm(constant->value());
+    } else if (auto *phys = move->val()->as<PhysReg>()) {
+        inst.reg(static_cast<Register>(phys->reg()));
+    } else {
+        assert(false);
+    }
 }
 
 void InstTranslator::visit(PhiInst *) {
