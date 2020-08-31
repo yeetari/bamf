@@ -60,7 +60,12 @@ void dump_inst(const MachineInst &inst, bool pretty) {
         }
     }
 
-    ss << mnemonic(inst.opcode) << ' ';
+    if (inst.opcode != Opcode::Label) {
+        if (!pretty) {
+            ss << "  ";
+        }
+        ss << mnemonic(inst.opcode) << ' ';
+    }
     for (bool first = true; const auto &operand : inst.operands) {
         if (operand.type == OperandType::None) {
             continue;
@@ -74,6 +79,9 @@ void dump_inst(const MachineInst &inst, bool pretty) {
         switch (operand.type) {
         case OperandType::Imm:
             ss << std::hex << operand.imm << std::dec;
+            break;
+        case OperandType::Label:
+            ss << ".L" + std::to_string(operand.imm);
             break;
         case OperandType::MemBaseDisp:
             ss << '[';
@@ -97,6 +105,9 @@ void dump_inst(const MachineInst &inst, bool pretty) {
         default:
             assert(false);
         }
+    }
+    if (inst.opcode == Opcode::Label) {
+        ss << ":";
     }
     std::cout << ss.str() << '\n';
 }

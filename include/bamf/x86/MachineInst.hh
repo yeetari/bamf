@@ -10,6 +10,7 @@ namespace bamf::x86 {
 enum class OperandType {
     None = 0,
     Imm,
+    Label,
     MemBaseDisp,
     MemBaseIndexScale,
     Reg,
@@ -43,6 +44,7 @@ enum class Opcode {
     Jge,
     Jle,
     Jmp,
+    Label,
     Lea,
     Mov,
     Pop,
