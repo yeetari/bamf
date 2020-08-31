@@ -1,6 +1,7 @@
 #include <bamf/ir/BasicBlock.hh>
 
 #include <algorithm>
+#include <cassert>
 
 namespace bamf {
 
@@ -11,6 +12,7 @@ BasicBlock::const_iterator BasicBlock::position_of(Instruction *inst) const {
 }
 
 BasicBlock::const_iterator BasicBlock::remove(Instruction *inst) {
+    assert(inst->users().empty());
     auto it = position_of(inst);
     if (it != m_instructions.end()) {
         m_instructions.erase(it);
