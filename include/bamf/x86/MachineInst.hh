@@ -64,6 +64,6 @@ struct MachineInst {
 };
 
 const char *mnemonic(Opcode opcode);
-void dump_inst(const MachineInst &inst);
+void dump_inst(const MachineInst &inst, bool pretty = true);
 
 } // namespace bamf::x86

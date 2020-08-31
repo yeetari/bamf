@@ -46,16 +46,18 @@ const char *mnemonic(Opcode opcode) {
     }
 }
 
-void dump_inst(const MachineInst &inst) {
+void dump_inst(const MachineInst &inst, bool pretty) {
     std::stringstream ss;
-    ss << std::hex << std::setfill(' ') << std::setw(4) << inst.offset << ": ";
-    for (int i = 0; i < inst.length; i++) {
-        ss << std::setfill('0') << std::setw(2) << (static_cast<unsigned int>(inst.bytes[i]) & 0xFFU);
-        ss << ' ';
-    }
+    if (pretty) {
+        ss << std::hex << std::setfill(' ') << std::setw(4) << inst.offset << ": ";
+        for (int i = 0; i < inst.length; i++) {
+            ss << std::setfill('0') << std::setw(2) << (static_cast<unsigned int>(inst.bytes[i]) & 0xFFU);
+            ss << ' ';
+        }
 
-    for (int i = 0; i < 8 - inst.length; i++) {
-        ss << "   ";
+        for (int i = 0; i < 8 - inst.length; i++) {
+            ss << "   ";
+        }
     }
 
     ss << mnemonic(inst.opcode) << ' ';
