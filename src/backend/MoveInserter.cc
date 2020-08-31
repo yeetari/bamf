@@ -52,9 +52,7 @@ void Visitor::visit(BinaryInst *) {
     assert(false);
 }
 
-void Visitor::visit(BranchInst *) {
-    assert(false);
-}
+void Visitor::visit(BranchInst *) {}
 
 void Visitor::visit(CompareInst *) {
     assert(false);
