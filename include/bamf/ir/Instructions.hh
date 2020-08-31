@@ -10,7 +10,9 @@
 
 namespace bamf {
 
-struct AllocInst : public Instruction {};
+struct AllocInst : public Instruction {
+    void accept(InstVisitor *visitor) override;
+};
 
 enum class BinaryOp {
     Add,
@@ -37,6 +39,7 @@ public:
         m_rhs->remove_user(this);
     }
 
+    void accept(InstVisitor *visitor) override;
     void replace_uses_of_with(Value *orig, Value *repl) override;
 
     BinaryOp op() const { return m_op; }
@@ -51,6 +54,7 @@ public:
     explicit BranchInst(BasicBlock *dst) : m_dst(dst) { m_dst->add_user(this); }
     ~BranchInst() override { m_dst->remove_user(this); }
 
+    void accept(InstVisitor *visitor) override;
     void replace_uses_of_with(Value *orig, Value *repl) override;
 
     BasicBlock *dst() const { return m_dst; }
@@ -78,6 +82,7 @@ public:
         m_rhs->remove_user(this);
     }
 
+    void accept(InstVisitor *visitor) override;
     void replace_uses_of_with(Value *orig, Value *repl) override;
 
     ComparePred pred() const { return m_pred; }
@@ -104,6 +109,7 @@ public:
         m_true_dst->remove_user(this);
     }
 
+    void accept(InstVisitor *visitor) override;
     void replace_uses_of_with(Value *orig, Value *repl) override;
 
     Value *cond() const { return m_cond; }
@@ -118,6 +124,7 @@ public:
     explicit LoadInst(Value *ptr) : m_ptr(ptr) { m_ptr->add_user(this); }
     ~LoadInst() override { m_ptr->remove_user(this); }
 
+    void accept(InstVisitor *visitor) override;
     void replace_uses_of_with(Value *orig, Value *repl) override;
 
     Value *ptr() const { return m_ptr; }
@@ -143,6 +150,7 @@ public:
         value->add_user(this);
     }
 
+    void accept(InstVisitor *visitor) override;
     void replace_uses_of_with(Value *orig, Value *repl) override;
 
     void remove_incoming(BasicBlock *block);
@@ -164,6 +172,7 @@ public:
         m_val->remove_user(this);
     }
 
+    void accept(InstVisitor *visitor) override;
     void replace_uses_of_with(Value *orig, Value *repl) override;
 
     Value *ptr() const { return m_ptr; }
@@ -177,6 +186,7 @@ public:
     explicit RetInst(Value *ret_val) : m_ret_val(ret_val) { m_ret_val->add_user(this); }
     ~RetInst() override { m_ret_val->remove_user(this); }
 
+    void accept(InstVisitor *visitor) override;
     void replace_uses_of_with(Value *orig, Value *repl) override;
 
     Value *ret_val() const { return m_ret_val; }

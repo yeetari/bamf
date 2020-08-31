@@ -1,21 +1,42 @@
 #include <bamf/ir/Instructions.hh>
 
 #include <bamf/ir/BasicBlock.hh>
+#include <bamf/ir/InstVisitor.hh>
 
 namespace bamf {
+
+void AllocInst::accept(InstVisitor *visitor) {
+    visitor->visit(this);
+}
+
+void BinaryInst::accept(InstVisitor *visitor) {
+    visitor->visit(this);
+}
 
 void BinaryInst::replace_uses_of_with(Value *orig, Value *repl) {
     m_lhs = m_lhs == orig ? repl : m_lhs;
     m_rhs = m_rhs == orig ? repl : m_rhs;
 }
 
+void BranchInst::accept(InstVisitor *visitor) {
+    visitor->visit(this);
+}
+
 void BranchInst::replace_uses_of_with(Value *orig, Value *repl) {
     m_dst = m_dst == orig ? repl->as<BasicBlock>() : m_dst;
+}
+
+void CompareInst::accept(InstVisitor *visitor) {
+    visitor->visit(this);
 }
 
 void CompareInst::replace_uses_of_with(Value *orig, Value *repl) {
     m_lhs = m_lhs == orig ? repl : m_lhs;
     m_rhs = m_rhs == orig ? repl : m_rhs;
+}
+
+void CondBranchInst::accept(InstVisitor *visitor) {
+    visitor->visit(this);
 }
 
 void CondBranchInst::replace_uses_of_with(Value *orig, Value *repl) {
@@ -24,8 +45,16 @@ void CondBranchInst::replace_uses_of_with(Value *orig, Value *repl) {
     m_true_dst = m_true_dst == orig ? repl->as<BasicBlock>() : m_true_dst;
 }
 
+void LoadInst::accept(InstVisitor *visitor) {
+    visitor->visit(this);
+}
+
 void LoadInst::replace_uses_of_with(Value *orig, Value *repl) {
     m_ptr = m_ptr == orig ? repl : m_ptr;
+}
+
+void PhiInst::accept(InstVisitor *visitor) {
+    visitor->visit(this);
 }
 
 void PhiInst::replace_uses_of_with(Value *orig, Value *repl) {
@@ -60,9 +89,17 @@ void PhiInst::remove_incoming(BasicBlock *block) {
     m_incoming.erase(block);
 }
 
+void StoreInst::accept(InstVisitor *visitor) {
+    visitor->visit(this);
+}
+
 void StoreInst::replace_uses_of_with(Value *orig, Value *repl) {
     m_ptr = m_ptr == orig ? repl : m_ptr;
     m_val = m_val == orig ? repl : m_val;
+}
+
+void RetInst::accept(InstVisitor *visitor) {
+    visitor->visit(this);
 }
 
 void RetInst::replace_uses_of_with(Value *orig, Value *repl) {
