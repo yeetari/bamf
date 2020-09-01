@@ -35,7 +35,7 @@ private:
     public:
         explicit Builder(MachineInst *inst) : m_inst(inst) {}
 
-        Builder &base_disp(Register base, std::uint32_t disp);
+        Builder &base_disp(Register base, std::int32_t disp);
         Builder &imm(std::uint64_t op);
         Builder &label(int lbl);
         Builder &reg(Register op);
@@ -66,7 +66,7 @@ public:
     void visit(RetInst *) override;
 };
 
-InstTranslator::Builder &InstTranslator::Builder::base_disp(Register base, std::uint32_t disp) {
+InstTranslator::Builder &InstTranslator::Builder::base_disp(Register base, std::int32_t disp) {
     m_inst->operands[m_op_count].type = OperandType::MemBaseDisp;
     m_inst->operands[m_op_count].base = base;
     m_inst->operands[m_op_count++].disp = disp;
@@ -130,10 +130,19 @@ void InstTranslator::visit(LoadInst *) {
 }
 
 void InstTranslator::visit(MoveInst *move) {
-    auto *dst = move->dst()->as<PhysReg>();
-    assert(dst != nullptr);
-    auto &inst = emit(Opcode::Mov).reg(static_cast<Register>(dst->reg()));
-    if (auto *constant = move->val()->as<Constant>()) {
+    auto inst = emit(Opcode::Mov);
+    if (auto *alloc = move->dst()->as<AllocInst>()) {
+        auto offset = m_alloc_map.at(alloc);
+        inst.base_disp(Register::Rbp, -offset);
+    } else if (auto *phys = move->dst()->as<PhysReg>()) {
+        inst.reg(static_cast<Register>(phys->reg()));
+    } else {
+        assert(false);
+    }
+    if (auto *alloc = move->val()->as<AllocInst>()) {
+        auto offset = m_alloc_map.at(alloc);
+        inst.base_disp(Register::Rbp, -offset);
+    } else if (auto *constant = move->val()->as<Constant>()) {
         inst.imm(constant->value());
     } else if (auto *phys = move->val()->as<PhysReg>()) {
         inst.reg(static_cast<Register>(phys->reg()));
