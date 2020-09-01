@@ -9,6 +9,7 @@
 
 #include <cassert>
 #include <unordered_map>
+#include <vector>
 
 namespace bamf {
 
@@ -66,8 +67,14 @@ void Visitor::visit(LoadInst *) {
     assert(false);
 }
 
-void Visitor::visit(PhiInst *) {
-    assert(false);
+void Visitor::visit(PhiInst *phi) {
+    auto *virt = virt_reg(phi);
+    for (auto [pred, value] : phi->incoming()) {
+        auto *pred_terminator = pred->terminator();
+        pred->insert<MoveInst>(pred->position_of(pred_terminator), virt, value);
+    }
+    phi->replace_all_uses_with(virt);
+    phi->remove_from_parent();
 }
 
 void Visitor::visit(StoreInst *) {
@@ -82,12 +89,17 @@ void Visitor::visit(RetInst *ret) {
 } // namespace
 
 void MoveInserter::run_on(Function *function) {
-    Visitor visitor(function);
+    std::vector<Instruction *> work_queue;
     for (auto &block : *function) {
-        visitor.set_block(block.get());
         for (auto &inst : *block) {
-            inst->accept(&visitor);
+            work_queue.push_back(inst.get());
         }
+    }
+
+    Visitor visitor(function);
+    for (auto *inst : work_queue) {
+        visitor.set_block(inst->parent());
+        inst->accept(&visitor);
     }
 }
 
