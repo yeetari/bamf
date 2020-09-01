@@ -3,6 +3,7 @@
 #include <bamf/ir/BasicBlock.hh>
 #include <bamf/ir/Constant.hh>
 #include <bamf/ir/Function.hh>
+#include <bamf/ir/GlobalVariable.hh>
 #include <bamf/ir/Instructions.hh>
 
 #include <cstdint>
@@ -34,10 +35,11 @@ void Dumper::run_on(Function *function) {
         if (auto *constant = value->as<Constant>()) {
             return std::to_string(constant->value());
         }
+        auto prefix = value->is<GlobalVariable>() ? '@' : '%';
         if (value->has_name()) {
-            return '%' + value->name();
+            return prefix + value->name();
         }
-        return '%' + std::to_string(versioned_value(value));
+        return prefix + std::to_string(versioned_value(value));
     };
 
     for (auto &block : *function) {
