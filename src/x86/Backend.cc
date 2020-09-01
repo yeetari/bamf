@@ -42,8 +42,11 @@ private:
     };
 
     Function *const m_function;
+    std::unordered_map<AllocInst *, std::size_t> m_alloc_map;
     std::unordered_map<BasicBlock *, int> m_block_map;
     std::vector<MachineInst> m_insts;
+
+    std::size_t m_frame_size{0};
 
     Builder emit(Opcode opcode);
 
@@ -95,8 +98,11 @@ InstTranslator::Builder InstTranslator::emit(Opcode opcode) {
     return InstTranslator::Builder(&inst);
 }
 
-void InstTranslator::visit(AllocInst *) {
-    assert(false);
+void InstTranslator::visit(AllocInst *alloc) {
+    assert(alloc->parent() == m_function->entry());
+    assert(!m_alloc_map.contains(alloc));
+    m_frame_size += 8;
+    m_alloc_map.emplace(alloc, m_frame_size);
 }
 
 void InstTranslator::visit(BinaryInst *) {
