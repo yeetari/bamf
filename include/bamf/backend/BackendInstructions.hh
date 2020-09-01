@@ -17,6 +17,24 @@ public:
 
 class VirtReg : public Value {};
 
+enum class Constraint {
+    None = 0,
+    ReturnValue,
+};
+
+class ConstraintInst : public Instruction {
+    VirtReg *m_reg;
+    Constraint m_constraint;
+
+public:
+    ConstraintInst(VirtReg *reg, Constraint constraint) : m_reg(reg), m_constraint(constraint) {}
+
+    void accept(InstVisitor *visitor) override;
+
+    VirtReg *reg() const { return m_reg; }
+    Constraint constraint() const { return m_constraint; }
+};
+
 class MoveInst : public Instruction {
     Value *m_dst;
     Value *m_val;

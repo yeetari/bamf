@@ -4,6 +4,12 @@
 
 namespace bamf {
 
+void ConstraintInst::accept(InstVisitor *visitor) {
+    if (auto *backend_visitor = dynamic_cast<BackendInstVisitor *>(visitor)) {
+        backend_visitor->visit(this);
+    }
+}
+
 void MoveInst::accept(InstVisitor *visitor) {
     if (auto *backend_visitor = dynamic_cast<BackendInstVisitor *>(visitor)) {
         backend_visitor->visit(this);

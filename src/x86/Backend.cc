@@ -58,6 +58,7 @@ public:
     void visit(BranchInst *) override;
     void visit(CompareInst *) override;
     void visit(CondBranchInst *) override;
+    void visit(ConstraintInst *) override;
     void visit(LoadInst *) override;
     void visit(MoveInst *) override;
     void visit(PhiInst *) override;
@@ -121,6 +122,8 @@ void InstTranslator::visit(CompareInst *) {
 void InstTranslator::visit(CondBranchInst *) {
     assert(false);
 }
+
+void InstTranslator::visit(ConstraintInst *) {}
 
 void InstTranslator::visit(LoadInst *) {
     assert(false);

@@ -7,6 +7,7 @@
 namespace bamf {
 
 struct BackendInstVisitor : public InstVisitor {
+    virtual void visit(ConstraintInst *) = 0;
     virtual void visit(MoveInst *) = 0;
 };
 
