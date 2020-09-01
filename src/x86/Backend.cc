@@ -50,6 +50,7 @@ private:
     std::size_t m_frame_size{0};
 
     Builder emit(Opcode opcode);
+    void emit_op(Builder &inst, Value *op);
 
 public:
     explicit InstTranslator(Function *function) : m_function(function) {}
@@ -100,6 +101,19 @@ InstTranslator::Builder InstTranslator::emit(Opcode opcode) {
     return InstTranslator::Builder(&inst);
 }
 
+void InstTranslator::emit_op(Builder &inst, Value *op) {
+    if (auto *alloc = op->as<AllocInst>()) {
+        auto offset = m_alloc_map.at(alloc);
+        inst.base_disp(Register::Rbp, -offset);
+    } else if (auto *constant = op->as<Constant>()) {
+        inst.imm(constant->value());
+    } else if (auto *phys = op->as<PhysReg>()) {
+        inst.reg(static_cast<Register>(phys->reg()));
+    } else {
+        assert(false);
+    }
+}
+
 void InstTranslator::visit(AllocInst *alloc) {
     assert(alloc->parent() == m_function->entry());
     assert(!m_alloc_map.contains(alloc));
@@ -132,24 +146,8 @@ void InstTranslator::visit(LoadInst *) {
 
 void InstTranslator::visit(MoveInst *move) {
     auto inst = emit(Opcode::Mov);
-    if (auto *alloc = move->dst()->as<AllocInst>()) {
-        auto offset = m_alloc_map.at(alloc);
-        inst.base_disp(Register::Rbp, -offset);
-    } else if (auto *phys = move->dst()->as<PhysReg>()) {
-        inst.reg(static_cast<Register>(phys->reg()));
-    } else {
-        assert(false);
-    }
-    if (auto *alloc = move->val()->as<AllocInst>()) {
-        auto offset = m_alloc_map.at(alloc);
-        inst.base_disp(Register::Rbp, -offset);
-    } else if (auto *constant = move->val()->as<Constant>()) {
-        inst.imm(constant->value());
-    } else if (auto *phys = move->val()->as<PhysReg>()) {
-        inst.reg(static_cast<Register>(phys->reg()));
-    } else {
-        assert(false);
-    }
+    emit_op(inst, move->dst());
+    emit_op(inst, move->val());
 }
 
 void InstTranslator::visit(PhiInst *) {
