@@ -229,6 +229,14 @@ std::unique_ptr<Program> Frontend::run() {
             m_block = next;
         }
 
+        // Make a new block if the current block already has a terminator but isn't a jump target.
+        if (m_block->size() > 0) {
+            auto *terminator = m_block->terminator();
+            if (terminator->is<BranchInst>() || terminator->is<CondBranchInst>() || terminator->is<RetInst>()) {
+                m_block = m_function->insert_block();
+            }
+        }
+
         switch (inst.opcode) {
         case Opcode::Add:
             translate_add(inst.operands[0], inst.operands[1]);
