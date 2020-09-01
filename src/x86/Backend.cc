@@ -41,12 +41,15 @@ private:
         Builder &reg(Register op);
     };
 
+    Function *const m_function;
     std::unordered_map<BasicBlock *, int> m_block_map;
     std::vector<MachineInst> m_insts;
 
     Builder emit(Opcode opcode);
 
 public:
+    explicit InstTranslator(Function *function) : m_function(function) {}
+
     void visit(AllocInst *) override;
     void visit(BinaryInst *) override;
     void visit(BranchInst *) override;
@@ -150,19 +153,17 @@ void Backend::build_usage(PassUsage *usage) {
     usage->depends_on<RegAllocator>();
 }
 
-void Backend::run_on(Program *program) {
-    InstTranslator translator;
-    for (auto &function : *program) {
-        auto *cfa = m_manager->get<ControlFlowAnalysis>(function.get());
-        auto dfs = cfa->cfg().run<DepthFirstSearch>();
-        for (int i = 0; auto *block : dfs.pre_order()) {
-            translator.m_block_map.emplace(block, i++);
-        }
-        for (auto *block : dfs.pre_order()) {
-            translator.emit(Opcode::Label).label(translator.m_block_map.at(block));
-            for (auto &inst : *block) {
-                inst->accept(&translator);
-            }
+void Backend::run_on(Function *function) {
+    auto *cfa = m_manager->get<ControlFlowAnalysis>(function);
+    auto dfs = cfa->cfg().run<DepthFirstSearch>();
+    InstTranslator translator(function);
+    for (int i = 0; auto *block : dfs.pre_order()) {
+        translator.m_block_map.emplace(block, i++);
+    }
+    for (auto *block : dfs.pre_order()) {
+        translator.emit(Opcode::Label).label(translator.m_block_map.at(block));
+        for (auto &inst : *block) {
+            inst->accept(&translator);
         }
     }
     for (auto &inst : translator.m_insts) {
