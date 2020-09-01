@@ -10,6 +10,7 @@ void PassManager::run(Program *program) {
         PassUsage usage(this);
         pass->build_usage(&usage);
         for (auto *dep : usage.m_dependencies) {
+            m_logger.trace("Running {} (dependency of {})", dep->name(), pass->name());
             dep->run_on(program);
             for (auto &function : *program) {
                 dep->run_on(function.get());
