@@ -19,7 +19,7 @@ bool DominatorTree<V>::dominates(const V *dominator, const V *dominatee) {
         return true;
     }
 
-    for (const V *pred = dominatee; pred != nullptr && pred != this->entry(); pred = idom(pred)) {
+    for (const V *pred = dominatee; pred != nullptr; pred = idom(pred)) {
         if (pred == dominator) {
             return true;
         }
@@ -29,6 +29,9 @@ bool DominatorTree<V>::dominates(const V *dominator, const V *dominatee) {
 
 template <typename V>
 V *DominatorTree<V>::idom(const V *vertex) {
+    if (vertex == this->entry()) {
+        return nullptr;
+    }
     assert(this->preds(vertex).size() == 1);
     return this->preds(vertex)[0];
 }
