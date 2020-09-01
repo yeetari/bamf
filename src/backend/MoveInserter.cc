@@ -83,7 +83,9 @@ void Visitor::visit(StoreInst *) {
 
 void Visitor::visit(RetInst *ret) {
     auto *val = ret->ret_val();
-    m_block->insert<MoveInst>(m_block->position_of(ret), virt_reg(val), val);
+    auto *virt = virt_reg(val);
+    m_block->insert<ConstraintInst>(m_block->position_of(ret), virt, Constraint::ReturnValue);
+    m_block->insert<MoveInst>(m_block->position_of(ret), virt, val);
 }
 
 } // namespace
