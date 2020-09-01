@@ -11,6 +11,43 @@
 
 namespace bamf::x86 {
 
+namespace {
+
+void print_operand_size(const MachineInst &inst, std::stringstream &ss) {
+    if (inst.operands[0].type == OperandType::None) {
+        return;
+    }
+
+    bool has_reg = false;
+    for (const auto &operand : inst.operands) {
+        if (operand.type == OperandType::Label) {
+            return;
+        }
+        has_reg |= operand.type == OperandType::Reg;
+    }
+
+    if (has_reg) {
+        return;
+    }
+
+    switch (inst.operand_width) {
+    case 8:
+        ss << "byte ";
+        break;
+    case 16:
+        ss << "word ";
+        break;
+    case 32:
+        ss << "dword ";
+        break;
+    case 64:
+        ss << "qword ";
+        break;
+    }
+}
+
+} // namespace
+
 const char *mnemonic(Opcode opcode) {
     switch (opcode) {
     case Opcode::Add:
@@ -69,6 +106,7 @@ void dump_inst(const MachineInst &inst, bool pretty) {
             ss << "  ";
         }
         ss << mnemonic(inst.opcode) << ' ';
+        print_operand_size(inst, ss);
     }
     for (bool first = true; const auto &operand : inst.operands) {
         if (operand.type == OperandType::None) {
