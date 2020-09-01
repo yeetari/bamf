@@ -17,6 +17,7 @@
 
 #include <cassert>
 #include <cstdint>
+#include <iostream>
 #include <unordered_map>
 #include <vector>
 
@@ -160,6 +161,7 @@ void InstTranslator::visit(StoreInst *) {
 }
 
 void InstTranslator::visit(RetInst *) {
+    emit(Opcode::Pop).reg(Register::Rbp);
     emit(Opcode::Ret);
 }
 
@@ -171,6 +173,10 @@ void Backend::build_usage(PassUsage *usage) {
     usage->depends_on<RegAllocator>();
 }
 
+void Backend::run_on(Program *) {
+    std::cout << "bits 64\n";
+}
+
 void Backend::run_on(Function *function) {
     auto *cfa = m_manager->get<ControlFlowAnalysis>(function);
     auto dfs = cfa->cfg().run<DepthFirstSearch>();
@@ -180,10 +186,16 @@ void Backend::run_on(Function *function) {
     }
     for (auto *block : dfs.pre_order()) {
         translator.emit(Opcode::Label).label(translator.m_block_map.at(block));
+        if (block == function->entry()) {
+            translator.emit(Opcode::Push).reg(Register::Rbp);
+            translator.emit(Opcode::Mov).reg(Register::Rbp).reg(Register::Rsp);
+        }
         for (auto &inst : *block) {
             inst->accept(&translator);
         }
     }
+    std::cout << "global " << function->name() << '\n';
+    std::cout << function->name() << ":\n";
     for (auto &inst : translator.m_insts) {
         dump_inst(inst, false);
     }
