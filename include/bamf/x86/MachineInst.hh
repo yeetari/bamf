@@ -44,6 +44,7 @@ enum class Opcode {
     Jge,
     Jle,
     Jmp,
+    Jne,
     Label,
     Lea,
     Mov,
