@@ -3,6 +3,7 @@
 #include <bamf/backend/BackendInstructions.hh>
 #include <bamf/ir/BasicBlock.hh>
 #include <bamf/ir/Function.hh>
+#include <bamf/ir/Instructions.hh>
 
 #include <cassert>
 #include <unordered_map>
@@ -10,9 +11,16 @@
 namespace bamf {
 
 void RegAllocator::run_on(Function *function) {
-    std::unordered_map<VirtReg *, PhysReg *> map;
+    std::unordered_map<VirtReg *, Constraint> constraints;
+    std::unordered_map<VirtReg *, Value *> map;
     for (auto &block : *function) {
         for (auto &inst : *block) {
+            if (auto *constraint = inst->as<ConstraintInst>()) {
+                assert(!constraints.contains(constraint->reg()));
+                constraints.emplace(constraint->reg(), constraint->constraint());
+                continue;
+            }
+
             auto *move = inst->as<MoveInst>();
             if (move == nullptr) {
                 continue;
@@ -22,7 +30,19 @@ void RegAllocator::run_on(Function *function) {
                 continue;
             }
             if (!map.contains(virt)) {
-                map.emplace(virt, new PhysReg(map.size()));
+                Constraint constraint = constraints[virt];
+                switch (constraint) {
+                case Constraint::ReturnValue:
+                    // If the virtual register is a return value, always assign it to the 0th physical register (rax on
+                    // x86).
+                    map.emplace(virt, new PhysReg(0));
+                    break;
+                default:
+                    // Else just spill the virtual register onto the stack using normal AllocInsts.
+                    auto *alloc = function->entry()->prepend<AllocInst>();
+                    map.emplace(virt, alloc);
+                    break;
+                }
             }
             virt->replace_all_uses_with(map.at(virt));
         }
