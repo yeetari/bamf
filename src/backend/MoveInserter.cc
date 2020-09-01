@@ -59,8 +59,11 @@ void Visitor::visit(CompareInst *) {
     assert(false);
 }
 
-void Visitor::visit(CondBranchInst *) {
-    assert(false);
+void Visitor::visit(CondBranchInst *cond_branch) {
+    auto *virt = virt_reg(cond_branch->cond());
+    m_block->insert<MoveInst>(m_block->position_of(cond_branch), virt, cond_branch->cond());
+    m_block->append<CondBranchInst>(virt, cond_branch->false_dst(), cond_branch->true_dst());
+    m_block->remove(cond_branch);
 }
 
 void Visitor::visit(LoadInst *) {
