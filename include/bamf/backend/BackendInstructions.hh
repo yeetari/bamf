@@ -6,9 +6,7 @@
 
 namespace bamf {
 
-class BackendOperand : public Value {};
-
-class PhysReg : public BackendOperand {
+class PhysReg : public Value {
     int m_reg;
 
 public:
@@ -17,14 +15,14 @@ public:
     int reg() const { return m_reg; }
 };
 
-class VirtReg : public BackendOperand {};
+class VirtReg : public Value {};
 
 class MoveInst : public Instruction {
-    BackendOperand *m_dst;
+    Value *m_dst;
     Value *m_val;
 
 public:
-    MoveInst(BackendOperand *dst, Value *val) : m_dst(dst), m_val(val) {
+    MoveInst(Value *dst, Value *val) : m_dst(dst), m_val(val) {
         m_dst->add_user(this);
         m_val->add_user(this);
     }
@@ -36,9 +34,9 @@ public:
 
     void accept(InstVisitor *visitor) override;
     void replace_uses_of_with(Value *orig, Value *repl) override;
-    void set_dst(BackendOperand *dst) { m_dst = dst; }
+    void set_dst(Value *dst) { m_dst = dst; }
 
-    BackendOperand *dst() const { return m_dst; }
+    Value *dst() const { return m_dst; }
     Value *val() const { return m_val; }
 };
 
