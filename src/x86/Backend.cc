@@ -134,8 +134,12 @@ void InstTranslator::visit(CompareInst *) {
     assert(false);
 }
 
-void InstTranslator::visit(CondBranchInst *) {
-    assert(false);
+void InstTranslator::visit(CondBranchInst *cond_branch) {
+    auto cmp = emit(Opcode::Cmp);
+    emit_op(cmp, cond_branch->cond());
+    cmp.imm(1);
+    emit(Opcode::Jne).label(m_block_map.at(cond_branch->false_dst()));
+    emit(Opcode::Jmp).label(m_block_map.at(cond_branch->true_dst()));
 }
 
 void InstTranslator::visit(ConstraintInst *) {}
