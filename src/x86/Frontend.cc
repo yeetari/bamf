@@ -7,8 +7,6 @@
 #include <bamf/ir/GlobalVariable.hh>
 #include <bamf/ir/Instructions.hh>
 #include <bamf/support/Stream.hh>
-#include <bamf/x86/Decoder.hh>
-#include <bamf/x86/MachineInst.hh>
 
 #include <cassert>
 #include <stdexcept>
@@ -154,9 +152,7 @@ void Frontend::translate_ret() {
 }
 
 void Frontend::build_jump_targets() {
-    Decoder decoder(m_stream);
-    while (decoder.has_next()) {
-        auto inst = decoder.next_inst();
+    for (const auto &inst : m_insts) {
         auto addr = inst.operands[0].imm;
         switch (inst.opcode) {
         case Opcode::Jg:
@@ -213,11 +209,8 @@ std::unique_ptr<Program> Frontend::run() {
 
     build_jump_targets();
     build_registers();
-    m_stream->reset();
 
-    Decoder decoder(m_stream);
-    while (decoder.has_next()) {
-        auto inst = decoder.next_inst();
+    for (const auto &inst : m_insts) {
         if (m_blocks.contains(inst.offset)) {
             auto *next = m_blocks.at(inst.offset);
             auto *term = m_block->terminator();

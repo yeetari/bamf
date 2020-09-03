@@ -20,6 +20,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 using namespace bamf;
 
@@ -74,16 +75,18 @@ int main(int argc, char **argv) {
     }
 
     Stream stream(executable.code, executable.code_size);
+    std::vector<x86::MachineInst> insts;
+    x86::Decoder decoder(&stream);
+    while (decoder.has_next()) {
+        insts.push_back(decoder.next_inst());
+    }
     if (mode == "disasm") {
-        x86::Decoder decoder(&stream);
-        while (decoder.has_next()) {
-            auto inst = decoder.next_inst();
+        for (const auto &inst : insts) {
             x86::dump_inst(inst);
         }
     } else if (mode == "decomp") {
         DecompilationContext decomp_ctx;
-        x86::Frontend frontend(&stream, &decomp_ctx);
-        auto program = frontend.run();
+        auto program = x86::Frontend(insts, &decomp_ctx).run();
         PassManager pass_manager;
         pass_manager.add<Verifier>();
         pass_manager.add<StackSimulator>(decomp_ctx);

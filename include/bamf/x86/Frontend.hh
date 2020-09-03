@@ -1,11 +1,13 @@
 #pragma once
 
 #include <bamf/ir/Program.hh>
+#include <bamf/x86/MachineInst.hh>
 #include <bamf/x86/Register.hh>
 
 #include <cstdint>
 #include <memory>
 #include <unordered_map>
+#include <vector>
 
 namespace bamf {
 
@@ -13,7 +15,6 @@ class BasicBlock;
 class DecompilationContext;
 class Function;
 struct GlobalVariable;
-class Stream;
 class Value;
 
 } // namespace bamf
@@ -23,7 +24,7 @@ namespace bamf::x86 {
 struct Operand;
 
 class Frontend {
-    Stream *const m_stream;
+    const std::vector<MachineInst> &m_insts;
     DecompilationContext *const m_decomp_ctx;
     Program *m_program{nullptr};
     Function *m_function{nullptr};
@@ -57,7 +58,8 @@ class Frontend {
     void build_registers();
 
 public:
-    Frontend(Stream *stream, DecompilationContext *decomp_ctx) : m_stream(stream), m_decomp_ctx(decomp_ctx) {}
+    Frontend(const std::vector<MachineInst> &insts, DecompilationContext *decomp_ctx)
+        : m_insts(insts), m_decomp_ctx(decomp_ctx) {}
 
     std::unique_ptr<Program> run();
 };
