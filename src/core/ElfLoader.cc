@@ -87,8 +87,6 @@ struct SectionHeader {
 
 void load_elf_exec(const InputFile &file, Executable *executable) {
     const auto *header = file.get<Header>(0);
-    executable->entry_point = header->entry;
-
     auto get_section_header = [&](int idx) -> const SectionHeader * {
         return file.get<SectionHeader>(header->sh_off + idx * header->sh_size);
     };

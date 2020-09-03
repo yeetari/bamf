@@ -4,10 +4,13 @@
 
 namespace bamf {
 
+class InputFile;
+
 struct Executable {
     const std::uint8_t *code;
     std::uint64_t code_size;
-    std::uint64_t entry_point;
 };
+
+Executable load_executable(const InputFile &file);
 
 } // namespace bamf

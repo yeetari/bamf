@@ -6,6 +6,7 @@ add_library(bamf
     backend/RegAllocator.cc
     core/DecompilationContext.cc
     core/ElfLoader.cc
+    core/Executable.cc
     core/InputFile.cc
     debug/Dumper.cc
     debug/Verifier.cc
