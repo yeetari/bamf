@@ -16,7 +16,7 @@ class Stream;
 namespace bamf::x86 {
 
 enum class OperandInfoType {
-    None = 0,
+    None,
     Constant,
     Imm,
     ModRmGpr,
@@ -26,7 +26,7 @@ enum class OperandInfoType {
 };
 
 struct OperandInfo {
-    OperandInfoType type;
+    OperandInfoType type{OperandInfoType::None};
     union {
         std::uint8_t constant;
         std::uint8_t imm_width;
@@ -34,15 +34,15 @@ struct OperandInfo {
 };
 
 struct InstructionInfo {
-    bool present;
-    std::uint8_t base_op;
-    Opcode opcode;
-    bool has_slash;
-    bool mod_rm;
-    int default_address_width;
-    int default_operand_width;
-    std::array<OperandInfo, 4> operands;
-    InstructionInfo *slashes;
+    bool present{false};
+    std::uint8_t base_op{0};
+    Opcode opcode{};
+    bool has_slash{false};
+    bool mod_rm{false};
+    int default_address_width{0};
+    int default_operand_width{0};
+    std::array<OperandInfo, 4> operands{};
+    InstructionInfo *slashes{nullptr};
 };
 
 class Decoder {
