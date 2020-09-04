@@ -51,6 +51,7 @@ int main(int argc, char **argv) {
     pass_manager.add<ConstantBranchEvaluator>();
     pass_manager.add<ConstantFolder>();
     pass_manager.add<CfgSimplifier>();
+    pass_manager.add<Verifier>();
     pass_manager.add<Dumper>();
     pass_manager.add<x86::Backend>();
     pass_manager.run(program.get());
