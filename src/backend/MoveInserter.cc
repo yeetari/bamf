@@ -49,8 +49,15 @@ void Visitor::visit(AllocInst *) {
     assert(false);
 }
 
-void Visitor::visit(BinaryInst *) {
-    assert(false);
+void Visitor::visit(BinaryInst *binary) {
+    auto *phys_lhs = new PhysReg(0);
+    auto *phys_rhs = new PhysReg(1);
+    m_block->insert<MoveInst>(m_block->position_of(binary), phys_lhs, binary->lhs());
+    m_block->insert<MoveInst>(m_block->position_of(binary), phys_rhs, binary->rhs());
+    auto *new_binary = m_block->insert<BinaryInst>(m_block->position_of(binary), binary->op(), phys_lhs, phys_rhs);
+    m_block->insert<MoveInst>(m_block->position_of(binary), virt_reg(new_binary), phys_lhs);
+    binary->replace_all_uses_with(virt_reg(new_binary));
+    binary->remove_from_parent();
 }
 
 void Visitor::visit(BranchInst *) {}
