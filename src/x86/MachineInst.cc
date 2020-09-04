@@ -52,6 +52,8 @@ const char *mnemonic(Opcode opcode) {
     switch (opcode) {
     case Opcode::Add:
         return "add";
+    case Opcode::And:
+        return "and";
     case Opcode::Call:
         return "call";
     case Opcode::Cmp:
@@ -72,6 +74,8 @@ const char *mnemonic(Opcode opcode) {
         return "lea";
     case Opcode::Mov:
         return "mov";
+    case Opcode::Or:
+        return "or";
     case Opcode::Pop:
         return "pop";
     case Opcode::Push:
@@ -80,6 +84,8 @@ const char *mnemonic(Opcode opcode) {
         return "ret";
     case Opcode::Shl:
         return "shl";
+    case Opcode::Sub:
+        return "sub";
     case Opcode::Xor:
         return "xor";
     default:

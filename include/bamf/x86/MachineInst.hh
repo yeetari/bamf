@@ -37,6 +37,7 @@ struct Operand {
 
 enum class Opcode {
     Add,
+    And,
     Call,
     Cmp,
     Inc,
@@ -48,10 +49,12 @@ enum class Opcode {
     Label,
     Lea,
     Mov,
+    Or,
     Pop,
     Push,
     Ret,
     Shl,
+    Sub,
     Xor,
 };
 
