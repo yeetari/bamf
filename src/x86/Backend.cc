@@ -121,8 +121,27 @@ void InstTranslator::visit(AllocInst *alloc) {
     m_alloc_map.emplace(alloc, m_frame_size);
 }
 
-void InstTranslator::visit(BinaryInst *) {
-    assert(false);
+void InstTranslator::visit(BinaryInst *binary) {
+    auto opcode = [](BinaryOp op) {
+      switch (op) {
+      case BinaryOp::Add:
+          return Opcode::Add;
+      case BinaryOp::And:
+          return Opcode::And;
+      case BinaryOp::Or:
+          return Opcode::Or;
+      case BinaryOp::Sub:
+          return Opcode::Sub;
+      case BinaryOp::Xor:
+          return Opcode::Xor;
+      default:
+          assert(false);
+      }
+      assert(false);
+    };
+    auto inst = emit(opcode(binary->op()));
+    emit_op(inst, binary->lhs());
+    emit_op(inst, binary->rhs());
 }
 
 void InstTranslator::visit(BranchInst *branch) {
