@@ -52,7 +52,6 @@ public:
 
     void accept(InstVisitor *visitor) override;
     void replace_uses_of_with(Value *orig, Value *repl) override;
-    void set_dst(Value *dst) { m_dst = dst; }
 
     Value *dst() const { return m_dst; }
     Value *val() const { return m_val; }
