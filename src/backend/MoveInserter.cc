@@ -62,8 +62,15 @@ void Visitor::visit(BinaryInst *binary) {
 
 void Visitor::visit(BranchInst *) {}
 
-void Visitor::visit(CompareInst *) {
-    assert(false);
+void Visitor::visit(CompareInst *compare) {
+    auto *phys_lhs = new PhysReg(0);
+    auto *phys_rhs = new PhysReg(1);
+    m_block->insert<MoveInst>(m_block->position_of(compare), phys_lhs, compare->lhs());
+    m_block->insert<MoveInst>(m_block->position_of(compare), phys_rhs, compare->rhs());
+    auto *new_compare = m_block->insert<CompareInst>(m_block->position_of(compare), compare->pred(), phys_lhs, phys_rhs);
+    m_block->insert<MoveInst>(m_block->position_of(compare), virt_reg(new_compare), phys_lhs);
+    compare->replace_all_uses_with(virt_reg(new_compare));
+    compare->remove_from_parent();
 }
 
 void Visitor::visit(CondBranchInst *cond_branch) {
