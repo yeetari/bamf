@@ -1,23 +1,12 @@
 #include <bamf/graph/DepthFirstSearch.hh>
 
+#include "TestData.hh"
+
 #include <gtest/gtest.h>
 
 namespace bamf {
 
 namespace {
-
-class TestVertex {
-    int m_num;
-
-public:
-    constexpr explicit TestVertex(int num) : m_num(num) {}
-
-    int num() const { return m_num; }
-};
-
-struct TestEdge : public Edge<TestVertex> {
-    constexpr TestEdge(TestVertex *src, TestVertex *dst) : Edge(src, dst) {}
-};
 
 TEST(DepthFirstSearchTest, Diamond) {
     Graph<TestVertex> graph;
