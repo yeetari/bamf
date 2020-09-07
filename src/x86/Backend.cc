@@ -217,7 +217,8 @@ void Backend::build_usage(PassUsage *usage) {
     usage->depends_on<RegAllocator>();
 }
 
-void Backend::run_on(Program *) {
+void Backend::run_on(Program *program) {
+    assert(program->globals().empty());
     std::cout << "bits 64\n";
 }
 
