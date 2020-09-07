@@ -6,6 +6,8 @@ const char *reg_to_str(Register reg, int bit_width) {
     switch (reg) {
     case Register::Rax:
         switch (bit_width) {
+        case 8:
+            return "al";
         case 16:
             return "ax";
         case 32:

@@ -82,6 +82,12 @@ const char *mnemonic(Opcode opcode) {
         return "push";
     case Opcode::Ret:
         return "ret";
+    case Opcode::Sete:
+        return "sete";
+    case Opcode::Setl:
+        return "setl";
+    case Opcode::Setne:
+        return "setne";
     case Opcode::Shl:
         return "shl";
     case Opcode::Sub:
