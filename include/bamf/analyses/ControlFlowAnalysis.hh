@@ -3,7 +3,7 @@
 #include <bamf/graph/DominatorTree.hh>
 #include <bamf/graph/Graph.hh>
 #include <bamf/ir/BasicBlock.hh>
-#include <bamf/pass/Analysis.hh>
+#include <bamf/pass/PassResult.hh>
 
 #include <unordered_map>
 #include <unordered_set>
@@ -13,7 +13,7 @@ namespace bamf {
 
 class ControlFlowAnalyser;
 
-class ControlFlowAnalysis : public Analysis {
+class ControlFlowAnalysis : public PassResult {
     friend ControlFlowAnalyser;
 
 private:

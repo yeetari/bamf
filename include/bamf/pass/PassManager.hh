@@ -1,7 +1,7 @@
 #pragma once
 
-#include <bamf/pass/Analysis.hh>
 #include <bamf/pass/Pass.hh>
+#include <bamf/pass/PassResult.hh>
 #include <bamf/support/Logger.hh>
 
 #include <concepts>
@@ -25,7 +25,7 @@ private:
     std::vector<Pass *> m_explicit;
     std::vector<std::unique_ptr<Pass>> m_passes;
     std::unordered_map<std::type_index, Pass *> m_pass_map;
-    std::unordered_map<Function *, std::unordered_map<std::type_index, std::unique_ptr<Analysis>>> m_results;
+    std::unordered_map<Function *, std::unordered_map<std::type_index, std::unique_ptr<PassResult>>> m_results;
 
     template <typename T, typename... Args>
     Pass *ensure_pass(Args &&... args);
