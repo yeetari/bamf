@@ -49,7 +49,7 @@ private:
 
     std::size_t m_frame_size{0};
 
-    Builder emit(Opcode opcode);
+    Builder emit(Opcode opcode, int operand_width = 64);
     void emit_op(Builder &inst, Value *op);
 
 public:
@@ -93,11 +93,11 @@ InstTranslator::Builder &InstTranslator::Builder::reg(Register op) {
     return *this;
 }
 
-InstTranslator::Builder InstTranslator::emit(Opcode opcode) {
+InstTranslator::Builder InstTranslator::emit(Opcode opcode, int operand_width) {
     auto &inst = m_insts.emplace_back();
     inst.opcode = opcode;
     inst.address_width = 64;
-    inst.operand_width = 64;
+    inst.operand_width = operand_width;
     return InstTranslator::Builder(&inst);
 }
 
@@ -149,8 +149,25 @@ void InstTranslator::visit(BranchInst *branch) {
     emit(Opcode::Jmp).label(dst);
 }
 
-void InstTranslator::visit(CompareInst *) {
-    assert(false);
+void InstTranslator::visit(CompareInst *compare) {
+    auto inst = emit(Opcode::Cmp);
+    emit_op(inst, compare->lhs());
+    emit_op(inst, compare->rhs());
+
+    auto opcode = [](ComparePred pred) {
+      switch (pred) {
+      case ComparePred::Eq:
+          return Opcode::Sete;
+      case ComparePred::Ne:
+          return Opcode::Setne;
+      case ComparePred::Slt:
+          return Opcode::Setl;
+      default:
+          assert(false);
+      }
+      assert(false);
+    };
+    emit(opcode(compare->pred()), 8).reg(Register::Rax);
 }
 
 void InstTranslator::visit(CondBranchInst *cond_branch) {
