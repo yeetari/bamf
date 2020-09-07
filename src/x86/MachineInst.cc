@@ -132,7 +132,7 @@ void dump_inst(const MachineInst &inst, bool pretty) {
 
         switch (operand.type) {
         case OperandType::Imm:
-            ss << std::hex << operand.imm << std::dec;
+            ss << operand.imm;
             break;
         case OperandType::Label:
             ss << ".L" + std::to_string(operand.imm);
