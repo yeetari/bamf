@@ -45,9 +45,7 @@ VirtReg *Visitor::virt_reg(Value *value) {
     return m_reg_map.at(value);
 }
 
-void Visitor::visit(AllocInst *) {
-    assert(false);
-}
+void Visitor::visit(AllocInst *) {}
 
 void Visitor::visit(BinaryInst *binary) {
     auto *phys_lhs = new PhysReg(0);
@@ -80,8 +78,11 @@ void Visitor::visit(CondBranchInst *cond_branch) {
     m_block->remove(cond_branch);
 }
 
-void Visitor::visit(LoadInst *) {
-    assert(false);
+void Visitor::visit(LoadInst *load) {
+    auto *virt = new VirtReg;
+    m_block->insert<MoveInst>(m_block->position_of(load), virt, load->ptr());
+    load->replace_all_uses_with(virt);
+    load->remove_from_parent();
 }
 
 void Visitor::visit(PhiInst *phi) {
@@ -94,8 +95,9 @@ void Visitor::visit(PhiInst *phi) {
     phi->remove_from_parent();
 }
 
-void Visitor::visit(StoreInst *) {
-    assert(false);
+void Visitor::visit(StoreInst *store) {
+    m_block->insert<MoveInst>(m_block->position_of(store), store->ptr(), store->val());
+    store->remove_from_parent();
 }
 
 void Visitor::visit(RetInst *ret) {
