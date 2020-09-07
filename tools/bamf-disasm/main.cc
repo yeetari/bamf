@@ -5,6 +5,8 @@
 #include <bamf/x86/Decoder.hh>
 #include <bamf/x86/MachineInst.hh>
 
+#include <iostream>
+
 using namespace bamf;
 
 int main(int argc, char **argv) {
@@ -22,6 +24,6 @@ int main(int argc, char **argv) {
     Stream stream(executable.code, executable.code_size);
     x86::Decoder decoder(&stream);
     while (decoder.has_next()) {
-        x86::dump_inst(decoder.next_inst());
+        std::cout << x86::dump_inst(decoder.next_inst()) << '\n';
     }
 }

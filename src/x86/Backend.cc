@@ -242,7 +242,7 @@ void Backend::run_on(Function *function) {
     std::cout << "global " << function->name() << '\n';
     std::cout << function->name() << ":\n";
     for (auto &inst : translator.m_insts) {
-        dump_inst(inst, false);
+        std::cout << dump_inst(inst, false) << '\n';
     }
 }
 

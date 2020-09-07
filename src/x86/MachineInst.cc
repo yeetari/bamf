@@ -5,7 +5,6 @@
 #include <cassert>
 #include <cstdint>
 #include <iomanip>
-#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -99,7 +98,7 @@ const char *mnemonic(Opcode opcode) {
     }
 }
 
-void dump_inst(const MachineInst &inst, bool pretty) {
+std::string dump_inst(const MachineInst &inst, bool pretty) {
     std::stringstream ss;
     if (pretty) {
         ss << std::hex << std::setfill(' ') << std::setw(4) << inst.offset << ": ";
@@ -163,7 +162,7 @@ void dump_inst(const MachineInst &inst, bool pretty) {
     if (inst.opcode == Opcode::Label) {
         ss << ":";
     }
-    std::cout << ss.str() << '\n';
+    return ss.str();
 }
 
 } // namespace bamf::x86

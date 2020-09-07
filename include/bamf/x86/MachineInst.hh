@@ -4,6 +4,7 @@
 
 #include <array>
 #include <cstdint>
+#include <string>
 
 namespace bamf::x86 {
 
@@ -73,6 +74,6 @@ struct MachineInst {
 };
 
 const char *mnemonic(Opcode opcode);
-void dump_inst(const MachineInst &inst, bool pretty = true);
+std::string dump_inst(const MachineInst &inst, bool pretty = true);
 
 } // namespace bamf::x86
