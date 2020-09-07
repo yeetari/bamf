@@ -168,9 +168,15 @@ void InstTranslator::visit(LoadInst *) {
 }
 
 void InstTranslator::visit(MoveInst *move) {
+    auto *val = move->val();
+    if (move->dst()->is<AllocInst>() && val->is<AllocInst>()) {
+        auto &inst = emit(Opcode::Mov).reg(Register::Rcx);
+        emit_op(inst, val);
+        val = new PhysReg(static_cast<int>(Register::Rcx));
+    }
     auto inst = emit(Opcode::Mov);
     emit_op(inst, move->dst());
-    emit_op(inst, move->val());
+    emit_op(inst, val);
 }
 
 void InstTranslator::visit(PhiInst *) {
