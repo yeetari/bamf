@@ -13,11 +13,11 @@
 #include <bamf/ir/Instructions.hh>
 #include <bamf/ir/Program.hh>
 #include <bamf/pass/PassUsage.hh>
+#include <bamf/x86/BackendResult.hh>
 #include <bamf/x86/MachineInst.hh>
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
 #include <unordered_map>
 #include <vector>
 
@@ -219,7 +219,6 @@ void Backend::build_usage(PassUsage *usage) {
 
 void Backend::run_on(Program *program) {
     assert(program->globals().empty());
-    std::cout << "bits 64\n";
 }
 
 void Backend::run_on(Function *function) {
@@ -239,10 +238,11 @@ void Backend::run_on(Function *function) {
             inst->accept(&translator);
         }
     }
-    std::cout << "global " << function->name() << '\n';
-    std::cout << function->name() << ":\n";
+
+    // TODO: Emplace instructions directly into BackendResult.
+    auto *result = m_manager->make<BackendResult>(function);
     for (auto &inst : translator.m_insts) {
-        std::cout << dump_inst(inst, false) << '\n';
+        result->push_back(inst);
     }
 }
 

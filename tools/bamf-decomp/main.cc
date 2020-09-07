@@ -14,9 +14,11 @@
 #include <bamf/transforms/ConstantFolder.hh>
 #include <bamf/transforms/TriviallyDeadInstPruner.hh>
 #include <bamf/x86/Backend.hh>
+#include <bamf/x86/BackendResult.hh>
 #include <bamf/x86/Decoder.hh>
 #include <bamf/x86/Frontend.hh>
 
+#include <iostream>
 #include <vector>
 
 using namespace bamf;
@@ -55,4 +57,14 @@ int main(int argc, char **argv) {
     pass_manager.add<Dumper>();
     pass_manager.add<x86::Backend>();
     pass_manager.run(program.get());
+
+    std::cout << "bits 64\n";
+    for (auto &function : *program) {
+        std::cout << "global " << function->name() << '\n';
+        std::cout << function->name() << ":\n";
+        auto *result = pass_manager.get<x86::BackendResult>(function.get());
+        for (auto &inst : *result) {
+            std::cout << x86::dump_inst(inst, false) << '\n';
+        }
+    }
 }
