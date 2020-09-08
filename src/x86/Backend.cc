@@ -14,6 +14,7 @@
 #include <bamf/ir/Program.hh>
 #include <bamf/pass/PassUsage.hh>
 #include <bamf/x86/BackendResult.hh>
+#include <bamf/x86/Builder.hh>
 #include <bamf/x86/MachineInst.hh>
 
 #include <cassert>
@@ -29,19 +30,6 @@ class InstTranslator : public BackendInstVisitor {
     friend Backend;
 
 private:
-    class Builder {
-        MachineInst *const m_inst;
-        std::uint8_t m_op_count{};
-
-    public:
-        explicit Builder(MachineInst *inst) : m_inst(inst) {}
-
-        Builder &base_disp(Register base, std::int32_t disp);
-        Builder &imm(std::uint64_t op);
-        Builder &label(int lbl);
-        Builder &reg(Register op);
-    };
-
     Function *const m_function;
     std::unordered_map<AllocInst *, std::size_t> m_alloc_map;
     std::unordered_map<BasicBlock *, int> m_block_map;
@@ -68,37 +56,12 @@ public:
     void visit(RetInst *) override;
 };
 
-InstTranslator::Builder &InstTranslator::Builder::base_disp(Register base, std::int32_t disp) {
-    m_inst->operands[m_op_count].type = OperandType::MemBaseDisp;
-    m_inst->operands[m_op_count].base = base;
-    m_inst->operands[m_op_count++].disp = disp;
-    return *this;
-}
-
-InstTranslator::Builder &InstTranslator::Builder::imm(std::uint64_t op) {
-    m_inst->operands[m_op_count].type = OperandType::Imm;
-    m_inst->operands[m_op_count++].imm = op;
-    return *this;
-}
-
-InstTranslator::Builder &InstTranslator::Builder::label(int lbl) {
-    m_inst->operands[m_op_count].type = OperandType::Label;
-    m_inst->operands[m_op_count++].imm = lbl;
-    return *this;
-}
-
-InstTranslator::Builder &InstTranslator::Builder::reg(Register op) {
-    m_inst->operands[m_op_count].type = OperandType::Reg;
-    m_inst->operands[m_op_count++].reg = op;
-    return *this;
-}
-
-InstTranslator::Builder InstTranslator::emit(Opcode opcode, int operand_width) {
+Builder InstTranslator::emit(Opcode opcode, int operand_width) {
     auto &inst = m_insts.emplace_back();
     inst.opcode = opcode;
     inst.address_width = 64;
     inst.operand_width = operand_width;
-    return InstTranslator::Builder(&inst);
+    return Builder(&inst);
 }
 
 void InstTranslator::emit_op(Builder &inst, Value *op) {

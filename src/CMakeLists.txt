@@ -26,6 +26,7 @@ add_library(bamf
     transforms/ConstantFolder.cc
     transforms/TriviallyDeadInstPruner.cc
     x86/Backend.cc
+    x86/Builder.cc
     x86/Decoder.cc
     x86/Frontend.cc
     x86/MachineInst.cc
