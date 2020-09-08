@@ -76,4 +76,7 @@ struct MachineInst {
 const char *mnemonic(Opcode opcode);
 std::string dump_inst(const MachineInst &inst, bool pretty = true);
 
+bool operator==(const Operand &, const Operand &);
+bool operator==(const MachineInst &, const MachineInst &);
+
 } // namespace bamf::x86

@@ -165,4 +165,41 @@ std::string dump_inst(const MachineInst &inst, bool pretty) {
     return ss.str();
 }
 
+bool operator==(const Operand &lhs, const Operand &rhs) {
+    if (lhs.type != rhs.type) {
+        return false;
+    }
+    switch (lhs.type) {
+    case OperandType::None:
+        return true;
+    case OperandType::Imm:
+    case OperandType::Label:
+        return lhs.imm == rhs.imm;
+    case OperandType::MemBaseDisp:
+        return lhs.base == rhs.base && lhs.disp == rhs.disp;
+    case OperandType::MemBaseIndexScale:
+        return lhs.base == rhs.base && lhs.index == rhs.index && lhs.scale == rhs.scale;
+    case OperandType::Reg:
+        return lhs.reg == rhs.reg;
+    }
+}
+
+bool operator==(const MachineInst &lhs, const MachineInst &rhs) {
+    if (lhs.opcode != rhs.opcode) {
+        return false;
+    }
+    if (lhs.address_width != rhs.address_width) {
+        return false;
+    }
+    if (lhs.operand_width != rhs.operand_width) {
+        return false;
+    }
+    for (int i = 0; i < lhs.operands.size(); i++) {
+        if (lhs.operands[i] != rhs.operands[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 } // namespace bamf::x86
