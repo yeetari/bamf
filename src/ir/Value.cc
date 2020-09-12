@@ -23,6 +23,7 @@ void Value::replace_all_uses_with(Value *value) {
             value->add_user(user);
         }
     }
+    // TODO: replace_uses_of_with() should remove itself as user. Replace this with assert(m_users.empty());
     m_users.clear();
 }
 

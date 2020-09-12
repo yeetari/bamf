@@ -26,10 +26,14 @@ void RegisterLocaliser::run_on(Program *program) {
                 auto *alloc = entry->prepend<AllocInst>();
                 alloc->set_name(reg->name());
                 alloc_map.emplace(function, alloc);
+                for (auto *new_user : reg->users()) {
+                    alloc->add_user(new_user);
+                }
             }
-            // TODO: This isn't right, this should be `inst->replace_uses_of_with(reg, alloc_map[function])`
-            reg->replace_all_uses_with(alloc_map.at(function));
+            inst->replace_uses_of_with(reg, alloc_map.at(function));
         }
+        // TODO: Hacky, replace_uses_of_with() should remove itself as user and add new users.
+        reg->replace_all_uses_with(nullptr);
         program->remove_global(reg);
     }
 }
