@@ -24,12 +24,7 @@ public:
     explicit Function(std::string name) : m_name(std::move(name)) {}
     ~Function() = default;
 
-    BasicBlock *insert_block() {
-        auto *block = m_blocks.emplace_back(new BasicBlock).get();
-        block->set_parent(this);
-        return block;
-    }
-
+    BasicBlock *insert_block();
     const_iterator position_of(BasicBlock *block) const;
     const_iterator remove(BasicBlock *block);
 
