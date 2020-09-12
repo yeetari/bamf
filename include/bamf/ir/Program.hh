@@ -3,13 +3,10 @@
 #include <bamf/graph/Graph.hh>
 #include <bamf/ir/Function.hh>
 #include <bamf/ir/GlobalVariable.hh>
-#include <bamf/ir/Value.hh>
 #include <bamf/support/Iterable.hh>
 #include <bamf/support/NonCopyable.hh>
 #include <bamf/support/NonMovable.hh>
 
-#include <algorithm>
-#include <cassert>
 #include <memory>
 #include <vector>
 
@@ -27,22 +24,11 @@ public:
     Program() = default;
     ~Program() = default;
 
-    // TODO: Move to source file.
-    GlobalVariable *add_global() { return m_globals.emplace_back(new GlobalVariable).get(); }
-    void remove_global(GlobalVariable *global) {
-        assert(global->users().empty());
-        auto it = std::find_if(m_globals.begin(), m_globals.end(), [global](auto &ptr) {
-            return ptr.get() == global;
-        });
-        if (it != m_globals.end()) {
-            m_globals.erase(it);
-        }
-    }
-
     template <typename... Args>
-    Function *create_function(Args &&... args) {
-        return m_call_graph.emplace(std::forward<Args>(args)...);
-    }
+    Function *create_function(Args &&... args);
+
+    GlobalVariable *add_global();
+    void remove_global(GlobalVariable *global);
 
     void set_main(Function *function) { m_call_graph.set_entry(function); }
     Function *main() { return m_call_graph.entry(); }
@@ -50,5 +36,10 @@ public:
     const Graph<Function> &call_graph() const { return m_call_graph; }
     const std::vector<std::unique_ptr<GlobalVariable>> &globals() const { return m_globals; }
 };
+
+template <typename... Args>
+Function *Program::create_function(Args &&... args) {
+    return m_call_graph.emplace(std::forward<Args>(args)...);
+}
 
 } // namespace bamf

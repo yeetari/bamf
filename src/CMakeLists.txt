@@ -16,6 +16,7 @@ add_library(bamf
     ir/Function.cc
     ir/Instruction.cc
     ir/Instructions.cc
+    ir/Program.cc
     ir/Value.cc
     pass/PassManager.cc
     pass/Statistic.cc
