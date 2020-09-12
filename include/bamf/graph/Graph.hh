@@ -1,7 +1,7 @@
 #pragma once
 
 #include <bamf/graph/Edge.hh>
-#include <bamf/support/Iterator.hh>
+#include <bamf/support/Iterable.hh>
 #include <bamf/support/NonCopyable.hh>
 
 #include <algorithm>

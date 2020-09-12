@@ -4,7 +4,7 @@
 #include <bamf/ir/BasicBlock.hh>
 #include <bamf/ir/Instruction.hh>
 #include <bamf/ir/Value.hh>
-#include <bamf/support/Iterator.hh>
+#include <bamf/support/Iterable.hh>
 
 #include <unordered_map>
 

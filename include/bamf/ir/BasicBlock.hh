@@ -2,7 +2,7 @@
 
 #include <bamf/ir/Instruction.hh>
 #include <bamf/ir/Value.hh>
-#include <bamf/support/Iterator.hh>
+#include <bamf/support/Iterable.hh>
 #include <bamf/support/NonCopyable.hh>
 #include <bamf/support/NonMovable.hh>
 
