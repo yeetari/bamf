@@ -4,7 +4,7 @@
 
 namespace bamf {
 
-BasicBlock *Function::insert_block() {
+BasicBlock *Function::append_block() {
     auto *block = m_blocks.emplace_back(new BasicBlock).get();
     block->set_parent(this);
     return block;

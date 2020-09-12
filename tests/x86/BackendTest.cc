@@ -32,7 +32,7 @@ namespace {
 std::tuple<std::unique_ptr<Program>, Function *, BasicBlock *> create_prog() {
     auto program = std::make_unique<Program>();
     auto *function = program->create_function("main");
-    auto *entry = function->insert_block();
+    auto *entry = function->append_block();
     program->set_main(function);
     return std::make_tuple(std::move(program), function, entry);
 }
@@ -53,9 +53,9 @@ TEST(x86BackendTest, RetConstant) {
 
 TEST(x86BackendTest, SimpleLoop) {
     auto [program, function, entry] = create_prog();
-    auto *body = function->insert_block();
-    auto *latch = function->insert_block();
-    auto *exit = function->insert_block();
+    auto *body = function->append_block();
+    auto *latch = function->append_block();
+    auto *exit = function->append_block();
     entry->append<BranchInst>(body);
 
     auto *count_phi = body->append<PhiInst>();

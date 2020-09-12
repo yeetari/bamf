@@ -160,14 +160,14 @@ void Frontend::build_jump_targets() {
         case Opcode::Jle:
         case Opcode::Jmp: {
             if (!m_blocks.contains(addr)) {
-                auto *true_block = m_function->insert_block();
+                auto *true_block = m_function->append_block();
                 m_blocks.emplace(addr, true_block);
             }
 
             if (inst.opcode != Opcode::Jmp) {
                 auto false_addr = inst.offset + inst.length;
                 if (!m_blocks.contains(false_addr)) {
-                    auto *false_block = m_function->insert_block();
+                    auto *false_block = m_function->append_block();
                     m_blocks.emplace(false_addr, false_block);
                 }
             }
@@ -203,7 +203,7 @@ std::unique_ptr<Program> Frontend::run() {
     auto program = std::make_unique<Program>();
     m_program = program.get();
     m_function = program->create_function("main");
-    m_block = m_function->insert_block();
+    m_block = m_function->append_block();
     m_blocks.emplace(0, m_block);
     m_program->set_main(m_function);
 
@@ -226,7 +226,7 @@ std::unique_ptr<Program> Frontend::run() {
         if (m_block->size() > 0) {
             auto *terminator = m_block->terminator();
             if (terminator->is<BranchInst>() || terminator->is<CondBranchInst>() || terminator->is<RetInst>()) {
-                m_block = m_function->insert_block();
+                m_block = m_function->append_block();
             }
         }
 
