@@ -31,11 +31,11 @@ public:
     Graph &operator=(Graph &&) noexcept = default;
 
     template <typename E = Edge<V>, typename... Args>
-    void connect(V *src, V *dst, Args &&... args);
+    void connect(V *src, V *dst, Args &&...args);
     void disconnect(V *src, V *dst);
 
     template <typename... Args>
-    V *emplace(Args &&... args);
+    V *emplace(Args &&...args);
     void remove(const V *vertex);
 
     template <template <typename> typename T, typename U = T<V>>
@@ -55,7 +55,7 @@ public:
 
 template <typename V>
 template <typename E, typename... Args>
-void Graph<V>::connect(V *src, V *dst, Args &&... args) {
+void Graph<V>::connect(V *src, V *dst, Args &&...args) {
     auto ptr = std::make_unique<E>(src, dst, std::forward<Args>(args)...);
     auto *edge = ptr.get();
     m_edges.push_back(std::move(ptr));
@@ -79,7 +79,7 @@ void Graph<V>::disconnect(V *src, V *dst) {
 
 template <typename V>
 template <typename... Args>
-V *Graph<V>::emplace(Args &&... args) {
+V *Graph<V>::emplace(Args &&...args) {
     return m_vertices.emplace_back(new V(std::forward<Args>(args)...)).get();
 }
 

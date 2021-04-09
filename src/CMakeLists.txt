@@ -1,6 +1,7 @@
 add_library(bamf
     analyses/ControlFlowAnalyser.cc
     analyses/ControlFlowAnalysis.cc
+    analyses/DataFlowAnalyser.cc
     backend/BackendInstructions.cc
     backend/MoveInserter.cc
     backend/RegAllocator.cc

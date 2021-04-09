@@ -18,11 +18,11 @@ private:
 
 public:
     template <typename T, typename... Args>
-    void depends_on(Args &&... args);
+    void depends_on(Args &&...args);
 };
 
 template <typename T, typename... Args>
-void PassUsage::depends_on(Args &&... args) {
+void PassUsage::depends_on(Args &&...args) {
     auto *pass = m_manager->ensure_pass<T>(std::forward<Args>(args)...);
     m_dependencies.push_back(pass);
 }

@@ -28,13 +28,13 @@ private:
     std::unordered_map<Function *, std::unordered_map<std::type_index, std::unique_ptr<PassResult>>> m_results;
 
     template <typename T, typename... Args>
-    Pass *ensure_pass(Args &&... args);
+    Pass *ensure_pass(Args &&...args);
 
 public:
     PassManager() : m_logger("pass-manager") {}
 
     template <typename T, typename... Args>
-    void add(Args &&... args) requires std::derived_from<T, Pass> {
+    void add(Args &&...args) requires std::derived_from<T, Pass> {
         m_explicit.push_back(ensure_pass<T>(std::forward<Args>(args)...));
     }
 
@@ -55,7 +55,7 @@ public:
 };
 
 template <typename T, typename... Args>
-Pass *PassManager::ensure_pass(Args &&... args) {
+Pass *PassManager::ensure_pass(Args &&...args) {
     auto type = std::type_index(typeid(T));
     if (!m_pass_map.contains(type)) {
         auto *pass = new T(this, std::forward<Args>(args)...);

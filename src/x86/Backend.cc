@@ -2,6 +2,7 @@
 
 #include <bamf/analyses/ControlFlowAnalyser.hh>
 #include <bamf/analyses/ControlFlowAnalysis.hh>
+#include <bamf/analyses/DataFlowAnalyser.hh>
 #include <bamf/backend/BackendInstVisitor.hh>
 #include <bamf/backend/BackendInstructions.hh>
 #include <bamf/backend/MoveInserter.hh>
@@ -176,6 +177,7 @@ void InstTranslator::visit(RetInst *) {
 
 void Backend::build_usage(PassUsage *usage) {
     usage->depends_on<ControlFlowAnalyser>();
+    usage->depends_on<DataFlowAnalyser>();
     usage->depends_on<MoveInserter>();
     usage->depends_on<RegAllocator>();
 }

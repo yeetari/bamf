@@ -18,6 +18,9 @@
 #include <bamf/x86/Decoder.hh>
 #include <bamf/x86/Frontend.hh>
 
+#include <bamf/ir/Constant.hh>
+#include <bamf/ir/Instructions.hh>
+
 #include <iostream>
 #include <vector>
 
@@ -42,8 +45,27 @@ int main(int argc, char **argv) {
         insts.push_back(decoder.next_inst());
     }
 
+    auto program = std::make_unique<Program>();
+    auto *function = program->create_function("main");
+    auto *entry = function->append_block();
+    program->set_main(function);
+
+    auto *body = function->append_block();
+    auto *latch = function->append_block();
+    auto *exit = function->append_block();
+    entry->append<BranchInst>(body);
+
+    auto *count_phi = body->append<PhiInst>();
+    count_phi->add_incoming(entry, new Constant(0));
+    auto *cmp = body->append<CompareInst>(ComparePred::Eq, count_phi, new Constant(10));
+    body->append<CondBranchInst>(cmp, latch, exit);
+
+    auto *count_add = latch->append<BinaryInst>(BinaryOp::Add, count_phi, new Constant(1));
+    count_phi->add_incoming(latch, count_add);
+    latch->append<BranchInst>(body);
+    exit->append<RetInst>(count_phi);
+
     DecompilationContext decomp_ctx;
-    auto program = x86::Frontend(insts, &decomp_ctx).run();
     PassManager pass_manager;
     pass_manager.add<Verifier>();
     pass_manager.add<StackSimulator>(decomp_ctx);

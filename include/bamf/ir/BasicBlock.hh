@@ -29,11 +29,11 @@ public:
     ~BasicBlock() override = default;
 
     template <typename Inst, typename... Args>
-    Inst *insert(const_iterator position, Args &&... args) requires std::derived_from<Inst, Instruction>;
+    Inst *insert(const_iterator position, Args &&...args) requires std::derived_from<Inst, Instruction>;
     template <typename Inst, typename... Args>
-    Inst *prepend(Args &&... args) requires std::derived_from<Inst, Instruction>;
+    Inst *prepend(Args &&...args) requires std::derived_from<Inst, Instruction>;
     template <typename Inst, typename... Args>
-    Inst *append(Args &&... args) requires std::derived_from<Inst, Instruction>;
+    Inst *append(Args &&...args) requires std::derived_from<Inst, Instruction>;
 
     const_iterator position_of(Instruction *inst) const;
     const_iterator remove(Instruction *inst);
@@ -45,7 +45,7 @@ public:
 };
 
 template <typename Inst, typename... Args>
-Inst *BasicBlock::insert(const_iterator position, Args &&... args) requires std::derived_from<Inst, Instruction> {
+Inst *BasicBlock::insert(const_iterator position, Args &&...args) requires std::derived_from<Inst, Instruction> {
     auto *inst = new Inst(std::forward<Args>(args)...);
     inst->set_parent(this);
     m_instructions.emplace(position, inst);
@@ -53,12 +53,12 @@ Inst *BasicBlock::insert(const_iterator position, Args &&... args) requires std:
 }
 
 template <typename Inst, typename... Args>
-Inst *BasicBlock::prepend(Args &&... args) requires std::derived_from<Inst, Instruction> {
+Inst *BasicBlock::prepend(Args &&...args) requires std::derived_from<Inst, Instruction> {
     return insert<Inst>(m_instructions.begin(), std::forward<Args>(args)...);
 }
 
 template <typename Inst, typename... Args>
-Inst *BasicBlock::append(Args &&... args) requires std::derived_from<Inst, Instruction> {
+Inst *BasicBlock::append(Args &&...args) requires std::derived_from<Inst, Instruction> {
     return insert<Inst>(m_instructions.end(), std::forward<Args>(args)...);
 }
 

@@ -59,52 +59,52 @@ public:
     ~Logger() = default;
 
     template <typename FmtStr, typename... Args>
-    void log(LogLevel level, const FmtStr &fmt, const Args &... args) const;
+    void log(LogLevel level, const FmtStr &fmt, const Args &...args) const;
 
     template <typename FmtStr, typename... Args>
-    void trace(const FmtStr &fmt, const Args &... args) const;
+    void trace(const FmtStr &fmt, const Args &...args) const;
 
     template <typename FmtStr, typename... Args>
-    void debug(const FmtStr &fmt, const Args &... args) const;
+    void debug(const FmtStr &fmt, const Args &...args) const;
 
     template <typename FmtStr, typename... Args>
-    void info(const FmtStr &fmt, const Args &... args) const;
+    void info(const FmtStr &fmt, const Args &...args) const;
 
     template <typename FmtStr, typename... Args>
-    void warn(const FmtStr &fmt, const Args &... args) const;
+    void warn(const FmtStr &fmt, const Args &...args) const;
 
     template <typename FmtStr, typename... Args>
-    void error(const FmtStr &fmt, const Args &... args) const;
+    void error(const FmtStr &fmt, const Args &...args) const;
 };
 
 template <typename FmtStr, typename... Args>
-void Logger::log(LogLevel level, const FmtStr &fmt, const Args &... args) const {
+void Logger::log(LogLevel level, const FmtStr &fmt, const Args &...args) const {
     auto formatted = fmt::format(fmt, args...);
     fmt::print(fmt::fg(log_level_to_colour(level)), "{:<5} [{}] {}\n", log_level_to_string(level), m_name, formatted);
 }
 
 template <typename FmtStr, typename... Args>
-void Logger::trace(const FmtStr &fmt, const Args &... args) const {
+void Logger::trace(const FmtStr &fmt, const Args &...args) const {
     log(LogLevel::Trace, fmt, args...);
 }
 
 template <typename FmtStr, typename... Args>
-void Logger::debug(const FmtStr &fmt, const Args &... args) const {
+void Logger::debug(const FmtStr &fmt, const Args &...args) const {
     log(LogLevel::Debug, fmt, args...);
 }
 
 template <typename FmtStr, typename... Args>
-void Logger::info(const FmtStr &fmt, const Args &... args) const {
+void Logger::info(const FmtStr &fmt, const Args &...args) const {
     log(LogLevel::Info, fmt, args...);
 }
 
 template <typename FmtStr, typename... Args>
-void Logger::warn(const FmtStr &fmt, const Args &... args) const {
+void Logger::warn(const FmtStr &fmt, const Args &...args) const {
     log(LogLevel::Warn, fmt, args...);
 }
 
 template <typename FmtStr, typename... Args>
-void Logger::error(const FmtStr &fmt, const Args &... args) const {
+void Logger::error(const FmtStr &fmt, const Args &...args) const {
     log(LogLevel::Error, fmt, args...);
 }
 

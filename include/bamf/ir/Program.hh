@@ -25,7 +25,7 @@ public:
     ~Program() = default;
 
     template <typename... Args>
-    Function *create_function(Args &&... args);
+    Function *create_function(Args &&...args);
 
     GlobalVariable *add_global();
     void remove_global(GlobalVariable *global);
@@ -38,7 +38,7 @@ public:
 };
 
 template <typename... Args>
-Function *Program::create_function(Args &&... args) {
+Function *Program::create_function(Args &&...args) {
     return m_call_graph.emplace(std::forward<Args>(args)...);
 }
 
